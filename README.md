@@ -14,7 +14,10 @@ algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
 2. Buat folder berisi hasil pekerjaan anda, beri nama folder dengan format : **Nama anda - NIM**. 
 
    Contoh : Varian - 13514041
-3. Untuk pengumpulan, lakukan merge request sebelum deadline.
+3. Lakukan commit secara berkala dan berikan pesan yang bermakna, hindari kasus sekali commit langsung selesai pada pengerjaan tugas.
+   Hal ini dimaksudkan agar anda terbiasa bekerja menggunakan git.
+
+4. Untuk pengumpulan, lakukan merge request sebelum deadline.
 
 # Spesifikasi Umum
 1. Program boleh dibuat dalam bahasa pemrograman apapun, boleh menggunakan GUI maupun console application biasa.
