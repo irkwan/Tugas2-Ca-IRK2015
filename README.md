@@ -24,7 +24,7 @@ algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
 2. Program dapat membaca input teks yang akan dienkripsi dari file eksternal.
 3. Program dapat melakukan generate public dan private key.
 4. Program dapat melakukan enkripsi pada teks yang dibaca dengan menggunakan key yang dihasilkan dan menampilkannya ke layar / menyimpannya ke file eksternal lain.
-5. Program dapat melakukan deksripsi kembali cipher text yang dihasilkan pada tahap (4) dan menampilkan ke layar / menyimpannya ke file eksternal lain.
+5. Program dapat melakukan dekripsi kembali cipher text yang dihasilkan pada tahap (4) dan menampilkan ke layar / menyimpannya ke file eksternal lain.
 6. Program dapat menghitung dan menampilkan waktu eksekusi dari tahap 3 hingga 4.
 
 # Spesifikasi RSA
