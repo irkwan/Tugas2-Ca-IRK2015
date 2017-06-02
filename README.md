@@ -17,7 +17,7 @@ algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
 3. Lakukan commit secara berkala dan berikan pesan yang bermakna, hindari kasus sekali commit langsung selesai pada pengerjaan tugas.
    Hal ini dimaksudkan agar anda terbiasa bekerja menggunakan git.
 
-4. Untuk pengumpulan, lakukan merge request sebelum deadline.
+4. Untuk pengumpulan, lakukan pull request sebelum deadline. **Lengkapi juga dengan readme yang berisi penjelasan singkat, cara penggunaan dan screenshot program anda. (Edit Readme ini).
 
 # Spesifikasi Umum
 1. Program boleh dibuat dalam bahasa pemrograman apapun, boleh menggunakan GUI maupun console application biasa.
@@ -37,3 +37,6 @@ Deadline pengerjaan tugas ini adalah tanggal 30 Juni 2017 pukul 20.17 WIB, silah
 Apabila ada perubahan spesifikasi maupun deadline, maka akan diberitahukan lebih lanjut.
 
 Tetap Semangat !! 
+
+# Referensi 
+1. https://en.wikipedia.org/wiki/RSA_(cryptosystem)
