@@ -17,7 +17,7 @@ algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
 3. Lakukan commit secara berkala dan berikan pesan yang bermakna, hindari kasus sekali commit langsung selesai pada pengerjaan tugas.
    Hal ini dimaksudkan agar anda terbiasa bekerja menggunakan git.
 
-4. Untuk pengumpulan, lakukan pull request sebelum deadline. **Lengkapi juga dengan readme yang berisi penjelasan singkat, cara penggunaan dan screenshot program anda. (Edit Readme ini).
+4. Untuk pengumpulan, lakukan pull request sebelum deadline. **Lengkapi juga dengan readme yang berisi penjelasan singkat, cara penggunaan dan screenshot program anda. (Edit Readme ini)**.
 
 # Spesifikasi Umum
 1. Program boleh dibuat dalam bahasa pemrograman apapun, boleh menggunakan GUI maupun console application biasa.
@@ -39,4 +39,4 @@ Apabila ada perubahan spesifikasi maupun deadline, maka akan diberitahukan lebih
 Tetap Semangat !! 
 
 # Referensi 
-1. https://en.wikipedia.org/wiki/RSA_(cryptosystem)
+https://en.wikipedia.org/wiki/RSA_(cryptosystem)
