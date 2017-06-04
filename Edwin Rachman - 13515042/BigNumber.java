@@ -29,7 +29,7 @@ public class BigNumber {
     return parts[parts.length - 1] < 0;
   }
 
-  public String getHexString () {
+  public String toHexString () {
     StringBuilder builder = new StringBuilder();
     for (int i = parts.length - 1; i >= 0; --i) {
       builder.append(String.format("%08X ", parts[i]));
@@ -37,27 +37,31 @@ public class BigNumber {
     return builder.toString();
   }
 
-  public BigNumber add (int n, BigNumber other) {
-    BigNumber result = new BigNumber(n);
+  public BigNumber add (int size, BigNumber other) {
+    BigNumber result = new BigNumber(size);
     int carry = 0;
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < size; ++i) {
       long sum = (i < parts.length ? Integer.toUnsignedLong(parts[i]) : 0) + (i < other.parts.length ? Integer.toUnsignedLong(other.parts[i]) : 0) + carry;
       result.parts[i] = (int) sum;
-      carry = Long.compareUnsigned(sum, 0xFFFFFFFL) > 0 ? 1 : 0;
+      carry = sum > 0xFFFFFFFFL ? 1 : 0;
     }
     return result;
   }
 
-  public BigNumber inverse (int n) {
-    BigNumber result = new BigNumber(n, this);
-    for (int i = 0; i < n; ++i) {
+  public BigNumber inverse (int size) {
+    BigNumber result = new BigNumber(size, this);
+    for (int i = 0; i < size; ++i) {
       result.parts[i] = ~result.parts[i];
     }
     return result;
   }
 
+  public BigNumber negate (int size) {
+    return inverse(size).add(size, new BigNumber(size, 1));
+  }
+
   public static void main (String[] args) {
-    BigNumber x = new BigNumber(1, 234);
-    System.out.println(x.inverse(4).inverse(3).getHexString());
+    BigNumber x = new BigNumber(4, 0xFFFFFFFF);
+    System.out.println(x.add(4, x).toHexString());
   }
 }
