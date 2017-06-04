@@ -3,18 +3,25 @@ import java.util.ArrayList;
 public class BigNumber {
   private int[] parts;
 
-  public BigNumber (int n) {
-    parts = new int[n];
-    for (int i = 0; i < n; ++i) {
+  public BigNumber (int size) {
+    parts = new int[size];
+    for (int i = 0; i < size; ++i) {
       parts[i] = 0;
     }
   }
 
-  public BigNumber (int n, int value) {
-    parts = new int[n];
+  public BigNumber (int size, int value) {
+    parts = new int[size];
     parts[0] = value;
-    for (int i = 1; i < n; ++i) {
+    for (int i = 1; i < size; ++i) {
       parts[i] = 0;
+    }
+  }
+
+  public BigNumber (int size, BigNumber obj) {
+    parts = new int[size];
+    for (int i = 0; i < size; ++i) {
+      parts[i] = i < obj.parts.length ? obj.parts[i] : 0;
     }
   }
 
@@ -39,5 +46,18 @@ public class BigNumber {
       carry = Long.compareUnsigned(sum, 0xFFFFFFFL) > 0 ? 1 : 0;
     }
     return result;
+  }
+
+  public BigNumber inverse (int n) {
+    BigNumber result = new BigNumber(n, this);
+    for (int i = 0; i < n; ++i) {
+      result.parts[i] = ~result.parts[i];
+    }
+    return result;
+  }
+
+  public static void main (String[] args) {
+    BigNumber x = new BigNumber(1, 234);
+    System.out.println(x.inverse(4).inverse(3).getHexString());
   }
 }
