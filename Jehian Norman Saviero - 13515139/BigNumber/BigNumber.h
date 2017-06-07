@@ -52,8 +52,18 @@ class BigNumber{
 		/* Operator input - output */
 		friend istream& operator>> (istream& is, BigNumber& A);
 		friend ostream& operator<< (ostream& os, const BigNumber& A);
+
+		/* Operator comparator */
+		/** Operator == **/
 		friend bool operator==(const BigNumber& A, const BigNumber& B);
+		friend bool operator==(const BigNumber& A, const ll& B);
+		friend bool operator==(const ll& A, const BigNumber& B);
+		friend bool operator==(const BigNumber& A, const string& B);
+		friend bool operator==(const string& A, const BigNumber& B);
+
+		/** Operator < **/
 		friend bool operator<(const BigNumber& A, const BigNumber& B);
+
 		friend bool operator>(const BigNumber& A, const BigNumber& B);
 		friend bool operator<=(const BigNumber& A, const BigNumber& B);
 		friend bool operator>=(const BigNumber& A, const BigNumber& B);
@@ -61,10 +71,10 @@ class BigNumber{
 		BigNumber& operator+=(const BigNumber& A);
 		friend BigNumber operator-(const BigNumber& X, const BigNumber& Y);
 		BigNumber& operator-=(const BigNumber& A);
-		friend BigNumber operator/(const BigNumber& A, const BigNumber& B);
-		BigNumber& operator/=(const BigNumber& A);
 		friend BigNumber operator*(const BigNumber& A, const BigNumber& B);
 		BigNumber& operator*=(const BigNumber& A);
+		friend BigNumber operator/(BigNumber A, BigNumber B);
+		BigNumber& operator/=(const BigNumber& A);
 
 	private:
 		vll number;

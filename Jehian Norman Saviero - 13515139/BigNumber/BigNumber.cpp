@@ -164,6 +164,26 @@ bool operator==(const BigNumber& A, const BigNumber& B){
 	return (A.number == B.number);
 }
 
+bool operator==(const BigNumber& A, const ll& B){
+	BigNumber b(B);
+	return (A.number == b.number);
+}
+
+bool operator==(const ll& A, const BigNumber& B){
+	BigNumber a(A);
+	return (A.number == B.number);
+}
+
+bool operator==(const BigNumber& A, const string& B){
+	BigNumber b(B);
+	return (A.number == b.number);
+}
+
+bool operator==(const string& A, const BigNumber& B){
+	BigNumber a(A);
+	return (A.number == B.number);
+}
+
 bool operator<(const BigNumber& A, const BigNumber& B){
 	vll numberA = A.number, numberB = B.number;
 	reverse(numberA.begin(),numberA.end());
@@ -348,6 +368,7 @@ BigNumber operator-(const BigNumber& X, const BigNumber& Y){
 	}
 }
 
+
 BigNumber operator*(const BigNumber& A, const BigNumber& B){
 	BigNumber C;
 	C.number.clear();
@@ -375,4 +396,32 @@ BigNumber operator*(const BigNumber& A, const BigNumber& B){
 	}
 	C.size = C.number.size();
 	return C;
+}
+
+BigNumber& BigNumber::operator*=(const BigNumber& A){
+	*this = *this * A;
+	return *this;
+}
+
+BigNumber operator/(BigNumber A, BigNumber B){
+	BigNumber C;
+	C.number.clear();
+	C.isNegate = A.isNegate ^ B.isNegate;
+	BigNumber temp;
+	while (B.number.size() >= A.number.size()){
+		ll i = A.number.size();
+		while (i--){
+			temp.number.pb(B.number.back());
+			B.number.pop_back();
+		}
+		BigNumber junk = temp;
+		reverse(junk.number.begin(),junk.number.end());
+		if (junk < A && B.number.size() > 0){
+			temp.number.pb(B.number.back());
+		}
+		reverse(temp.number.begin(),temp.number.end());
+		ll count = 0;
+		ll next = 0;
+		while (temp)
+	}
 }
