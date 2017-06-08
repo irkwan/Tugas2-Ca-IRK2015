@@ -41,10 +41,10 @@ BigNumber::BigNumber(){
 
 BigNumber::BigNumber(const BigNumber& A){
 	number.clear();
-	for (ll i = 0; i < A.size; ++i){
+	for (ll i = 0; i < A.number.size(); ++i){
 		number.pb(A.number[i]);
 	}
-	size = A.size;
+	size = A.number.size();
 	isNegate = A.isNegate;
 }
 
@@ -86,11 +86,11 @@ BigNumber::BigNumber(const string& A){
 
 BigNumber& BigNumber::operator= (const BigNumber& A){
 	number.clear();
-	for (ll i = 0; i < A.size; ++i){
+	for (ll i = 0; i < A.number.size(); ++i){
 		number.pb(A.number[i]);		
 	}
 	isNegate = A.isNegate;
-	size = A.size;
+	size = A.number.size();
 	return *this;
 }
 
@@ -154,7 +154,7 @@ ostream& operator<< (ostream& os, const BigNumber& A){
 	if (A.isNegate){
 		os << "-";
 	}
-	for (i = A.size - 1; i >= 0; --i){
+	for (i = A.number.size() - 1; i >= 0; --i){
 		os << A.number[i];
 	}
 	return os;
@@ -171,7 +171,7 @@ bool operator==(const BigNumber& A, const ll& B){
 
 bool operator==(const ll& A, const BigNumber& B){
 	BigNumber a(A);
-	return (A.number == B.number);
+	return (a.number == B.number);
 }
 
 bool operator==(const BigNumber& A, const string& B){
@@ -181,7 +181,7 @@ bool operator==(const BigNumber& A, const string& B){
 
 bool operator==(const string& A, const BigNumber& B){
 	BigNumber a(A);
-	return (A.number == B.number);
+	return (a.number == B.number);
 }
 
 bool operator<(const BigNumber& A, const BigNumber& B){
@@ -189,9 +189,9 @@ bool operator<(const BigNumber& A, const BigNumber& B){
 	reverse(numberA.begin(),numberA.end());
 	reverse(numberB.begin(),numberB.end());
 	if (!A.isNegate && !B.isNegate){
-		if (A.size < B.size){
+		if (A.number.size() < B.number.size()){
 			return true;
-		} else if (A.size == B.size){
+		} else if (A.number.size() == B.number.size()){
 			return numberA < numberB;
 		} else {
 			return false;
@@ -201,9 +201,9 @@ bool operator<(const BigNumber& A, const BigNumber& B){
 	} else if (A.isNegate && !B.isNegate){
 		return true;
 	} else {
-		if (A.size > B.size){
+		if (A.number.size() > B.number.size()){
 			return true;
-		} else if (A.size ==  B.size){
+		} else if (A.number.size() == B.number.size()){
 			return numberA > numberB;
 		} else {
 			return false;
@@ -211,14 +211,34 @@ bool operator<(const BigNumber& A, const BigNumber& B){
 	}
 }
 
+bool operator<(const BigNumber& A, const ll& B){
+	BigNumber b(B);
+	return (A < b);
+}
+
+bool operator<(const ll& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a < B);
+}
+
+bool operator<(const BigNumber& A, const string& B){
+	BigNumber b(B);
+	return (A < b);
+}
+
+bool operator<(const string& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a < B);
+}
+
 bool operator>(const BigNumber& A, const BigNumber& B){
 	vll numberA = A.number, numberB = B.number;
 	reverse(numberA.begin(),numberA.end());
 	reverse(numberB.begin(),numberB.end());
 	if (!A.isNegate && !B.isNegate){
-		if (A.size > B.size){
+		if (A.number.size() > B.number.size()){
 			return true;
-		} else if (A.size ==  B.size){
+		} else if (A.number.size() ==  B.number.size()){
 			return numberA > numberB;
 		} else {
 			return false;
@@ -228,9 +248,9 @@ bool operator>(const BigNumber& A, const BigNumber& B){
 	} else if (A.isNegate && !B.isNegate){
 		return false;
 	} else {
-		if (A.size < B.size){
+		if (A.number.size() < B.number.size()){
 			return true;
-		} else if (A.size == B.size){
+		} else if (A.number.size() == B.number.size()){
 			return numberA < numberB;
 		} else {
 			return false;
@@ -238,12 +258,72 @@ bool operator>(const BigNumber& A, const BigNumber& B){
 	}
 }
 
+bool operator>(const BigNumber& A, const ll& B){
+	BigNumber b(B);
+	return (A > b);
+}
+
+bool operator>(const ll& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a > B);
+}
+
+bool operator>(const BigNumber& A, const string& B){
+	BigNumber b(B);
+	return (A > b);
+}
+
+bool operator>(const string& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a > B);
+}
+
 bool operator<=(const BigNumber& A, const BigNumber& B){
 	return A == B || A < B;
 }
 
+bool operator<=(const BigNumber& A, const ll& B){
+	BigNumber b(B);
+	return (A <= b);
+}
+
+bool operator<=(const ll& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a <= B);
+}
+
+bool operator<=(const BigNumber& A, const string& B){
+	BigNumber b(B);
+	return (A <= b);
+}
+
+bool operator<=(const string& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a <= B);
+}
+
 bool operator>=(const BigNumber& A, const BigNumber& B){
 	return A == B || A > B;
+}
+
+bool operator>=(const BigNumber& A, const ll& B){
+	BigNumber b(B);
+	return (A >= b);
+}
+
+bool operator>=(const ll& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a >= B);
+}
+
+bool operator>=(const BigNumber& A, const string& B){
+	BigNumber b(B);
+	return (A >= b);
+}
+
+bool operator>=(const string& A, const BigNumber& B){
+	BigNumber a(A);
+	return (a >= B);
 }
 
 BigNumber operator+(const BigNumber& A, const BigNumber& B){
@@ -252,15 +332,15 @@ BigNumber operator+(const BigNumber& A, const BigNumber& B){
 		C.number.clear();
 		ll i;
 		ll carry = 0;
-		ll MIN = min(A.size,B.size);
+		ll MIN = min(A.number.size(), B.number.size());
 		for (i = 0; i < MIN; ++i){
 			C.number.pb((A.number[i] + B.number[i] + carry) % 10);
 			carry = (A.number[i] + B.number[i] + carry) > 9;
 		}
-		ll MAX = max(A.size,B.size);
+		ll MAX = max(A.number.size(), B.number.size());
 		bool goB, goA;
-		goB = B.size > A.size;
-		goA = A.size > B.size;
+		goB = B.number.size() > A.number.size();
+		goA = A.number.size() > B.number.size();
 		for (; i < MAX && (goA || goB); ++i){
 			if (goB){
 				C.number.pb((B.number[i]+carry) % 10);
@@ -315,8 +395,8 @@ BigNumber operator-(const BigNumber& X, const BigNumber& Y){
 		}
 		C.number.clear();
 		ll i = 0;
-		ll MIN = min(A.size,B.size);
-		ll MAX = max(A.size,B.size);
+		ll MIN = min(A.number.size(), B.number.size());
+		ll MAX = max(A.number.size(), B.number.size());
 		for (i = 0; i < MIN; ++i){
 			if (A.number[i] >= B.number[i]){
 				C.number.pb(A.number[i] - B.number[i]);
@@ -326,8 +406,8 @@ BigNumber operator-(const BigNumber& X, const BigNumber& Y){
 			}
 		}
 		bool goA, goB;
-		goA = A.size > B.size;
-		goB = B.size > A.size;
+		goA = A.number.size() > B.number.size();
+		goB = B.number.size() > A.number.size();
 		for(; i < MAX && (goA || goB); ++i){
 			if (goB){
 				if (B.number[i] < 0){
@@ -368,6 +448,10 @@ BigNumber operator-(const BigNumber& X, const BigNumber& Y){
 	}
 }
 
+BigNumber& BigNumber::operator-=(const BigNumber& A){
+	*this = *this - A;
+	return *this;
+}
 
 BigNumber operator*(const BigNumber& A, const BigNumber& B){
 	BigNumber C;
@@ -382,7 +466,7 @@ BigNumber operator*(const BigNumber& A, const BigNumber& B){
 	}
 
 	ll carry = 0;
-	for (ll i = 0; i < C.size; ++i){
+	for (ll i = 0; i < C.number.size(); ++i){
 		ll next_carry = ((C.number[i] + carry) / 10);
 		C.number[i] = (C.number[i] + carry) % 10;
 		carry = next_carry;
@@ -403,12 +487,14 @@ BigNumber& BigNumber::operator*=(const BigNumber& A){
 	return *this;
 }
 
-BigNumber operator/(BigNumber A, BigNumber B){
+BigNumber operator/(BigNumber B, BigNumber A){
 	BigNumber C;
 	C.number.clear();
 	C.isNegate = A.isNegate ^ B.isNegate;
 	BigNumber temp;
-	while (B.number.size() >= A.number.size()){
+	temp.number.clear();
+	/* PRE-COMPUTE GET AMOUNT OF NUMBER */
+	if (B.number.size() >= A.number.size()){
 		ll i = A.number.size();
 		while (i--){
 			temp.number.pb(B.number.back());
@@ -418,10 +504,33 @@ BigNumber operator/(BigNumber A, BigNumber B){
 		reverse(junk.number.begin(),junk.number.end());
 		if (junk < A && B.number.size() > 0){
 			temp.number.pb(B.number.back());
+			B.number.pop_back();
 		}
 		reverse(temp.number.begin(),temp.number.end());
 		ll count = 0;
-		ll next = 0;
-		while (temp)
+		while (temp >= A){
+			temp -= A;
+			++count;
+		}
+		C.number.pb(count);
 	}
+
+	/* ITERATION UNTIL B < A */
+	while (B.number.size() > 0){
+		temp.number.insert(temp.number.begin(),B.number.back());
+		B.number.pop_back();
+		ll count = 0;
+		while (temp >= A){
+			temp -= A;
+			++count;
+		}
+		C.number.pb(count);
+	}
+	reverse(C.number.begin(), C.number.end());
+	return C;
+}
+
+BigNumber& BigNumber::operator/=(const BigNumber& A){
+	*this = *this / A;
+	return *this;
 }

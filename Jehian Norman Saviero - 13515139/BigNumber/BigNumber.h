@@ -63,9 +63,25 @@ class BigNumber{
 
 		/** Operator < **/
 		friend bool operator<(const BigNumber& A, const BigNumber& B);
+		friend bool operator<(const BigNumber& A, const ll& B);
+		friend bool operator<(const ll& A, const BigNumber& B);
+		friend bool operator<(const BigNumber& A, const string& B);
+		friend bool operator<(const string& A, const BigNumber& B);
 
+		/** Operator > **/
 		friend bool operator>(const BigNumber& A, const BigNumber& B);
+		friend bool operator>(const BigNumber& A, const ll& B);
+		friend bool operator>(const ll& A, const BigNumber& B);
+		friend bool operator>(const BigNumber& A, const string& B);
+		friend bool operator>(const string& A, const BigNumber& B);
+
+		/** Operator <= **/
 		friend bool operator<=(const BigNumber& A, const BigNumber& B);
+		friend bool operator<=(const BigNumber& A, const ll& B);
+		friend bool operator<=(const ll& A, const BigNumber& B);
+		friend bool operator<=(const BigNumber& A, const string& B);
+		friend bool operator<=(const string& A, const BigNumber& B);
+
 		friend bool operator>=(const BigNumber& A, const BigNumber& B);
 		friend BigNumber operator+(const BigNumber& A, const BigNumber& B);
 		BigNumber& operator+=(const BigNumber& A);
@@ -73,7 +89,7 @@ class BigNumber{
 		BigNumber& operator-=(const BigNumber& A);
 		friend BigNumber operator*(const BigNumber& A, const BigNumber& B);
 		BigNumber& operator*=(const BigNumber& A);
-		friend BigNumber operator/(BigNumber A, BigNumber B);
+		friend BigNumber operator/(BigNumber B, BigNumber A);
 		BigNumber& operator/=(const BigNumber& A);
 
 	private:

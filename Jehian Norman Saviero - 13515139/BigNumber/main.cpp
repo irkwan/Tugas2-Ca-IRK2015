@@ -34,13 +34,9 @@ typedef pair<ld,ld> pld;
 int main(){
 	BigNumber A, B;
 	cin >> A >> B;
-	BigNumber Z(0), C = Z;
-	C += A;
-	cout << C << endl;
-	C = 100000;
-	cout << C << endl;
-	cout << A + B << endl;
-	cout << A - B << endl;
-	cout << A * B << endl;
+	cout << "Hasil A + B adalah: " << A + B << endl;
+	cout << "Hasil A - B adalah: " << A - B << endl;
+	cout << "Hasil A * B adalah: " << A * B << endl;
+	cout << "Hasil A / B adalah: " << A / B << endl;
 	return 0;
 }
