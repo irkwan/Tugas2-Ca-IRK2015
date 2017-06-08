@@ -2,6 +2,9 @@
 // File     : biginteger.cpp
 
 #include "biginteger.h"
+#include <iostream>
+#include <vector>
+#include <string>
 using namespace std;
 
 /* Constructors */
@@ -12,7 +15,7 @@ biginteger::biginteger(){
 biginteger::biginteger(long long v){
 	sign = v >= 0;
 	while (v != 0){
-		
+
 	}
 }
 
