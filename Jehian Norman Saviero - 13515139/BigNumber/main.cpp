@@ -38,5 +38,7 @@ int main(){
 	cout << "Hasil A - B adalah: " << A - B << endl;
 	cout << "Hasil A * B adalah: " << A * B << endl;
 	cout << "Hasil A / B adalah: " << A / B << endl;
+	cout << "Hasil A mod B adalah: " << A % B << endl;
+	cout << "Hasil (A - A mod B) / B adalah " << (A + A % B) / B << endl;
 	return 0;
 }

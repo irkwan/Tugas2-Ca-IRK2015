@@ -544,3 +544,53 @@ BigNumber& BigNumber::operator/=(const BigNumber& A){
 	*this = *this / A;
 	return *this;
 }
+
+BigNumber operator%(BigNumber B, BigNumber A){
+	BigNumber temp;
+	temp.isNegate = A.isNegate ^ B.isNegate;
+	temp.number.clear();
+	/* PRE-COMPUTE GET AMOUNT OF NUMBER */
+	if (B.number.size() >= A.number.size()){
+		ll i = A.number.size();
+		while (i--){
+			temp.number.pb(B.number.back());
+			B.number.pop_back();
+		}
+		BigNumber junk = temp;
+		reverse(junk.number.begin(),junk.number.end());
+		if (junk < A && B.number.size() > 0){
+			temp.number.pb(B.number.back());
+			B.number.pop_back();
+		}
+		reverse(temp.number.begin(),temp.number.end());
+		while (temp >= A){
+			temp -= A;
+		}
+	}
+
+	/* ITERATION UNTIL B < A */
+	while (B.number.size() > 0){
+		temp.number.insert(temp.number.begin(),B.number.back());
+		B.number.pop_back();
+		while (!temp.number.back() && temp.number.size() > 1){
+			temp.number.pop_back();
+		}
+		while (temp >= A){
+			temp -= A;
+		}
+	}
+	while (!temp.number.back() && temp.number.size() > 1){
+		temp.number.pop_back();
+	}
+	temp.size = temp.number.size();
+	if (temp.isNegate){
+		return temp + A;
+	} else {
+		return temp;
+	}
+}
+
+BigNumber& BigNumber::operator%=(const BigNumber& A){
+	*this = *this % A;
+	return *this;
+}
