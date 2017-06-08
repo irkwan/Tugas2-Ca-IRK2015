@@ -353,6 +353,9 @@ BigNumber operator+(const BigNumber& A, const BigNumber& B){
 		if (carry){
 			C.number.pb(carry);
 		}
+		while (!C.number.back() && C.number.size() > 1){
+			C.number.pop_back();
+		}
 		C.size = C.number.size();
 		return C;
 	} else if (!A.isNegate && B.isNegate){
@@ -519,6 +522,9 @@ BigNumber operator/(BigNumber B, BigNumber A){
 	while (B.number.size() > 0){
 		temp.number.insert(temp.number.begin(),B.number.back());
 		B.number.pop_back();
+		while (!temp.number.back() && temp.number.size() > 1){
+			temp.number.pop_back();
+		}
 		ll count = 0;
 		while (temp >= A){
 			temp -= A;
@@ -527,6 +533,10 @@ BigNumber operator/(BigNumber B, BigNumber A){
 		C.number.pb(count);
 	}
 	reverse(C.number.begin(), C.number.end());
+	while (!C.number.back() && C.number.size() > 1){
+		C.number.pop_back();
+	}
+	C.size = C.number.size();
 	return C;
 }
 
