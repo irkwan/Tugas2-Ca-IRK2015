@@ -8,10 +8,10 @@
 using namespace std;
 
 int main() {
-	biginteger b1(1234);
-	biginteger b2("-8765432210003232830134147208");
-	biginteger b3 = b2;
-	biginteger b4;
+	biginteger b1(54321);
+	biginteger b2(987);
+	biginteger b3(77777);
+	biginteger b4(123456);
 
 	biginteger b5(-17364324723847238LL);
 	biginteger b6("1234567890");
@@ -25,7 +25,11 @@ int main() {
 
 	cout << b1 << " " << b2 << " " << b3 << " " << b4 << endl;
 	cout << b5 << " " << b6 << " " << b7 << " " << b8 << endl;
-	cout << b9 << " " << b10 << " " << b11 << " " << b12 << endl;
+	cout << b9 << " " << b10 << " " << b11 << " " << b12 << endl << endl;
+
+	cout << b1 + b2 << endl;
+	cout << b1 + b3 << endl;
+	cout << b1 + b4 << endl;
 
 	return 0;
 }

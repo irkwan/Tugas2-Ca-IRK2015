@@ -20,6 +20,13 @@ public:
 	biginteger& operator=(const biginteger& rhs);
 
 	/* Arithmetic Operators */
+	biginteger operator+(const biginteger& rhs);
+	biginteger operator-();
+	biginteger operator-(const biginteger& rhs);
+	biginteger operator*(const biginteger& rhs);
+	biginteger operator/(const biginteger& rhs);
+	biginteger operator%(const biginteger& rhs);
+
 	biginteger& operator+=(const biginteger& rhs);
 	biginteger& operator-=(const biginteger& rhs);
 	biginteger& operator*=(const biginteger& rhs);
@@ -31,12 +38,7 @@ public:
 	biginteger mul(const biginteger& rhs);
 	biginteger div(const biginteger& rhs);
 	biginteger mod(const biginteger& rhs);
-
-	biginteger operator+(const biginteger& rhs);
-	biginteger operator-(const biginteger& rhs);
-	biginteger operator*(const biginteger& rhs);
-	biginteger operator/(const biginteger& rhs);
-	biginteger operator%(const biginteger& rhs);
+	biginteger abs();
 
 	/* Relational Operators */
 	bool operator==(const biginteger& rhs);
@@ -53,4 +55,8 @@ public:
 private:
 	vector<int> digits;
 	bool pos;
+
+	static const int BASE = 10;
+
+	int max(int a, int b);
 };

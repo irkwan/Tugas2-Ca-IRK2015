@@ -18,9 +18,9 @@ biginteger::biginteger(long long v) {
 	if (!pos)
 		v = -v;
 	while (v != 0){
-		int dig = v % 10;
+		int dig = v % BASE;
 		digits.push_back(dig);
-		v /= 10;
+		v /= BASE;
 	}
 }
 
@@ -57,6 +57,53 @@ biginteger& biginteger::operator=(const biginteger& rhs){
 
 
 /* Arithmetic Operators */
+biginteger biginteger::operator+(const biginteger& rhs){
+	int end = max(rhs.digits.size(), digits.size());
+	int carry = 0;
+	biginteger res = rhs;
+
+	if (pos == res.pos){
+		for(int i=0; i<end; i++){
+			if (i == res.digits.size())
+				res.digits.push_back(0);
+
+			res.digits[i] += carry + (i < digits.size() ? digits[i] : 0);
+			carry = res.digits[i] / BASE;
+			if (carry)
+				res.digits[i] -= BASE;
+		}
+		if (carry)
+			res.digits.push_back(carry);
+
+		return res;
+	}
+	else{
+		return biginteger(0);
+	}
+}
+
+biginteger biginteger::operator-(){
+	biginteger res = *this;
+	res.pos = !res.pos;
+	return res;
+}
+
+biginteger biginteger::operator-(const biginteger& rhs){
+
+}
+
+biginteger biginteger::operator*(const biginteger& rhs){
+
+}
+
+biginteger biginteger::operator/(const biginteger& rhs){
+
+}
+
+biginteger biginteger::operator%(const biginteger& rhs){
+
+}
+
 biginteger& biginteger::operator+=(const biginteger& rhs){
 
 }
@@ -97,24 +144,10 @@ biginteger biginteger::mod(const biginteger& rhs){
 
 }
 
-biginteger biginteger::operator+(const biginteger& rhs){
-
-}
-
-biginteger biginteger::operator-(const biginteger& rhs){
-
-}
-
-biginteger biginteger::operator*(const biginteger& rhs){
-
-}
-
-biginteger biginteger::operator/(const biginteger& rhs){
-
-}
-
-biginteger biginteger::operator%(const biginteger& rhs){
-
+biginteger biginteger::abs(){
+	biginteger res = *this;
+	res.pos = true;
+	return res;
 }
 
 
@@ -143,4 +176,8 @@ ostream& operator<<(ostream &os, const biginteger& v){
 	for(int i=v.digits.size()-1; i>=0; i--)
 		os << v.digits[i];
 	return os;
+}
+
+int biginteger::max(int a, int b){
+	return (a > b) ? a : b;
 }
