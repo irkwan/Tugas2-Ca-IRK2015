@@ -58,12 +58,12 @@ biginteger& biginteger::operator=(const biginteger& rhs){
 
 /* Arithmetic Operators */
 biginteger biginteger::operator+(const biginteger& rhs){
-	int end = max(rhs.digits.size(), digits.size());
-	int carry = 0;
-	biginteger res = rhs;
-
 	if (pos == res.pos){
-		for(int i=0; i<end; i++){
+		int max = max(rhs.digits.size(), digits.size());
+		int carry = 0;
+		biginteger res = rhs;
+
+		for(int i=0; i<max; i++){
 			if (i == res.digits.size())
 				res.digits.push_back(0);
 
@@ -78,7 +78,7 @@ biginteger biginteger::operator+(const biginteger& rhs){
 		return res;
 	}
 	else{
-		return biginteger(0);
+		return *this - (-rhs);
 	}
 }
 
@@ -89,10 +89,48 @@ biginteger biginteger::operator-(){
 }
 
 biginteger biginteger::operator-(const biginteger& rhs){
+	if (pos == rhs.pos){
+		if (abs() >= rhs.abs()){ // this >= rhs
+			biginteger res = *this;
+			int carry = 0;
 
+			for(int i=0; i<digits.size(); i++){
+				res.digits[i] -= carry + rhs.digits[i];
+				carry = (res.digits[i] < 0)? 1 : 0;
+				if (carry)
+					res.digits += BASE;
+			}
+
+			return res;
+		}
+		else{ // this < rhs
+			// this - rhs = -(rhs - this)
+			return -(rhs - *this);
+		}
+	}
+	else{
+		return *this + (-v);
+	}
 }
 
 biginteger biginteger::operator*(const biginteger& rhs){
+	// Make sure both value have same size
+	int diffsize = digits.size() - rhs.size();
+	if (diffsize < 0) diffsize *= -1;
+
+	biginteger v1 = *this;
+	biginteger v2 = rhs;
+
+	if (v1.digits.size() < v2.digits.size()){
+		for(int i=0; i<diffsize; i++)
+			v1.push_back(0);
+	}
+	else{
+		for(int i=0; i<diffsize; i++)
+			v2.push_back(0);
+	}
+
+	// Calculate with Karatsuba Algorithm
 
 }
 
@@ -105,11 +143,13 @@ biginteger biginteger::operator%(const biginteger& rhs){
 }
 
 biginteger& biginteger::operator+=(const biginteger& rhs){
-
+	*this = *this + rhs;
+	return *this;
 }
 
 biginteger& biginteger::operator-=(const biginteger& rhs){
-
+	*this = *this - rhs;
+	return *this;
 }
 
 biginteger& biginteger::operator*=(const biginteger& rhs){
@@ -125,11 +165,11 @@ biginteger& biginteger::operator%=(const biginteger& rhs){
 }
 
 biginteger biginteger::add(const biginteger& rhs){
-
+	return *this + rhs;
 }
 
 biginteger biginteger::min(const biginteger& rhs){
-
+	return *this - rhs;
 }
 
 biginteger biginteger::mul(const biginteger& rhs){
