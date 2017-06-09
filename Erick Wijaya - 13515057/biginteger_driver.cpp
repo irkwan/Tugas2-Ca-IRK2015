@@ -31,5 +31,9 @@ int main() {
 	cout << b1 + b3 << endl;
 	cout << b1 + b4 << endl;
 
+	cout << b1 - b2 << endl;
+	cout << b1 - b3 << endl;
+	cout << b1 - b4 << endl;
+
 	return 0;
 }

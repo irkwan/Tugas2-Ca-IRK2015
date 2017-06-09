@@ -8,12 +8,12 @@
 using namespace std;
 
 /* Constructors */
-biginteger::biginteger() {
+biginteger::biginteger(){
 	pos = true;
 	digits.push_back(0);
 }
 
-biginteger::biginteger(long long v) {
+biginteger::biginteger(long long v){
 	pos = v >= 0;
 	if (!pos)
 		v = -v;
@@ -24,7 +24,7 @@ biginteger::biginteger(long long v) {
 	}
 }
 
-biginteger::biginteger(const string& v) {
+biginteger::biginteger(const string& v){
 	if (v.length() == 0){
 		pos = true;
 		digits.push_back(0);
@@ -41,7 +41,7 @@ biginteger::biginteger(const string& v) {
 	}
 }
 
-biginteger::biginteger(const biginteger& v) : pos(v.pos), digits(v.digits) {
+biginteger::biginteger(const biginteger& v) : pos(v.pos), digits(v.digits){
 
 }
 
@@ -57,13 +57,13 @@ biginteger& biginteger::operator=(const biginteger& rhs){
 
 
 /* Arithmetic Operators */
-biginteger biginteger::operator+(const biginteger& rhs){
-	if (pos == res.pos){
-		int max = max(rhs.digits.size(), digits.size());
+biginteger biginteger::operator+(const biginteger& rhs) const{
+	if (pos == rhs.pos){
+		int end = max(rhs.digits.size(), digits.size());
 		int carry = 0;
 		biginteger res = rhs;
 
-		for(int i=0; i<max; i++){
+		for(int i=0; i<end; i++){
 			if (i == res.digits.size())
 				res.digits.push_back(0);
 
@@ -82,13 +82,13 @@ biginteger biginteger::operator+(const biginteger& rhs){
 	}
 }
 
-biginteger biginteger::operator-(){
+biginteger biginteger::operator-() const{
 	biginteger res = *this;
 	res.pos = !res.pos;
 	return res;
 }
 
-biginteger biginteger::operator-(const biginteger& rhs){
+biginteger biginteger::operator-(const biginteger& rhs) const{
 	if (pos == rhs.pos){
 		if (abs() >= rhs.abs()){ // this >= rhs
 			biginteger res = *this;
@@ -98,7 +98,7 @@ biginteger biginteger::operator-(const biginteger& rhs){
 				res.digits[i] -= carry + rhs.digits[i];
 				carry = (res.digits[i] < 0)? 1 : 0;
 				if (carry)
-					res.digits += BASE;
+					res.digits[i] += BASE;
 			}
 
 			return res;
@@ -109,13 +109,13 @@ biginteger biginteger::operator-(const biginteger& rhs){
 		}
 	}
 	else{
-		return *this + (-v);
+		return *this + (-rhs);
 	}
 }
 
-biginteger biginteger::operator*(const biginteger& rhs){
+biginteger biginteger::operator*(const biginteger& rhs) const{
 	// Make sure both value have same size
-	int diffsize = digits.size() - rhs.size();
+	int diffsize = digits.size() - rhs.digits.size();
 	if (diffsize < 0) diffsize *= -1;
 
 	biginteger v1 = *this;
@@ -123,22 +123,22 @@ biginteger biginteger::operator*(const biginteger& rhs){
 
 	if (v1.digits.size() < v2.digits.size()){
 		for(int i=0; i<diffsize; i++)
-			v1.push_back(0);
+			v1.digits.push_back(0);
 	}
 	else{
 		for(int i=0; i<diffsize; i++)
-			v2.push_back(0);
+			v2.digits.push_back(0);
 	}
 
 	// Calculate with Karatsuba Algorithm
 
 }
 
-biginteger biginteger::operator/(const biginteger& rhs){
+biginteger biginteger::operator/(const biginteger& rhs) const{
 
 }
 
-biginteger biginteger::operator%(const biginteger& rhs){
+biginteger biginteger::operator%(const biginteger& rhs) const{
 
 }
 
@@ -164,27 +164,27 @@ biginteger& biginteger::operator%=(const biginteger& rhs){
 
 }
 
-biginteger biginteger::add(const biginteger& rhs){
+biginteger biginteger::add(const biginteger& rhs) const{
 	return *this + rhs;
 }
 
-biginteger biginteger::min(const biginteger& rhs){
+biginteger biginteger::min(const biginteger& rhs) const{
 	return *this - rhs;
 }
 
-biginteger biginteger::mul(const biginteger& rhs){
+biginteger biginteger::mul(const biginteger& rhs) const{
 
 }
 
-biginteger biginteger::div(const biginteger& rhs){
+biginteger biginteger::div(const biginteger& rhs) const{
 
 }
 
-biginteger biginteger::mod(const biginteger& rhs){
+biginteger biginteger::mod(const biginteger& rhs) const{
 
 }
 
-biginteger biginteger::abs(){
+biginteger biginteger::abs() const{
 	biginteger res = *this;
 	res.pos = true;
 	return res;
@@ -192,15 +192,23 @@ biginteger biginteger::abs(){
 
 
 /* Relational Operators */
-bool biginteger::operator==(const biginteger& rhs){
+bool biginteger::operator==(const biginteger& rhs) const{
 
 }
 
-bool biginteger::operator>(const biginteger& rhs){
+bool biginteger::operator>(const biginteger& rhs) const{
 
 }
 
-bool biginteger::operator<(const biginteger& rhs){
+bool biginteger::operator>=(const biginteger& rhs) const{
+
+}
+
+bool biginteger::operator<(const biginteger& rhs) const{
+
+}
+
+bool biginteger::operator<=(const biginteger& rhs) const{
 
 }
 
@@ -218,6 +226,6 @@ ostream& operator<<(ostream &os, const biginteger& v){
 	return os;
 }
 
-int biginteger::max(int a, int b){
+int biginteger::max(int a, int b) const{
 	return (a > b) ? a : b;
 }
