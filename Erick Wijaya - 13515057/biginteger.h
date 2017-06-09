@@ -20,6 +20,12 @@ public:
 	biginteger& operator=(const biginteger& rhs);
 
 	/* Arithmetic Operators */
+	biginteger& operator+=(const biginteger& rhs);
+	biginteger& operator-=(const biginteger& rhs);
+	biginteger& operator*=(const biginteger& rhs);
+	biginteger& operator/=(const biginteger& rhs);
+	biginteger& operator%=(const biginteger& rhs);
+
 	biginteger add(const biginteger& rhs);
 	biginteger min(const biginteger& rhs);
 	biginteger mul(const biginteger& rhs);
@@ -34,15 +40,17 @@ public:
 
 	/* Relational Operators */
 	bool operator==(const biginteger& rhs);
+	bool operator!=(const biginteger& rhs);
 	bool operator>(const biginteger& rhs);
+	bool operator>=(const biginteger& rhs);
 	bool operator<(const biginteger& rhs);
-	bool isZero() const;
+	bool operator<=(const biginteger& rhs);
 
 	/* I/O */
 	friend istream& operator>>(istream &is, const biginteger& v);
 	friend ostream& operator<<(ostream &os, const biginteger& v);
 
 private:
-	vector<char> digits;
-	bool sign;
+	vector<int> digits;
+	bool pos;
 };

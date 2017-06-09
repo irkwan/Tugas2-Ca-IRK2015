@@ -8,44 +8,75 @@
 using namespace std;
 
 /* Constructors */
-biginteger::biginteger(){
-	sign = true;
+biginteger::biginteger() {
+	pos = true;
+	digits.push_back(0);
 }
 
-biginteger::biginteger(long long v){
-	sign = v >= 0;
-	vector<char> temp;
+biginteger::biginteger(long long v) {
+	pos = v >= 0;
+	if (!pos)
+		v = -v;
 	while (v != 0){
-		char dig = v % 10;
-		temp.push_back(dig);
+		int dig = v % 10;
+		digits.push_back(dig);
 		v /= 10;
 	}
-	for(int i=temp.size()-1; i>=0; i--){
-		digits.push_back(temp[i]);
+}
+
+biginteger::biginteger(const string& v) {
+	if (v.length() == 0){
+		pos = true;
+		digits.push_back(0);
+	}
+	else{
+		pos = v[0] != '-';
+		int end = pos ? 0 : 1;
+		for(int i=v.length()-1; i>=end; i--){
+			int dig = v[i] - '0';
+			digits.push_back(dig);
+			//cout << v[i] << " " << dig << " " << endl;
+			//cout << *this << endl;
+		}
 	}
 }
 
-biginteger::biginteger(const string& v){
-	sign = v[0] != '-';
-	int i = sign ? 0 : 1;
-	for(; i<v.length(); i++){
-		digits.push_back(v[i]);
-	}
-}
+biginteger::biginteger(const biginteger& v) : pos(v.pos), digits(v.digits) {
 
-biginteger::biginteger(const biginteger& v){
-	sign = v.sign;
-	digits = v.digits;
 }
 
 
 /* Operator= */
 biginteger& biginteger::operator=(const biginteger& rhs){
-
+	if (this != &rhs){
+		pos = rhs.pos;
+		digits = rhs.digits;
+	}
+	return *this;
 }
 
 
 /* Arithmetic Operators */
+biginteger& biginteger::operator+=(const biginteger& rhs){
+
+}
+
+biginteger& biginteger::operator-=(const biginteger& rhs){
+
+}
+
+biginteger& biginteger::operator*=(const biginteger& rhs){
+
+}
+
+biginteger& biginteger::operator/=(const biginteger& rhs){
+
+}
+
+biginteger& biginteger::operator%=(const biginteger& rhs){
+
+}
+
 biginteger biginteger::add(const biginteger& rhs){
 
 }
@@ -65,7 +96,6 @@ biginteger biginteger::div(const biginteger& rhs){
 biginteger biginteger::mod(const biginteger& rhs){
 
 }
-
 
 biginteger biginteger::operator+(const biginteger& rhs){
 
@@ -101,10 +131,6 @@ bool biginteger::operator<(const biginteger& rhs){
 
 }
 
-bool biginteger::isZero() const {
-	return digits.empty();
-}
-
 
 /* I/O */
 istream& operator>>(istream &is, const biginteger& v){
@@ -112,14 +138,9 @@ istream& operator>>(istream &is, const biginteger& v){
 }
 
 ostream& operator<<(ostream &os, const biginteger& v){
-	if (v.isZero()){
-		os << 0;
-	}
-	else {
-		if (!v.sign)
-			os << "-";
-		for(int i=0; i<v.digits.size(); i++)
-			os << v.digits[i];
-	}
+	if (!v.pos)
+		os << "-";
+	for(int i=v.digits.size()-1; i>=0; i--)
+		os << v.digits[i];
 	return os;
 }
