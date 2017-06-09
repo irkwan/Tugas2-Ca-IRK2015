@@ -193,23 +193,42 @@ biginteger biginteger::abs() const{
 
 /* Relational Operators */
 bool biginteger::operator==(const biginteger& rhs) const{
+	bool same = (digits.size() == rhs.digits.size()) && (pos == rhs.pos);
+	int i=0;
+	while (same && (i < digits.size())){
+		same = digits[i] == rhs.digits[i];
+	}
+	return same;
+}
 
+bool biginteger::operator!=(const biginteger& rhs) const{
+	return !(*this == rhs);
 }
 
 bool biginteger::operator>(const biginteger& rhs) const{
-
+	if (pos != rhs.pos)
+		return pos == true;
+	else if (digits.size() != rhs.digits.size())
+		return pos ? digits.size() > rhs.digits.size() : digits.size() < rhs.digits.size();
+	else{
+		for(int i=digits.size()-1; i>=0; i--){
+			if (digits[i] != rhs.digits[i])
+				return pos ? digits[i] > rhs.digits[i] : digits[i] < rhs.digits[i];
+		}
+		return false;
+	}
 }
 
 bool biginteger::operator>=(const biginteger& rhs) const{
-
+	return !(*this < rhs);
 }
 
 bool biginteger::operator<(const biginteger& rhs) const{
-
+	return (*this != rhs) && !(*this > rhs);
 }
 
 bool biginteger::operator<=(const biginteger& rhs) const{
-
+	return !(*this > rhs);
 }
 
 
