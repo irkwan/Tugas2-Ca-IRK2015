@@ -59,4 +59,5 @@ private:
 	static const int BASE = 10;
 
 	int max(int a, int b) const;
+	void delTrail0();
 };

@@ -100,6 +100,7 @@ biginteger biginteger::operator-(const biginteger& rhs) const{
 				if (carry)
 					res.digits[i] += BASE;
 			}
+			res.delTrail0();
 
 			return res;
 		}
@@ -247,4 +248,10 @@ ostream& operator<<(ostream &os, const biginteger& v){
 
 int biginteger::max(int a, int b) const{
 	return (a > b) ? a : b;
+}
+
+void biginteger::delTrail0(){
+	while ((digits[digits.size()-1] == 0) && (digits.size() > 1)){
+		digits.pop_back();
+	}
 }
