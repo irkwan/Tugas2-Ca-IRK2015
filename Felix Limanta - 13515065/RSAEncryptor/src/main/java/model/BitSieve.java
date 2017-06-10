@@ -40,12 +40,12 @@ class BitSieve {
 
       // Take each multiple of step out of sieve
       start = convertedStep - start;
-      if (start%2 == 0)
+      if ((start & 1) == 0)
         start += convertedStep;
-      sieveSingle(searchLen, (start-1)/2, convertedStep);
+      sieveSingle(searchLen, (start - 1) / 2, convertedStep);
 
       // Find next prime from small sieve
-      step = smallSieve.sieveSearch(smallSieve.length, step+1);
+      step = smallSieve.sieveSearch(smallSieve.length, step + 1);
       convertedStep = (step *2) + 1;
     } while (step > 0);
   }

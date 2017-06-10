@@ -475,6 +475,35 @@ class BigIntTest {
   }
 
   @Test
+  void gcd() {
+    final int k = 10000;
+    for (int i = 0; i < k; ++i) {
+      String s1 = getRandomPosBigInt(100);
+      String s2 = getRandomPosBigInt(100);
+      BigInteger exp = new BigInteger(s1).gcd(new BigInteger(s2));
+      BigInt act = new BigInt(s1).gcd(new BigInt(s2));
+      assertEquals(exp.toString(), act.toString(),
+          "GCD(" + s1 + ", " + s2 + ") mismatch");
+      //System.out.println(i + ". GCD(" + s1 + ", " + s2 + ")");
+    }
+  }
+
+  @Test
+  void lcm() {
+    final int k = 10000;
+    for (int i = 0; i < k; ++i) {
+      String s1 = getRandomPosBigInt(100);
+      String s2 = getRandomPosBigInt(100);
+      BigInteger exp = new BigInteger(s1).
+          divide(new BigInteger(s1).gcd(new BigInteger(s2))).multiply(new BigInteger(s2));
+      BigInt act = new BigInt(s1).lcm(new BigInt(s2));
+      assertEquals(exp.toString(), act.toString(),
+          "LCM(" + s1 + ", " + s2 + ") mismatch");
+      //System.out.println(i + ". GCD(" + s1 + ", " + s2 + ")");
+    }
+  }
+
+  @Test
   void primeValidation() {
     final int k = 100;
     for (int i = 0; i < k; ++i) {

@@ -20,12 +20,15 @@ public class BigInt extends Number implements Comparable<BigInt> {
    * This mask is used to obtain the value of an int as if it were unsigned.
    * Usage: <code>long a = int b & LONG_MASK</code>
    */
-  final static long LONG_MASK = 0xffffffffL;
-
-  private static final int KARATSUBA_THRESHOLD = 50;
+  private final static long LONG_MASK = 0xffffffffL;
 
   private static final int SMALL_PRIME_THRESHOLD = 95;
   private static final int DEFAULT_PRIME_CERTAINTY = 100;
+
+  private static int[] primesBelow100 = new int[] {
+      2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
+      47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+  };
 
   private static long bitsPerDigit[] = { 0, 0,
       1024, 1624, 2048, 2378, 2648, 2875, 3072, 3247, 3402, 3543, 3672,
@@ -555,6 +558,241 @@ public class BigInt extends Number implements Comparable<BigInt> {
   //------------------------------------------------------------------------------------------------
   //endregion
 
+  //region Bit operations
+  //------------------------------------------------------------------------------------------------
+
+  public int bitLength() {
+    int n = bitLength - 1;
+    if (n == -1) { // bitLength not initialized yet
+      int[] m = mag;
+      int len = m.length;
+      if (len == 0) {
+        n = 0; // offset by one to initialize
+      }  else {
+        // Calculate the bit length of the magnitude
+        int magBitLength = ((len - 1) << 5) + 32 - Integer.numberOfLeadingZeros(mag[0]);
+        if (sign < 0) {
+          // Check if magnitude is a power of two
+          boolean pow2 = (Integer.bitCount(mag[0]) == 1);
+          for (int i=1; i< len && pow2; i++)
+            pow2 = (mag[i] == 0);
+
+          n = (pow2 ? magBitLength -1 : magBitLength);
+        } else {
+          n = magBitLength;
+        }
+      }
+      bitLength = n + 1;
+    }
+    return n;
+  }
+
+  public int getLowestSetBit() {
+    int lsb = lowestSetBit - 2;
+    if (lsb == -2) {  // lowestSetBit not initialized yet
+      lsb = 0;
+      if (sign == 0) {
+        lsb -= 1;
+      } else {
+        // Search for lowest order nonzero int
+        int i,b;
+        for (i=0; (b = getInt(i)) == 0; i++);
+        lsb += (i << 5) + Integer.numberOfTrailingZeros(b);
+      }
+      lowestSetBit = lsb + 2;
+    }
+    return lsb;
+  }
+
+  public BigInt setBit(int n) {
+    if (n < 0)
+      throw new ArithmeticException("Negative bit address");
+
+    int intNum = n >>> 5;
+    int[] result = new int[Math.max((bitLength() >>> 5) + 1, intNum+2)];
+
+    for (int i=0; i < result.length; i++)
+      result[result.length-i-1] = getInt(i);
+
+    result[result.length-intNum-1] |= (1 << (n & 31));
+
+    return new BigInt(result);
+  }
+
+  public boolean testBit(int n) {
+    if (n < 0)
+      throw new ArithmeticException("Negative bit address");
+
+    return (getInt(n >>> 5) & (1 << (n & 31))) != 0;
+  }
+
+  private static byte[] randomBits(int numBits, Random rnd) {
+    if (numBits < 0)
+      throw new IllegalArgumentException("numBits must be non-negative");
+    int numBytes = (int)(((long) numBits + 7) / 8); // avoid overflow
+    byte[] randomBits = new byte[numBytes];
+
+    // Generate random bytes and mask out excess bits
+    if (numBytes > 0) {
+      rnd.nextBytes(randomBits);
+      int excessBits = 8 * numBytes - numBits;
+      randomBits[0] &= (1 << (8 - excessBits)) - 1;
+    }
+    return randomBits;
+  }
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region Shifts
+  //------------------------------------------------------------------------------------------------
+
+  public BigInt shiftLeft(int n) {
+    if (sign == 0)
+      return ZERO;
+    if (n > 0) {
+      return new BigInt(shiftLeft(mag, n), sign);
+    } else if (n == 0) {
+      return this;
+    } else {
+      return shiftRightImpl(-n);
+    }
+  }
+
+  private static int[] shiftLeft(int[] mag, int n) {
+    if (mag.length == 0)
+      return mag;
+
+    int nInts = n >>> 5;
+    int nBits = n & 0x1f;
+    int magLen = mag.length;
+    int newMag[] = null;
+
+    if (nBits == 0) {
+      newMag = new int[magLen + nInts];
+      System.arraycopy(mag, 0, newMag, 0, magLen);
+    } else {
+      int i = 0;
+      int nBits2 = 32 - nBits;
+      int highBits = mag[0] >>> nBits2;
+      if (highBits != 0) {
+        newMag = new int[magLen + nInts + 1];
+        newMag[i++] = highBits;
+      } else {
+        newMag = new int[magLen + nInts];
+      }
+      int j = 0;
+      while (j < magLen-1)
+        newMag[i++] = mag[j++] << nBits | mag[j] >>> nBits2;
+      newMag[i] = mag[j] << nBits;
+    }
+    return newMag;
+  }
+
+  public BigInt shiftRight(int n) {
+    if (sign == 0)
+      return ZERO;
+    if (n > 0) {
+      return shiftRightImpl(n);
+    } else if (n == 0) {
+      return this;
+    } else {
+      // Possible int overflow in {@code -n} is not a trouble,
+      // because shiftLeft considers its argument unsigned
+      return new BigInt(shiftLeft(mag, -n), sign);
+    }
+  }
+
+  private static int[] shiftRight(int[] mag, int n) {
+    return new BigInt(mag, (byte) 1).shiftRightImpl(n).mag;
+  }
+
+  private BigInt shiftRightImpl(int n) {
+    int nInts = n >>> 5;
+    int nBits = n & 0x1f;
+    int magLen = mag.length;
+    int newMag[] = null;
+
+    // Special case: entire contents shifted off the end
+    if (nInts >= magLen)
+      return (sign >= 0 ? ZERO : NEGATIVE_ONE);
+
+    if (nBits == 0) {
+      int newMagLen = magLen - nInts;
+      newMag = Arrays.copyOf(mag, newMagLen);
+    } else {
+      int i = 0;
+      int highBits = mag[0] >>> nBits;
+      if (highBits != 0) {
+        newMag = new int[magLen - nInts];
+        newMag[i++] = highBits;
+      } else {
+        newMag = new int[magLen - nInts -1];
+      }
+
+      int nBits2 = 32 - nBits;
+      int j=0;
+      while (j < magLen - nInts - 1)
+        newMag[i++] = (mag[j++] << nBits2) | (mag[j] >>> nBits);
+    }
+
+    if (sign < 0) {
+      // Find out whether any one-bits were shifted off the end.
+      boolean onesLost = false;
+      for (int i=magLen-1, j=magLen-nInts; i >= j && !onesLost; i--)
+        onesLost = (mag[i] != 0);
+      if (!onesLost && nBits != 0)
+        onesLost = (mag[magLen - nInts - 1] << (32 - nBits) != 0);
+
+      if (onesLost)
+        newMag = increment(newMag);
+    }
+    return new BigInt(newMag, sign);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region Bitwise AND, OR, XOR, NOT
+  //------------------------------------------------------------------------------------------------
+
+  public BigInt and(BigInt val) {
+    final int len = Math.max((bitLength() >>> 5) + 1, (val.bitLength() >>> 5) + 1);
+    int[] result = new int[len];
+    for (int i = 0; i < result.length; ++i)
+      result[i] = (getInt(result.length - i - 1)
+          & val.getInt(result.length - i - 1));
+    return new BigInt(result);
+  }
+
+  public BigInt or(BigInt val) {
+    final int len = Math.max((bitLength() >>> 5) + 1, (val.bitLength() >>> 5) + 1);
+    int[] result = new int[len];
+    for (int i = 0; i < result.length; ++i)
+      result[i] = (getInt(result.length - i - 1)
+          | val.getInt(result.length - i - 1));
+    return new BigInt(result);
+  }
+
+  public BigInt xor(BigInt val) {
+    final int len = Math.max((bitLength() >>> 5) + 1, (val.bitLength() >>> 5) + 1);
+    int[] result = new int[len];
+    for (int i = 0; i < result.length; ++i)
+      result[i] = (getInt(result.length - i - 1)
+          ^ val.getInt(result.length - i - 1));
+    return new BigInt(result);
+  }
+
+  public BigInt not(BigInt val) {
+    int[] result = new int[(bitLength() >>> 5) + 1];
+    for (int i = 0; i < result.length; ++i)
+      result[i] = ~getInt(result.length-i-1);
+    return new BigInt(result);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
   //region Addition and Subtraction
   //------------------------------------------------------------------------------------------------
 
@@ -844,6 +1082,66 @@ public class BigInt extends Number implements Comparable<BigInt> {
   //------------------------------------------------------------------------------------------------
   //endregion
 
+  //region GCD, LCM
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Computes GCD using Stein's algorithm
+   *
+   * @param val Value to be GCDed with
+   * @return GCD of this and val
+   */
+  public BigInt gcd(BigInt val) {
+    // GCD(0, v) == GCD(u, 0) == GCD(0, 0) == 0
+    if (this.equals(ZERO) || val.equals(ZERO))
+      return ZERO;
+
+    BigInt u = this;
+    BigInt v = val;
+    /* Let shift := lg K, where K is the greatest power of 2
+        dividing both u and v. */
+    int shift;
+    for (shift = 0; u.or(v).and(ONE).equals(ZERO); ++shift) {
+      u = u.shiftRight(1);
+      v = v.shiftRight(1);
+    }
+
+    // Make u odd
+    while ((u.mag[u.mag.length - 1] & 1) == 0)
+      u = u.shiftRight(1);
+
+    do {
+      // Make v odd
+      while ((v.mag[v.mag.length - 1] & 1) == 0)
+        v = v.shiftRight(1);
+
+      // Swap if necessary so that u <= v
+      if (u.compareTo(v) == 1) {
+        BigInt t = v;
+        v = u;
+        u = t;
+      }
+
+      v = v.subtract(u);
+    } while (!v.equals(ZERO));
+
+    // Restore common factors of 2
+    return u.shiftLeft(shift);
+  }
+
+  /**
+   * Computes LCM with GCD, where LCM = (this / GCD) * val
+   *
+   * @param val Value to be LCMed with
+   * @return LCM of this and val
+   */
+  public BigInt lcm(BigInt val) {
+    return this.divide(this.gcd(val)).multiply(val);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
   //region Prime number operations
   //------------------------------------------------------------------------------------------------
 
@@ -859,10 +1157,12 @@ public class BigInt extends Number implements Comparable<BigInt> {
         smallPrime(bitLength, DEFAULT_PRIME_CERTAINTY, random) :
         largePrime(bitLength, DEFAULT_PRIME_CERTAINTY, random));
   }
-  
+
   private static BigInt smallPrime(int bitLength, int certainty, Random rnd) {
-    final BigInt smallPrimeProduct =
-        valueOf(3L * 5 * 7 * 11 * 13 * 17 * 19 * 23 * 29 * 31 * 37 * 41);
+    long n = 1;
+    for (int x: primesBelow100)
+      n *= x;
+    BigInt smallPrimeProduct = valueOf(n);
     
     int magLen = (bitLength + 31) >>> 5;
     int temp[] = new int[magLen];
@@ -871,7 +1171,7 @@ public class BigInt extends Number implements Comparable<BigInt> {
 
     while (true) {
       // Construct a candidate
-      for (int i=0; i < magLen; i++)
+      for (int i = 0; i < magLen; i++)
         temp[i] = rnd.nextInt();
       temp[0] = (temp[0] & highMask) | highBit;  // Ensure exact length
       if (bitLength > 2)
@@ -882,10 +1182,11 @@ public class BigInt extends Number implements Comparable<BigInt> {
       // Do cheap "pre-test" if applicable
       if (bitLength > 6) {
         long r = p.remainder(smallPrimeProduct).longValue();
-        if ((r %  3 == 0) || (r %  5 == 0) || (r %  7 == 0) || (r % 11 == 0) ||
-            (r % 13 == 0) || (r % 17 == 0) || (r % 19 == 0) || (r % 23 == 0) ||
-            (r % 29 == 0) || (r % 31 == 0) || (r % 37 == 0) || (r % 41 == 0))
-          continue; // Candidate is composite; try another
+        boolean prime = true;
+        for (int i = 0; i < primesBelow100.length && prime; ++i)
+          prime = prime && (r % primesBelow100[i] != 0);
+        if (!prime)
+          continue;
       }
 
       // All candidates of bitLength 2 and 3 are prime by this point
@@ -1024,201 +1325,6 @@ public class BigInt extends Number implements Comparable<BigInt> {
       exp = exp.shiftRight(1);
     }
     return result;
-  }
-
-  //------------------------------------------------------------------------------------------------
-  //endregion
-
-  //region Bit operations
-  //------------------------------------------------------------------------------------------------
-
-  public int bitLength() {
-    int n = bitLength - 1;
-    if (n == -1) { // bitLength not initialized yet
-      int[] m = mag;
-      int len = m.length;
-      if (len == 0) {
-        n = 0; // offset by one to initialize
-      }  else {
-        // Calculate the bit length of the magnitude
-        int magBitLength = ((len - 1) << 5) + 32 - Integer.numberOfLeadingZeros(mag[0]);
-        if (sign < 0) {
-          // Check if magnitude is a power of two
-          boolean pow2 = (Integer.bitCount(mag[0]) == 1);
-          for (int i=1; i< len && pow2; i++)
-            pow2 = (mag[i] == 0);
-
-          n = (pow2 ? magBitLength -1 : magBitLength);
-        } else {
-          n = magBitLength;
-        }
-      }
-      bitLength = n + 1;
-    }
-    return n;
-  }
-
-  public int getLowestSetBit() {
-    int lsb = lowestSetBit - 2;
-    if (lsb == -2) {  // lowestSetBit not initialized yet
-      lsb = 0;
-      if (sign == 0) {
-        lsb -= 1;
-      } else {
-        // Search for lowest order nonzero int
-        int i,b;
-        for (i=0; (b = getInt(i)) == 0; i++);
-        lsb += (i << 5) + Integer.numberOfTrailingZeros(b);
-      }
-      lowestSetBit = lsb + 2;
-    }
-    return lsb;
-  }
-
-  public BigInt setBit(int n) {
-    if (n < 0)
-      throw new ArithmeticException("Negative bit address");
-
-    int intNum = n >>> 5;
-    int[] result = new int[Math.max((bitLength() >>> 5) + 1, intNum+2)];
-
-    for (int i=0; i < result.length; i++)
-      result[result.length-i-1] = getInt(i);
-
-    result[result.length-intNum-1] |= (1 << (n & 31));
-
-    return new BigInt(result);
-  }
-
-  public boolean testBit(int n) {
-    if (n < 0)
-      throw new ArithmeticException("Negative bit address");
-
-    return (getInt(n >>> 5) & (1 << (n & 31))) != 0;
-  }
-
-  private static byte[] randomBits(int numBits, Random rnd) {
-    if (numBits < 0)
-      throw new IllegalArgumentException("numBits must be non-negative");
-    int numBytes = (int)(((long) numBits + 7) / 8); // avoid overflow
-    byte[] randomBits = new byte[numBytes];
-
-    // Generate random bytes and mask out excess bits
-    if (numBytes > 0) {
-      rnd.nextBytes(randomBits);
-      int excessBits = 8 * numBytes - numBits;
-      randomBits[0] &= (1 << (8 - excessBits)) - 1;
-    }
-    return randomBits;
-  }
-
-  //------------------------------------------------------------------------------------------------
-  //endregion
-
-  //region Shifts
-  //------------------------------------------------------------------------------------------------
-
-  public BigInt shiftLeft(int n) {
-    if (sign == 0)
-      return ZERO;
-    if (n > 0) {
-      return new BigInt(shiftLeft(mag, n), sign);
-    } else if (n == 0) {
-      return this;
-    } else {
-      return shiftRightImpl(-n);
-    }
-  }
-
-  private static int[] shiftLeft(int[] mag, int n) {
-    if (mag.length == 0)
-      return mag;
-
-    int nInts = n >>> 5;
-    int nBits = n & 0x1f;
-    int magLen = mag.length;
-    int newMag[] = null;
-
-    if (nBits == 0) {
-      newMag = new int[magLen + nInts];
-      System.arraycopy(mag, 0, newMag, 0, magLen);
-    } else {
-      int i = 0;
-      int nBits2 = 32 - nBits;
-      int highBits = mag[0] >>> nBits2;
-      if (highBits != 0) {
-        newMag = new int[magLen + nInts + 1];
-        newMag[i++] = highBits;
-      } else {
-        newMag = new int[magLen + nInts];
-      }
-      int j = 0;
-      while (j < magLen-1)
-        newMag[i++] = mag[j++] << nBits | mag[j] >>> nBits2;
-      newMag[i] = mag[j] << nBits;
-    }
-    return newMag;
-  }
-
-  public BigInt shiftRight(int n) {
-    if (sign == 0)
-      return ZERO;
-    if (n > 0) {
-      return shiftRightImpl(n);
-    } else if (n == 0) {
-      return this;
-    } else {
-      // Possible int overflow in {@code -n} is not a trouble,
-      // because shiftLeft considers its argument unsigned
-      return new BigInt(shiftLeft(mag, -n), sign);
-    }
-  }
-
-  private static int[] shiftRight(int[] mag, int n) {
-    return new BigInt(mag, (byte) 1).shiftRightImpl(n).mag;
-  }
-
-  private BigInt shiftRightImpl(int n) {
-    int nInts = n >>> 5;
-    int nBits = n & 0x1f;
-    int magLen = mag.length;
-    int newMag[] = null;
-
-    // Special case: entire contents shifted off the end
-    if (nInts >= magLen)
-      return (sign >= 0 ? ZERO : NEGATIVE_ONE);
-
-    if (nBits == 0) {
-      int newMagLen = magLen - nInts;
-      newMag = Arrays.copyOf(mag, newMagLen);
-    } else {
-      int i = 0;
-      int highBits = mag[0] >>> nBits;
-      if (highBits != 0) {
-        newMag = new int[magLen - nInts];
-        newMag[i++] = highBits;
-      } else {
-        newMag = new int[magLen - nInts -1];
-      }
-
-      int nBits2 = 32 - nBits;
-      int j=0;
-      while (j < magLen - nInts - 1)
-        newMag[i++] = (mag[j++] << nBits2) | (mag[j] >>> nBits);
-    }
-
-    if (sign < 0) {
-      // Find out whether any one-bits were shifted off the end.
-      boolean onesLost = false;
-      for (int i=magLen-1, j=magLen-nInts; i >= j && !onesLost; i--)
-        onesLost = (mag[i] != 0);
-      if (!onesLost && nBits != 0)
-        onesLost = (mag[magLen - nInts - 1] << (32 - nBits) != 0);
-
-      if (onesLost)
-        newMag = increment(newMag);
-    }
-    return new BigInt(newMag, sign);
   }
 
   //------------------------------------------------------------------------------------------------
