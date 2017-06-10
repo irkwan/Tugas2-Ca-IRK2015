@@ -12,8 +12,6 @@ import sun.misc.FloatConsts;
  */
 public class BigInt extends Number implements Comparable<BigInt> {
 
-  private static final int DIGITS_PER_INT = 9;
-  private static final int BASE = 1000000000;
   private static final int MAX_MAG_LENGTH = Integer.MAX_VALUE / Integer.SIZE + 1;
 
   /**
@@ -555,6 +553,10 @@ public class BigInt extends Number implements Comparable<BigInt> {
     return val;
   }
 
+  public boolean isOdd() {
+    return ((mag[mag.length - 1] & 1) != 0);
+  }
+
   //------------------------------------------------------------------------------------------------
   //endregion
 
@@ -1029,15 +1031,6 @@ public class BigInt extends Number implements Comparable<BigInt> {
     return divide(new BigInt(val));
   }
 
-  public BigInt mod(BigInt val) {
-    BigInt b = remainder(val);
-    return (b.sign >= 0 ? b : b.add(val));
-  }
-
-  public BigInt mod(long val) {
-    return mod(new BigInt(val));
-  }
-
   public BigInt remainder(BigInt val) {
     if (val.compareTo(ZERO) == 0)
       throw new ArithmeticException("Divisor is zero");
@@ -1082,7 +1075,7 @@ public class BigInt extends Number implements Comparable<BigInt> {
   //------------------------------------------------------------------------------------------------
   //endregion
 
-  //region GCD, LCM
+  //region GCD, LCM, Coprimes
   //------------------------------------------------------------------------------------------------
 
   /**
@@ -1107,12 +1100,12 @@ public class BigInt extends Number implements Comparable<BigInt> {
     }
 
     // Make u odd
-    while ((u.mag[u.mag.length - 1] & 1) == 0)
+    while (!u.isOdd())
       u = u.shiftRight(1);
 
     do {
       // Make v odd
-      while ((v.mag[v.mag.length - 1] & 1) == 0)
+      while (!v.isOdd())
         v = v.shiftRight(1);
 
       // Swap if necessary so that u <= v
@@ -1136,7 +1129,64 @@ public class BigInt extends Number implements Comparable<BigInt> {
    * @return LCM of this and val
    */
   public BigInt lcm(BigInt val) {
-    return this.divide(this.gcd(val)).multiply(val);
+    BigInt gcd = this.gcd(val);
+    if (gcd.equals(ZERO))
+      return ZERO;
+    return this.divide(gcd).multiply(val);
+  }
+
+  public boolean isCoprime(BigInt val) {
+    return (this.gcd(val).equals(ONE));
+  }
+
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region Modular arithmetic
+  //------------------------------------------------------------------------------------------------
+
+  public BigInt mod(BigInt val) {
+    BigInt b = remainder(val);
+    return (b.sign >= 0 ? b : b.add(val));
+  }
+
+  public BigInt mod(long val) {
+    return mod(new BigInt(val));
+  }
+
+  /**
+   * Finds the modular multiplicative inverse of this using extended Euclidean algorithm.
+   *
+   * @param modulus modulus value
+   * @return Modular multiplicative inverse
+   */
+  public BigInt modInverse(BigInt modulus) {
+    if (modulus.compareTo(ZERO) != 1)
+      throw new ArithmeticException("Modulus must be positive");
+    else if (modulus.equals(ONE))
+      return ZERO;
+
+    BigInt val = this;
+    BigInt mod = modulus;
+    BigInt x0 = ZERO;
+    BigInt x1 = ONE;
+
+    while (val.compareTo(ONE) == 1) {
+      BigInt quotient = val.divide(mod);
+      BigInt t = mod;
+      mod = val.mod(mod);
+      val = t;
+
+      t = x0;
+      x0 = x1.subtract(quotient.multiply(x0));
+      x1 = t;
+    }
+
+    // Make x1 positive
+    if (x1.compareTo(ZERO) == -1)
+      return x1.add(modulus);
+    return x1;
   }
 
   //------------------------------------------------------------------------------------------------
@@ -1263,7 +1313,7 @@ public class BigInt extends Number implements Comparable<BigInt> {
   }
 
   private boolean passesMillerRabin(int iterations, Random rnd) {
-    // Find a and m such that m is odd and this == 1 + 2**a * m
+    // Find a and m such that m is odd and this == 1 + 2 ^ a * m
     BigInt thisMinusOne = this.subtract(ONE);
     BigInt m = thisMinusOne;
     int a = m.getLowestSetBit();
@@ -1289,6 +1339,39 @@ public class BigInt extends Number implements Comparable<BigInt> {
       }
     }
     return true;
+  }
+
+
+  /**
+   * Finds the least prime number greater than this using Bertrand's postulate
+   *
+   * @return Next probable prime
+   */
+  public BigInt nextProbablePrime() {
+    if (this.sign < 0)
+      throw new ArithmeticException("start < 0: " + this);
+
+    // Handle trivial cases
+    if ((this.sign == 0) || this.equals(ONE))
+      return TWO;
+
+    BigInt result = this.increment();
+
+    // Start at previous even number
+    if (result.isOdd())
+      result = result.decrement();
+
+    // Looking for the next large prime
+    int searchLen = result.bitLength() / 20 * 64;
+
+    while (true) {
+      BitSieve searchSieve = new BitSieve(result, searchLen);
+      BigInt candidate = searchSieve.retrieve(result,
+          DEFAULT_PRIME_CERTAINTY, random);
+      if (candidate != null)
+        return candidate;
+      result = result.add(BigInt.valueOf(2 * searchLen));
+    }
   }
 
   //------------------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ class BigIntTest {
 
   private String getRandomPosBigInt(int n) {
     StringBuilder s = new StringBuilder();
-    for (int i = 0; i < getRandomInt() % n && s.length() < n; ++i) {
+    for (int i = 0; i < getRandomInt() % n && s.length() <= n; ++i) {
       s.append(Integer.toUnsignedLong(getRandomInt()));
     }
     if (s.toString().equals(""))
@@ -489,6 +489,25 @@ class BigIntTest {
   }
 
   @Test
+  void modInverse() {
+    BigInteger exp = new BigInteger("10").modInverse(new BigInteger("17"));
+    BigInt act = new BigInt("10").modInverse(new BigInt("17"));
+    assertEquals(exp.toString(2), act.toBinaryString(),
+        "Different modInverse for 10 % 17");
+
+    final int k = 10000;
+    for (int i = 0; i < k; ++i) {
+      System.out.println(i);
+      String s1 = getRandomPosBigInt(128);
+      String s2 = new BigInteger(s1).nextProbablePrime().toString();
+      exp = new BigInteger(s1).modInverse(new BigInteger(s2));
+      act = new BigInt(s1).modInverse(new BigInt(s2));
+      assertEquals(exp.toString(2), act.toBinaryString(),
+          "Different modInverse for " + s1 + " % " + s2);
+    }
+  }
+
+  @Test
   void lcm() {
     final int k = 10000;
     for (int i = 0; i < k; ++i) {
@@ -524,8 +543,19 @@ class BigIntTest {
       BigInt b1 = BigInt.probablePrime(128, random);
       BigInteger b2 = new BigInteger(b1.toBinaryString(), 2);
       String s = b2.toString();
-      assertTrue(b2.isProbablePrime(100), " composite number generated");
+      assertTrue(b2.isProbablePrime(100), "Composite number generated");
       System.out.println(i + ". " + s);
+    }
+  }
+
+  @Test
+  void nextProbablePrime() {
+    final int k = 100;
+    for (int i = 0; i < k; ++i) {
+      BigInt b1 = BigInt.probablePrime(128, random);
+      BigInteger exp = new BigInteger(b1.toBinaryString(), 2).nextProbablePrime();
+      BigInt act = b1.nextProbablePrime();
+      assertEquals(exp.toString(2), act.toBinaryString(), "Diffrrent next primes");
     }
   }
 
@@ -542,5 +572,7 @@ class BigIntTest {
       d = b.abs().add(d);
       System.out.println(b.multiply(c).add(d) + " = " + b + " * " + c + " + " + d);
     }
+
+    System.out.println(new BigInteger("65537").isProbablePrime(100));
   }
 }
