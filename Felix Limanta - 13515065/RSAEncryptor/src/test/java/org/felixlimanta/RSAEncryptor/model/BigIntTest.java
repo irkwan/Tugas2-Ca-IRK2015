@@ -1,10 +1,11 @@
 package org.felixlimanta.RSAEncryptor.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.concurrent.ThreadLocalRandom;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -15,13 +16,19 @@ class BigIntTest {
   private org.felixlimanta.RSAEncryptor.model.BigInt b;
 
   private static SecureRandom random;
+  static int n;
+
+  @BeforeAll
+  static void setUpAll() {
+    random = new SecureRandom();
+  }
 
   private boolean getRandomBoolean() {
-    return ThreadLocalRandom.current().nextBoolean();
+    return random.nextBoolean();
   }
 
   private int getRandomInt() {
-    return ThreadLocalRandom.current().nextInt();
+    return random.nextInt();
   }
 
   private String getRandomPosBigInt(int n) {
@@ -48,40 +55,41 @@ class BigIntTest {
 
   @Test
   void stringConstructor() {
-    StringBuilder s = new StringBuilder();
-    if (getRandomBoolean()) {
-      s.append("-");
-    }
-    for (int i = 0; i < getRandomInt() % 10; ++i) {
-      s.append(Integer.toUnsignedLong(getRandomInt()));
-    }
-    if (s.toString().equals("") || s.toString().equals("-"))
-      s.append(Integer.toUnsignedLong(getRandomInt()));
-    System.out.println(s.toString());
+    final int k = 10000;
+    for (int i = 0; i < k; ++i) {
+      StringBuilder s = new StringBuilder();
+      if (getRandomBoolean()) {
+        s.append("-");
+      }
+      for (int j = 0; j < getRandomInt() % 10; ++i) {
+        s.append(Integer.toUnsignedLong(getRandomInt()));
+      }
+      if (s.toString().equals("") || s.toString().equals("-"))
+        s.append(Integer.toUnsignedLong(getRandomInt()));
 
-    b = new BigInt(s.toString());
-    System.out.println(b.toString());
-    System.out.println(b.toString(true));
-    assertEquals(s.toString(), b.toString(), "String value mismatch");
+      b = new BigInt(s.toString());
+      assertEquals(s.toString(), b.toString(), "String value mismatch");
+    }
   }
 
   @Test
   void toBinaryString() {
-    StringBuilder s = new StringBuilder();
-    if (getRandomBoolean()) {
-      s.append("-");
-    }
-    for (int i = 0; i < getRandomInt() % 10; ++i) {
-      s.append(Integer.toUnsignedLong(getRandomInt()));
-    }
-    if (s.toString().equals("") || s.toString().equals("-"))
-      s.append(Integer.toUnsignedLong(getRandomInt()));
+    final int k = 10000;
+    for (int i = 0; i < k; ++i) {
+      StringBuilder s = new StringBuilder();
+      if (getRandomBoolean()) {
+        s.append("-");
+      }
+      for (int j = 0; j < getRandomInt() % 10; ++i) {
+        s.append(Integer.toUnsignedLong(getRandomInt()));
+      }
+      if (s.toString().equals("") || s.toString().equals("-"))
+        s.append(Integer.toUnsignedLong(getRandomInt()));
 
-    BigInt b1 = new BigInt(s.toString());
-    BigInteger b2 = new BigInteger(s.toString());
-    System.out.println(b1.toBinaryString());
-    System.out.println(b2.toString(2));
-    assertEquals(b1.toBinaryString(), b2.toString(2), "String value mismatch");
+      BigInt b1 = new BigInt(s.toString());
+      BigInteger b2 = new BigInteger(s.toString());
+      assertEquals(b1.toBinaryString(), b2.toString(2), "String value mismatch");
+    }
   }
 
   @Test
@@ -212,6 +220,16 @@ class BigIntTest {
         "156500072834599941898774713720503211384503211228003138549903269485728497664");
     assertEquals(b3.toString(), b2.toString(),
         "Large word left shift mismatch");
+
+    final int max = 1 << 16;
+    for (int i = 0; i < 1000; ++i) {
+      String s1 = getRandomPosBigInt(10);
+      n = Math.min(max, Math.abs(getRandomInt()));
+      BigInteger exp = new BigInteger(s1).shiftLeft(n);
+      BigInt act = new BigInt(s1).shiftLeft(n);
+      assertEquals(exp.toString(2), act.toBinaryString(),
+          s1 + " << " + n + " shift mismatch");
+    }
   }
 
   @Test
@@ -220,14 +238,14 @@ class BigIntTest {
     BigInt b1 = new BigInt("65536");
     BigInt b2 = b1.shiftRight(n);
     BigInt b3 = new BigInt("1");
-    assertEquals(b3.toString(), b2.toString(),
+    assertEquals(b3.toBinaryString(), b2.toBinaryString(),
         "Single word right shift mismatch");
 
     n = 10;
     b1 = new BigInt("1024000000000000000000");
     b2 = b1.shiftRight(n);
     b3 = new BigInt("1000000000000000000");
-    assertEquals(b3.toString(), b2.toString(),
+    assertEquals(b3.toBinaryString(), b2.toBinaryString(),
         "Multi word right shift mismatch");
 
     n = 100;
@@ -235,8 +253,17 @@ class BigIntTest {
         "156500072834599941898774713720503211384503211228003138549903269485728497664");
     b2 = b1.shiftRight(n);
     b3 = new BigInt("123456789123456789123456789123456789123456789");
-    assertEquals(b3.toString(), b2.toString(),
+    assertEquals(b3.toBinaryString(), b2.toBinaryString(),
         "Large word left shift mismatch");
+
+    for (int i = 0; i < 1000; ++i) {
+      String s1 = getRandomPosBigInt(100);
+      n = Math.abs(getRandomInt());
+      BigInteger exp = new BigInteger(s1).shiftRight(n);
+      BigInt act = new BigInt(s1).shiftRight(n);
+      assertEquals(exp.toString(2), act.toBinaryString(),
+          s1 + " >> " + n + " shift mismatch");
+    }
   }
 
   @Test
@@ -352,12 +379,126 @@ class BigIntTest {
   }
 
   @Test
+  void remainder() {
+    BigInt b1 = new BigInt("1000");
+    BigInt b2 = new BigInt("100");
+    BigInt b3 = new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC1");
+
+    b1 = new BigInt("17179869184");
+    b2 = new BigInt("8589934592");
+    b3 = new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC2");
+
+    b1 = new BigInt("231584178474632390847141970017375815706539969331281128078915168015826259279872");
+    b2 = new BigInt("158456325028528675187087900672");
+    b3 = new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC3");
+
+    b1 = new BigInt("123456789123456789");
+    b2 = new BigInt("98765432198765");
+    b3 = new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toBinaryString(), b1.remainder(b2).toBinaryString(),"TC4");
+
+    b1 = new BigInt("123456789012345678901234567890");
+    b2 = new BigInt("98765432109876543210");
+    b3 = new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toBinaryString(), b1.remainder(b2).toBinaryString(),"TC5");
+
+    b1 = new BigInt("123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789");
+    b2 = new BigInt("987654321987654321987654321987654321987654321987654321987654321987654321");
+    b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC6");
+
+    b1 = new BigInt("123456789123456789123456789123456789123456789");
+    b2 = new BigInt("987654321987654321987654321987654321987654321987654321987654321987654321");
+    b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC7");
+
+    b1 = new BigInt("123456789123456789123456789123456789123456789");
+    b2 = new BigInt("123456789123456789123456789123456789123456789");
+    b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC8");
+
+    b1 = new BigInt("1826821235914201983");
+    b2 = new BigInt("-4150004966");
+    b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC9");
+
+    b1 = new BigInt("-1826821235914201983");
+    b2 = new BigInt("4150004966");
+    b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC10");
+
+    b1 = new BigInt("-1826821235914201983");
+    b2 = new BigInt("-4150004966");
+    b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
+    assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC10");
+
+    for (int i = 0; i < 1000; ++i) {
+      String s1 = getRandomPosBigInt(100);
+      String s2 = getRandomPosBigInt(100);
+      b1 = new BigInt(s1);
+      b2 = new BigInt(s2);
+      b3 = new BigInt(new BigInteger(s1).remainder(new BigInteger(s2)).toString(10));
+      assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC." + i);
+    }
+  }
+
+  @Test
+  void modExp() {
+    assertEquals(BigInt.ONE.toBinaryString(),
+        new BigInt(5).modExp(new BigInt(117), new BigInt(19)).toBinaryString(),
+        "5 ^ 117 % 19 == 1");
+
+    final int k = 10000;
+    int n = 0;
+    for (int i = 0; i < k; ++i) {
+      String s1 = getRandomPosBigInt(50);
+      String s2 = getRandomPosBigInt(10);
+      String s3 = getRandomPosBigInt(30);
+
+      BigInteger exp = new BigInteger(s1).modPow(new BigInteger(s2),new BigInteger(s3));
+      BigInt act = new BigInt(s1).modExp(new BigInt(s2), new BigInt(s3));
+      assertEquals(exp.toString(2), act.toBinaryString(),
+      s1 + " ^ " + s2 + " % " + s3 + " mismatch");
+      if (exp.toString(2).equals(act.toBinaryString())) {
+        //System.out.println("v   " + s1 + " ^ " + s2 + " % " + s3);
+        n++;
+      } else {
+        //System.out.println("    " + s1 + " ^ " + s2 + " % " + s3);
+      }
+    }
+    assertTrue(n >= k * 0.95,
+        "Multi word test: n = " + n + ", k = " + k + ", error = " + (100 - (n * 100 / k)) + "%");
+  }
+
+  @Test
+  void primeValidation() {
+    final int k = 100;
+    for (int i = 0; i < k; ++i) {
+      System.out.print(i);
+      BigInteger b1 = BigInteger.probablePrime(1024, random);
+      BigInt b2 = new BigInt(b1.toString());
+      boolean exp = b1.isProbablePrime(100);
+      boolean act = b2.primeToCertainty(100, random);
+      assertEquals(exp, act,b1.toString() + " primality test mismatch");
+      System.out.println();
+    }
+  }
+
+  @Test
   void testWithJavaBigInteger() {
-    BigInteger a = new BigInteger("1826821235914201983");
-    BigInteger b = new BigInteger("4150004966");
+    BigInteger a = new BigInteger("-5");
+    BigInteger b = new BigInteger("2");
     BigInteger c = a.divide(b);
-    System.out.println(a);
-    System.out.println(b);
-    System.out.println(c);
+    BigInteger d = a.remainder(b);
+    System.out.println(a + " = " + b + " * " + c + " + " + d);
+
+    if (d.compareTo(BigInteger.ZERO) == -1) {
+      c = c.subtract(BigInteger.ONE);
+      d = b.abs().add(d);
+      System.out.println(b.multiply(c).add(d) + " = " + b + " * " + c + " + " + d);
+    }
   }
 }

@@ -1,6 +1,9 @@
 package org.felixlimanta.RSAEncryptor.model;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by ASUS on 07/06/17.
@@ -18,6 +21,8 @@ public class BigInt implements Comparable<BigInt> {
   final static long LONG_MASK = 0xffffffffL;
 
   private static final int KARATSUBA_THRESHOLD = 50;
+
+  private static final int DEFAULT_PRIME_CERTAINTY = 100;
 
   private static long bitsPerDigit[] = { 0, 0,
       1024, 1624, 2048, 2378, 2648, 2875, 3072, 3247, 3402, 3543, 3672,
@@ -39,11 +44,17 @@ public class BigInt implements Comparable<BigInt> {
       0x40000000, 0x4cfa3cc1, 0x5c13d840, 0x6d91b519, 0x39aa400
   };
 
+
   private byte sign;
   private int[] mag;
 
+  private int lowestSetBit;
+  private int bitLength;
+  private int firstNonzeroIntNum;
+
   public static BigInt ZERO = new BigInt(new int[0], (byte) 0);
   public static BigInt ONE = new BigInt(valueOf(1));
+  public static BigInt TWO = new BigInt(valueOf(2));
   public static BigInt NEGATIVE_ONE = new BigInt(valueOf(-1));
 
 
@@ -78,6 +89,24 @@ public class BigInt implements Comparable<BigInt> {
       checkRange();
   }
 
+  public BigInt(byte[] mag, byte sign) {
+    this.mag = stripLeadingZeros(mag);
+
+    if (sign < -1 || sign > 1)
+      throw(new NumberFormatException("Invalid signum value"));
+
+    if (this.mag.length == 0) {
+      this.sign = 0;
+    } else {
+      if (sign == 0)
+        throw(new NumberFormatException("signum-magnitude mismatch"));
+      this.sign = sign;
+    }
+    if (mag.length >= MAX_MAG_LENGTH) {
+      checkRange();
+    }
+  }
+
   public BigInt(String val) {
     this(valueOf(val, 10));
   }
@@ -91,6 +120,10 @@ public class BigInt implements Comparable<BigInt> {
     sign = b.sign;
   }
 
+  public BigInt(int numBits, Random rnd) {
+    this(randomBits(numBits, rnd), (byte) 1);
+  }
+
   //------------------------------------------------------------------------------------------------
   //endregion
 
@@ -98,35 +131,6 @@ public class BigInt implements Comparable<BigInt> {
   //------------------------------------------------------------------------------------------------
 
   public static BigInt valueOf(String val, int radix) {
-    /*
-    int strLen = val.length();
-    if (strLen == 0)
-      throw new NumberFormatException("Zero length BigInteger");
-
-    byte sign;
-    int shift;
-    if (val.charAt(0) == '-') {
-      strLen--;
-      sign = -1;
-      shift = 1;
-    } else {
-      sign = 1;
-      shift = 0;
-    }
-
-    int intLen = (strLen - 1) / DIGITS_PER_INT + 1;
-    int firstLen = strLen - (intLen - 1) * DIGITS_PER_INT;
-    int[] digits = new int[intLen];
-    for (int i = 0; i < intLen; ++i) {
-      String block = val.substring(
-          Math.max(firstLen + (i - 1) * DIGITS_PER_INT + shift, shift),
-          firstLen + (i * DIGITS_PER_INT) + shift
-      );
-      digits[i] = Integer.parseInt(block);
-    }
-    return new BigInt(digits, sign);
-    */
-
     int cursor = 0, numDigits;
     final int len = val.length();
 
@@ -235,17 +239,27 @@ public class BigInt implements Comparable<BigInt> {
    */
   @Override
   public String toString() {
-    if (sign == 0)
+    if (sign == 0 || mag.length == 0)
       return "0";
+
+    BigInt base = new BigInt(1000000000);
+    BigInt b = this.abs();
+    java.util.Stack<Integer> x = new java.util.Stack<>();
+    while (!b.equals(ZERO)) {
+      BigInt[] divMod = b.divideAndRemainder(base);
+      x.push(divMod[1].mag[0]);
+      b = divMod[0];
+    }
 
     StringBuilder s = new StringBuilder();
     if (sign < 0)
       s.append('-');
-    s.append(Integer.toUnsignedString(mag[0]));
-    for (int i = 1; i < mag.length; ++i)
+    s.append(Integer.toUnsignedString(x.pop()));
+    while (!x.empty()) {
       s.append(
-          String.format("%09d", Integer.toUnsignedLong(mag[i]))
+          String.format("%09d", Integer.toUnsignedLong(x.pop()))
       );
+    }
     return s.toString();
   }
 
@@ -267,6 +281,7 @@ public class BigInt implements Comparable<BigInt> {
     }
     return s.toString();
   }
+
 
   /**
    * toString function for debugging. Generates string with sign and array contents
@@ -327,6 +342,18 @@ public class BigInt implements Comparable<BigInt> {
       }
     }
     return 0;
+  }
+
+  public boolean equals(BigInt val) {
+    return this.compareTo(val) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) sign;
+    result = 31 * result + Arrays.hashCode(mag);
+    result = 31 * result + lowestSetBit;
+    return result;
   }
 
   //------------------------------------------------------------------------------------------------
@@ -609,7 +636,7 @@ public class BigInt implements Comparable<BigInt> {
   //------------------------------------------------------------------------------------------------
   //endregion
 
-  //region Division
+  //region Division and Remainder
   //------------------------------------------------------------------------------------------------
 
   public BigInt divide(BigInt val) {
@@ -620,13 +647,13 @@ public class BigInt implements Comparable<BigInt> {
       return ONE;
 
     if (val.compareTo(ZERO) == 0)
-      return ZERO;
+      throw new ArithmeticException("Divisor is zero");
     else if (val.compareTo(ONE) == 0)
       return this;
     else if (val.compareTo(NEGATIVE_ONE) == 0)
       return this.negate();
 
-    BigInt result = this.abs().divideImpl(val.abs());
+    BigInt result = this.abs().divideAndRemainder(val.abs())[0];
     result.mag = stripLeadingZeros(result.mag);
     if (result.mag.length >= MAX_MAG_LENGTH)
       result.checkRange();
@@ -634,7 +661,38 @@ public class BigInt implements Comparable<BigInt> {
     return result;
   }
 
-  private BigInt divideImpl(BigInt y) {
+  public BigInt divide(long val) {
+    return divide(new BigInt(val));
+  }
+
+  public BigInt mod(BigInt val) {
+    BigInt b = remainder(val);
+    return (b.sign >= 0 ? b : b.add(val));
+  }
+
+  public BigInt mod(long val) {
+    return mod(new BigInt(val));
+  }
+
+  public BigInt remainder(BigInt val) {
+    if (val.compareTo(ZERO) == 0)
+      throw new ArithmeticException("Divisor is zero");
+    if (val.compareTo(ONE) == 0 || val.compareTo(NEGATIVE_ONE) == 0)
+      return ZERO;
+
+    BigInt result = this.abs().divideAndRemainder(val.abs())[1];
+    result.mag = stripLeadingZeros(result.mag);
+    if (result.mag.length >= MAX_MAG_LENGTH)
+      result.checkRange();
+    result.sign = this.sign;
+    return result;
+  }
+
+  public BigInt remainder(long val) {
+    return remainder(new BigInt(val));
+  }
+
+  private BigInt[] divideAndRemainder(BigInt y) {
     BigInt dividend = new BigInt(this);
     BigInt divisor = new BigInt(y);
     BigInt quotient = ZERO;
@@ -654,44 +712,177 @@ public class BigInt implements Comparable<BigInt> {
         quotient = quotient.shiftLeft(1);
       }
     }
-    return quotient;
+    return new BigInt[]{quotient, dividend};
   }
 
-  private static int divideArrayByInt(int[] quot, int[] x,
-      final int xlen, final int y) {
-    long rem = 0;
-    long yl = y & LONG_MASK;
+  //------------------------------------------------------------------------------------------------
+  //endregion
 
-    for (int i = xlen - 1; i >= 0; --i) {
-      long temp = (rem << 32) | x[i] & LONG_MASK;
-      long curr;
-      if (temp >= 0) {
-        curr = temp / yl;
-        rem = temp % yl;
-      } else {
-        // Make dividend positive
-        long aPos = temp >>> 1;
-        long bPos = y >>> 1;
-        curr = aPos / bPos;
-        rem = ((aPos % bPos) << 1) + (temp & 1);
-        if ((y & 1) != 0) {
-          // Odd divisor
-          if (curr <= rem) {
-            rem -= curr;
-          } else {
-            if (curr - rem <= yl) {
-              rem += yl - curr;
-              curr -= 1;
-            } else {
-              rem += (yl << 1) - curr;
-              curr -= 2;
-            }
-          }
+  //region Prime number operations
+  //------------------------------------------------------------------------------------------------
+
+  public boolean primeToCertainty() {
+    return primeToCertainty(DEFAULT_PRIME_CERTAINTY, new SecureRandom());
+  }
+
+  public boolean primeToCertainty(Random random) {
+    return primeToCertainty(DEFAULT_PRIME_CERTAINTY, random);
+  }
+
+  public boolean primeToCertainty(int certainty, Random random) {
+    int rounds;
+    int n = (Math.min(certainty, Integer.MAX_VALUE-1)+1)/2;
+
+    int sizeInBits = this.bitLength();
+    if (sizeInBits < 100) {
+      rounds = 50;
+      rounds = n < rounds ? n : rounds;
+      return passesMillerRabin(rounds, random);
+    }
+
+    if (sizeInBits < 256) {
+      rounds = 27;
+    } else if (sizeInBits < 512) {
+      rounds = 15;
+    } else if (sizeInBits < 768) {
+      rounds = 8;
+    } else if (sizeInBits < 1024) {
+      rounds = 4;
+    } else {
+      rounds = 2;
+    }
+    rounds = n < rounds ? n : rounds;
+
+    return passesMillerRabin(rounds, random);
+  }
+
+  private boolean passesMillerRabin(int iterations, Random rnd) {
+    // Find a and m such that m is odd and this == 1 + 2**a * m
+    BigInt thisMinusOne = this.subtract(ONE);
+    BigInt m = thisMinusOne;
+    int a = m.getLowestSetBit();
+    m = m.shiftRight(a);
+
+    // Do the tests
+    if (rnd == null) {
+      rnd = ThreadLocalRandom.current();
+    }
+    for (int i=0; i < iterations; i++) {
+      // Generate a uniform random on (1, this)
+      BigInt b;
+      do {
+        b = new BigInt(this.bitLength(), rnd);
+      } while (b.compareTo(ONE) <= 0 || b.compareTo(this) >= 0);
+
+      int j = 0;
+      BigInt z = b.modExp(m, this);
+      while (!((j == 0 && z.equals(ONE)) || z.equals(thisMinusOne))) {
+        if (j > 0 && z.equals(ONE) || ++j == a)
+          return false;
+        z = z.modExp(TWO, this);
+      }
+    }
+    return true;
+  }
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region Exponents
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Performs modular exponentiaton (this ^ exp % mod)
+   *
+   * <p>Reference:
+   * <a href="http://www.geeksforgeeks.org/modular-exponentiation-power-in-modular-arithmetic/">
+   *   GeeksForGeeks</a></p>
+   *
+   * @param exp Exponent, must be non-negative
+   * @param mod Modulus
+   * @return this ^ exp % mod
+   */
+  public BigInt modExp(BigInt exp, BigInt mod) {
+    if (exp.sign == -1)
+      throw new ArithmeticException("Negative exponent");
+
+    if (mod.equals(ONE))
+      return ZERO;
+
+    BigInt result = ONE;
+    BigInt base = this.mod(mod);
+
+    while (exp.compareTo(ZERO) == 1) {
+      if ((exp.mag[exp.mag.length - 1] & 1) == 1)
+        result = result.multiply(base).mod(mod);
+      base = base.multiply(base).mod(mod);
+      exp = exp.shiftRight(1);
+    }
+    return result;
+  }
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region Bit operations
+  //------------------------------------------------------------------------------------------------
+
+  public int bitLength() {
+    int n = bitLength - 1;
+    if (n == -1) { // bitLength not initialized yet
+      int[] m = mag;
+      int len = m.length;
+      if (len == 0) {
+        n = 0; // offset by one to initialize
+      }  else {
+        // Calculate the bit length of the magnitude
+        int magBitLength = ((len - 1) << 5) + 32 - Integer.numberOfLeadingZeros(mag[0]);
+        if (sign < 0) {
+          // Check if magnitude is a power of two
+          boolean pow2 = (Integer.bitCount(mag[0]) == 1);
+          for (int i=1; i< len && pow2; i++)
+            pow2 = (mag[i] == 0);
+
+          n = (pow2 ? magBitLength -1 : magBitLength);
+        } else {
+          n = magBitLength;
         }
       }
-      quot[i] = (int)(curr & LONG_MASK);
+      bitLength = n + 1;
     }
-    return (int) rem;
+    return n;
+  }
+
+  public int getLowestSetBit() {
+    int lsb = lowestSetBit - 2;
+    if (lsb == -2) {  // lowestSetBit not initialized yet
+      lsb = 0;
+      if (sign == 0) {
+        lsb -= 1;
+      } else {
+        // Search for lowest order nonzero int
+        int i,b;
+        for (i=0; (b = getInt(i)) == 0; i++);
+        lsb += (i << 5) + Integer.numberOfTrailingZeros(b);
+      }
+      lowestSetBit = lsb + 2;
+    }
+    return lsb;
+  }
+
+  private static byte[] randomBits(int numBits, Random rnd) {
+    if (numBits < 0)
+      throw new IllegalArgumentException("numBits must be non-negative");
+    int numBytes = (int)(((long) numBits + 7) / 8); // avoid overflow
+    byte[] randomBits = new byte[numBytes];
+
+    // Generate random bytes and mask out excess bits
+    if (numBytes > 0) {
+      rnd.nextBytes(randomBits);
+      int excessBits = 8 * numBytes - numBits;
+      randomBits[0] &= (1 << (8 - excessBits)) - 1;
+    }
+    return randomBits;
   }
 
   //------------------------------------------------------------------------------------------------
@@ -806,7 +997,7 @@ public class BigInt implements Comparable<BigInt> {
   //------------------------------------------------------------------------------------------------
   //endregion
 
-  //region Private utility functions for construction and conversion
+  //region Common private utility functions
   //------------------------------------------------------------------------------------------------
 
   private void checkRange() {
@@ -850,6 +1041,28 @@ public class BigInt implements Comparable<BigInt> {
     }
   }
 
+  private static int[] stripLeadingZeros(byte a[]) {
+    final int len = a.length;
+    int keep;
+
+    // Find first nonzero byte
+    for (keep = 0; keep < len && a[keep] == 0; keep++);
+
+    // Allocate new array and copy relevant part of input array
+    int intLength = ((len - keep) + 3) >>> 2;
+    int[] result = new int[intLength];
+    int b = len - 1;
+    for (int i = intLength-1; i >= 0; i--) {
+      result[i] = a[b--] & 0xff;
+      int bytesLeft = b - keep + 1;
+      int bytesToTransfer = Math.min(3, bytesLeft);
+      for (int j=8; j <= (bytesToTransfer << 3); j += 8)
+        result[i] |= ((a[b--] & 0xff) << j);
+    }
+    return result;
+  }
+
+
   /**
    * Strips leading zero
    *
@@ -892,6 +1105,30 @@ public class BigInt implements Comparable<BigInt> {
     for (int i = result.length - 1; ++result[i] == 0; --i);
 
     return result;
+  }
+
+  private int getInt(int n) {
+    if (n < 0)
+      return 0;
+    if (n >= mag.length)
+      return (sign < 0) ? -1 : 0;
+
+    int magInt = mag[mag.length-n-1];
+    return (sign >= 0 ? magInt :
+        (n <= firstNonzeroIntNum() ? -magInt : ~magInt));
+  }
+
+  private int firstNonzeroIntNum() {
+    int fn = firstNonzeroIntNum - 2;
+    if (fn == -2) { // firstNonzeroIntNum not initialized yet
+      // Search for the first nonzero int
+      int i;
+      int mlen = mag.length;
+      for (i = mlen - 1; i >= 0 && mag[i] == 0; i--);
+      fn = mlen - i - 1;
+      firstNonzeroIntNum = fn + 2; // offset by two to initialize
+    }
+    return fn;
   }
 
   //------------------------------------------------------------------------------------------------
