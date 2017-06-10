@@ -20,6 +20,7 @@ public class BigInt extends Number implements Comparable<BigInt> {
    */
   private final static long LONG_MASK = 0xffffffffL;
 
+  private static final int KARATSUBA_THRESHOLD = 50;
   private static final int SMALL_PRIME_THRESHOLD = 95;
   private static final int DEFAULT_PRIME_CERTAINTY = 100;
 
@@ -32,11 +33,13 @@ public class BigInt extends Number implements Comparable<BigInt> {
       1024, 1624, 2048, 2378, 2648, 2875, 3072, 3247, 3402, 3543, 3672,
       3790, 3899, 4001, 4096, 4186, 4271, 4350, 4426, 4498, 4567, 4633,
       4696, 4756, 4814, 4870, 4923, 4975, 5025, 5074, 5120, 5166, 5210,
-      5253, 5295};
+      5253, 5295
+  };
 
   private static int digitsPerInt[] = {0, 0, 30, 19, 15, 13, 11,
       11, 10, 9, 9, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6,
-      6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5};
+      6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5
+  };
 
   private static int intRadix[] = {0, 0,
       0x40000000, 0x4546b3db, 0x40000000, 0x48c27395, 0x159fd800,
@@ -933,20 +936,24 @@ public class BigInt extends Number implements Comparable<BigInt> {
     int xlen = mag.length;
     int ylen = val.mag.length;
 
-    byte resultSign;
-    if (sign == val.sign)
-      resultSign = 1;
-    else
-      resultSign = -1;
+    if ((xlen < KARATSUBA_THRESHOLD) || (ylen < KARATSUBA_THRESHOLD)) {
+      byte resultSign;
+      if (sign == val.sign)
+        resultSign = 1;
+      else
+        resultSign = -1;
 
-    if (ylen == 1)
-      return multiplyByInt(mag, val.mag[0], resultSign);
-    if (xlen == 1)
-      return multiplyByInt(val.mag, mag[0], resultSign);
+      if (ylen == 1)
+        return multiplyByInt(mag, val.mag[0], resultSign);
+      if (xlen == 1)
+        return multiplyByInt(val.mag, mag[0], resultSign);
 
-    int[] result = multiplyToLen(mag, xlen, val.mag, ylen);
-    result = stripLeadingZeros(result);
-    return new BigInt(result, resultSign);
+      int[] result = multiplyToLen(mag, xlen, val.mag, ylen);
+      result = stripLeadingZeros(result);
+      return new BigInt(result, resultSign);
+    } else {
+      return multiplyKaratsuba(val);
+    }
   }
 
   private static BigInt multiplyByInt(int[] x, int y, byte sign) {
@@ -974,6 +981,9 @@ public class BigInt extends Number implements Comparable<BigInt> {
   }
 
   private static int[] multiplyToLen(int[] x, int xlen, int[] y, int ylen) {
+    if (xlen == 0 || ylen == 0)
+      return ZERO.mag;
+
     final int xi = xlen - 1;
     final int yi = ylen - 1;
     int[] z = new int[xlen + ylen];
@@ -997,6 +1007,37 @@ public class BigInt extends Number implements Comparable<BigInt> {
       z[i] = (int) carry;
     }
     return z;
+  }
+
+  private BigInt multiplyKaratsuba(BigInt val) {
+    int xlen = this.mag.length;
+    int ylen = val.mag.length;
+
+    // The number of ints in each half of the number.
+    int half = (Math.max(xlen, ylen)+1) / 2;
+
+    // xl and yl are the lower halves of x and y respectively,
+    // xh and yh are the upper halves.
+    BigInt xl = this.getLower(half);
+    BigInt xh = this.getUpper(half);
+    BigInt yl = this.getLower(half);
+    BigInt yh = this.getUpper(half);
+
+    BigInt p1 = xh.multiply(yh);  // p1 = xh * yh
+    BigInt p2 = xl.multiply(yl);  // p2 = xl * yl
+
+    // p3 = (xh + xl) * (yh + yl);
+    BigInt p3 = xh.add(xl).multiply(yh.add(yl));
+
+    // result = p1 * 2^(32 * 2 * half) + (p3 - p1 - p2) * 2^(32 * half) + p2
+    BigInt result = p1.shiftLeft(32 * half)
+        .add(p3.subtract(p1).subtract(p2))
+        .shiftLeft(32 * half).add(p2);
+
+    if (this.sign != val.sign)
+      return result.negate();
+    else
+      return result;
   }
 
   //------------------------------------------------------------------------------------------------
@@ -1157,6 +1198,7 @@ public class BigInt extends Number implements Comparable<BigInt> {
 
   /**
    * Finds the modular multiplicative inverse of this using extended Euclidean algorithm.
+   * Assumes this and modulus are coprimes
    *
    * @param modulus modulus value
    * @return Modular multiplicative inverse
@@ -1166,6 +1208,9 @@ public class BigInt extends Number implements Comparable<BigInt> {
       throw new ArithmeticException("Modulus must be positive");
     else if (modulus.equals(ONE))
       return ZERO;
+
+    if (!isCoprime(modulus))
+      throw new ArithmeticException("This and modulus must be coprimes");
 
     BigInt val = this;
     BigInt mod = modulus;
@@ -1545,6 +1590,24 @@ public class BigInt extends Number implements Comparable<BigInt> {
       firstNonzeroIntNum = fn + 2; // offset by two to initialize
     }
     return fn;
+  }
+
+  private BigInt getLower(int n) {
+    final int len = mag.length;
+    if (len <= n)
+      return abs();
+
+    int lowerInts[] = Arrays.copyOfRange(mag, len - n, n);
+    return new BigInt(stripLeadingZeros(lowerInts), (byte) 1);
+  }
+
+  private BigInt getUpper(int n) {
+    final int len = mag.length;
+    if (len <= n)
+      return ZERO;
+
+    int upperInts[] = Arrays.copyOf(mag, len - n);
+    return new BigInt(stripLeadingZeros(upperInts), (byte) 1);
   }
 
   //------------------------------------------------------------------------------------------------
