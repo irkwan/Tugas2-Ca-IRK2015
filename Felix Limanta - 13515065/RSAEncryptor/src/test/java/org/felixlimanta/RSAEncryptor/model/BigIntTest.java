@@ -55,7 +55,7 @@ class BigIntTest {
 
   @Test
   void stringConstructor() {
-    final int k = 10000;
+    final int k = 1000000;
     for (int i = 0; i < k; ++i) {
       StringBuilder s = new StringBuilder();
       if (getRandomBoolean()) {
@@ -136,7 +136,7 @@ class BigIntTest {
     assertEquals(b3.toString(), b1.add(b2).toString(),
         "Larger + larger addition value mismatch");
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
       b1 = new BigInt(getRandomPosBigInt(100));
       b2 = new BigInt(getRandomPosBigInt(80));
       b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).add(new BigInteger(b2.toBinaryString(), 2)).toString(10));
@@ -189,7 +189,7 @@ class BigIntTest {
     assertEquals(b3.toString(), b1.subtract(b2).toString(),
         "Larger - larger subtraction value mismatch");
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
       b1 = new BigInt(getRandomPosBigInt(100));
       b2 = new BigInt(getRandomPosBigInt(80));
       b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).subtract(new BigInteger(b2.toBinaryString(), 2)).toString(10));
@@ -222,7 +222,7 @@ class BigIntTest {
         "Large word left shift mismatch");
 
     final int max = 1 << 16;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
       String s1 = getRandomPosBigInt(10);
       n = Math.min(max, Math.abs(getRandomInt()));
       BigInteger exp = new BigInteger(s1).shiftLeft(n);
@@ -256,7 +256,7 @@ class BigIntTest {
     assertEquals(b3.toBinaryString(), b2.toBinaryString(),
         "Large word left shift mismatch");
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
       String s1 = getRandomPosBigInt(100);
       n = Math.abs(getRandomInt());
       BigInteger exp = new BigInteger(s1).shiftRight(n);
@@ -303,7 +303,7 @@ class BigIntTest {
     assertEquals(b3.toString(), b1.multiply(b2).toString(),
         "medium neg * medium pos multiplication value mismatch");
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
       b1 = new BigInt(getRandomPosBigInt(100));
       b2 = new BigInt(getRandomPosBigInt(80));
       b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).multiply(new BigInteger(b2.toBinaryString(), 2)).toString(10));
@@ -368,7 +368,7 @@ class BigIntTest {
     b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).divide(new BigInteger(b2.toBinaryString(), 2)).toString(10));
     assertEquals(b3.toString(), b1.divide(b2).toString(),"TC10");
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
       String s1 = getRandomPosBigInt(100);
       String s2 = getRandomPosBigInt(100);
       b1 = new BigInt(s1);
@@ -435,7 +435,7 @@ class BigIntTest {
     b3 =  new BigInt(new BigInteger(b1.toBinaryString(), 2).remainder(new BigInteger(b2.toBinaryString(), 2)).toString(10));
     assertEquals(b3.toString(), b1.remainder(b2).toString(),"TC10");
 
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
       String s1 = getRandomPosBigInt(100);
       String s2 = getRandomPosBigInt(100);
       b1 = new BigInt(s1);
@@ -454,6 +454,7 @@ class BigIntTest {
     final int k = 10000;
     int n = 0;
     for (int i = 0; i < k; ++i) {
+      System.out.print(i + ". ");
       String s1 = getRandomPosBigInt(50);
       String s2 = getRandomPosBigInt(10);
       String s3 = getRandomPosBigInt(30);
@@ -463,10 +464,10 @@ class BigIntTest {
       assertEquals(exp.toString(2), act.toBinaryString(),
       s1 + " ^ " + s2 + " % " + s3 + " mismatch");
       if (exp.toString(2).equals(act.toBinaryString())) {
-        //System.out.println("v   " + s1 + " ^ " + s2 + " % " + s3);
+        System.out.println("v   " + s1 + " ^ " + s2 + " % " + s3);
         n++;
       } else {
-        //System.out.println("    " + s1 + " ^ " + s2 + " % " + s3);
+        System.out.println("    " + s1 + " ^ " + s2 + " % " + s3);
       }
     }
     assertTrue(n >= k * 0.95,
@@ -477,13 +478,25 @@ class BigIntTest {
   void primeValidation() {
     final int k = 100;
     for (int i = 0; i < k; ++i) {
-      System.out.print(i);
-      BigInteger b1 = BigInteger.probablePrime(1024, random);
-      BigInt b2 = new BigInt(b1.toString());
+      BigInteger b1 = BigInteger.probablePrime(128, random);
+      String s = b1.toString();
+      BigInt b2 = new BigInt(s);
       boolean exp = b1.isProbablePrime(100);
-      boolean act = b2.primeToCertainty(100, random);
+      boolean act = b2.isProbablePrime(100, random);
       assertEquals(exp, act,b1.toString() + " primality test mismatch");
-      System.out.println();
+      System.out.println(i + ". " + s);
+    }
+  }
+
+  @Test
+  void primeGeneration() {
+    final int k = 100;
+    for (int i = 0;i < k; ++i) {
+      BigInt b1 = BigInt.probablePrime(128, random);
+      BigInteger b2 = new BigInteger(b1.toBinaryString(), 2);
+      String s = b2.toString();
+      assertTrue(b2.isProbablePrime(100), " composite number generated");
+      System.out.println(i + ". " + s);
     }
   }
 

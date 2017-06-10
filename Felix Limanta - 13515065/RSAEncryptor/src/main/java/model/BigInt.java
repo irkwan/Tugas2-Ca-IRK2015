@@ -4,11 +4,13 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import sun.misc.DoubleConsts;
+import sun.misc.FloatConsts;
 
 /**
  * Created by ASUS on 07/06/17.
  */
-public class BigInt implements Comparable<BigInt> {
+public class BigInt extends Number implements Comparable<BigInt> {
 
   private static final int DIGITS_PER_INT = 9;
   private static final int BASE = 1000000000;
@@ -22,6 +24,7 @@ public class BigInt implements Comparable<BigInt> {
 
   private static final int KARATSUBA_THRESHOLD = 50;
 
+  private static final int SMALL_PRIME_THRESHOLD = 95;
   private static final int DEFAULT_PRIME_CERTAINTY = 100;
 
   private static long bitsPerDigit[] = { 0, 0,
@@ -44,6 +47,8 @@ public class BigInt implements Comparable<BigInt> {
       0x40000000, 0x4cfa3cc1, 0x5c13d840, 0x6d91b519, 0x39aa400
   };
 
+  private static SecureRandom random;
+
 
   private byte sign;
   private int[] mag;
@@ -58,7 +63,9 @@ public class BigInt implements Comparable<BigInt> {
   public static BigInt NEGATIVE_ONE = new BigInt(valueOf(-1));
 
 
-
+  static {
+    random = new SecureRandom();
+  }
 
   //region Constructor
   //------------------------------------------------------------------------------------------------
@@ -247,7 +254,11 @@ public class BigInt implements Comparable<BigInt> {
     java.util.Stack<Integer> x = new java.util.Stack<>();
     while (!b.equals(ZERO)) {
       BigInt[] divMod = b.divideAndRemainder(base);
-      x.push(divMod[1].mag[0]);
+      try {
+        x.push(divMod[1].mag[0]);
+      } catch (ArrayIndexOutOfBoundsException e) {
+        x.push(0);
+      }
       b = divMod[0];
     }
 
@@ -270,7 +281,11 @@ public class BigInt implements Comparable<BigInt> {
     StringBuilder s = new StringBuilder();
     if (sign < 0)
       s.append('-');
-    s.append(Integer.toBinaryString(mag[0]));
+    try {
+      s.append(Integer.toBinaryString(mag[0]));
+    } catch (ArrayIndexOutOfBoundsException e) {
+      s.append(Integer.toBinaryString(0));
+    }
     for (int i = 1; i < mag.length; ++i) {
       // Pad with zeros
       String group = Integer.toBinaryString(mag[i]);
@@ -297,6 +312,119 @@ public class BigInt implements Comparable<BigInt> {
           '}';
     else
       return toString();
+  }
+
+  @Override
+  public int intValue() {
+    int result = 0;
+    result = getInt(0);
+    return result;
+  }
+
+  @Override
+  public long longValue() {
+    long result = 0;
+
+    for (int i=1; i >= 0; i--)
+      result = (result << 32) + (getInt(i) & LONG_MASK);
+    return result;
+  }
+
+  @Override
+  public float floatValue() {
+    if (sign == 0) {
+      return 0.0f;
+    }
+
+    int exponent = ((mag.length - 1) << 5) + 32 - Integer.numberOfLeadingZeros(mag[0]) - 1;
+
+    // exponent == floor(log2(abs(this)))
+    if (exponent < Long.SIZE - 1) {
+      return longValue();
+    } else if (exponent > Float.MAX_EXPONENT) {
+      return sign > 0 ? Float.POSITIVE_INFINITY : Float.NEGATIVE_INFINITY;
+    }
+    
+    int shift = exponent - FloatConsts.SIGNIFICAND_WIDTH;
+
+    int twiceSignifFloor;
+
+    int nBits = shift & 0x1f;
+    int nBits2 = 32 - nBits;
+
+    if (nBits == 0) {
+      twiceSignifFloor = mag[0];
+    } else {
+      twiceSignifFloor = mag[0] >>> nBits;
+      if (twiceSignifFloor == 0) {
+        twiceSignifFloor = (mag[0] << nBits2) | (mag[1] >>> nBits);
+      }
+    }
+
+    int signifFloor = twiceSignifFloor >> 1;
+    signifFloor &= FloatConsts.SIGNIF_BIT_MASK; // remove the implied bit
+    
+    boolean increment = (twiceSignifFloor & 1) != 0
+        && ((signifFloor & 1) != 0 || abs().getLowestSetBit() < shift);
+    int signifRounded = increment ? signifFloor + 1 : signifFloor;
+    int bits = ((exponent + FloatConsts.EXP_BIAS))
+        << (FloatConsts.SIGNIFICAND_WIDTH - 1);
+    bits += signifRounded;
+    bits |= sign & FloatConsts.SIGN_BIT_MASK;
+    return Float.intBitsToFloat(bits);
+  }
+
+  @Override
+  public double doubleValue() {
+    if (sign == 0) {
+      return 0.0;
+    }
+
+    int exponent = ((mag.length - 1) << 5) + 32 - Integer.numberOfLeadingZeros(mag[0]) - 1;
+
+    // exponent == floor(log2(abs(this))Double)
+    if (exponent < Long.SIZE - 1) {
+      return longValue();
+    } else if (exponent > Double.MAX_EXPONENT) {
+      return sign > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+    }
+    
+    int shift = exponent - DoubleConsts.SIGNIFICAND_WIDTH;
+
+    long twiceSignifFloor;
+
+    int nBits = shift & 0x1f;
+    int nBits2 = 32 - nBits;
+
+    int highBits;
+    int lowBits;
+    if (nBits == 0) {
+      highBits = mag[0];
+      lowBits = mag[1];
+    } else {
+      highBits = mag[0] >>> nBits;
+      lowBits = (mag[0] << nBits2) | (mag[1] >>> nBits);
+      if (highBits == 0) {
+        highBits = lowBits;
+        lowBits = (mag[1] << nBits2) | (mag[2] >>> nBits);
+      }
+    }
+
+    twiceSignifFloor = ((highBits & LONG_MASK) << 32)
+        | (lowBits & LONG_MASK);
+
+    long signifFloor = twiceSignifFloor >> 1;
+    signifFloor &= DoubleConsts.SIGNIF_BIT_MASK; // remove the implied bit
+    
+    boolean increment = (twiceSignifFloor & 1) != 0
+        && ((signifFloor & 1) != 0 || abs().getLowestSetBit() < shift);
+    long signifRounded = increment ? signifFloor + 1 : signifFloor;
+    long bits = (long) ((exponent + DoubleConsts.EXP_BIAS))
+        << (DoubleConsts.SIGNIFICAND_WIDTH - 1);
+    bits += signifRounded;
+
+    bits |= sign & DoubleConsts.SIGN_BIT_MASK;
+    return Double.longBitsToDouble(bits);
   }
 
   //------------------------------------------------------------------------------------------------
@@ -565,7 +693,6 @@ public class BigInt implements Comparable<BigInt> {
     int xlen = mag.length;
     int ylen = val.mag.length;
 
-    //if (xlen < KARATSUBA_THRESHOLD || ylen < KARATSUBA_THRESHOLD) {
     byte resultSign;
     if (sign == val.sign)
       resultSign = 1;
@@ -580,7 +707,6 @@ public class BigInt implements Comparable<BigInt> {
     int[] result = multiplyToLen(mag, xlen, val.mag, ylen);
     result = stripLeadingZeros(result);
     return new BigInt(result, resultSign);
-    //}
   }
 
   private static BigInt multiplyByInt(int[] x, int y, byte sign) {
@@ -691,8 +817,8 @@ public class BigInt implements Comparable<BigInt> {
   public BigInt remainder(long val) {
     return remainder(new BigInt(val));
   }
-
-  private BigInt[] divideAndRemainder(BigInt y) {
+  
+  BigInt[] divideAndRemainder(BigInt y) {
     BigInt dividend = new BigInt(this);
     BigInt divisor = new BigInt(y);
     BigInt quotient = ZERO;
@@ -721,15 +847,94 @@ public class BigInt implements Comparable<BigInt> {
   //region Prime number operations
   //------------------------------------------------------------------------------------------------
 
-  public boolean primeToCertainty() {
-    return primeToCertainty(DEFAULT_PRIME_CERTAINTY, new SecureRandom());
+  public static BigInt probablePrime(int bitLength) {
+    return probablePrime(bitLength, random);
   }
 
-  public boolean primeToCertainty(Random random) {
-    return primeToCertainty(DEFAULT_PRIME_CERTAINTY, random);
+  public static BigInt probablePrime(int bitLength, Random random) {
+    if (bitLength < 2)
+      throw new ArithmeticException("bitLength < 2");
+
+    return (bitLength < SMALL_PRIME_THRESHOLD ?
+        smallPrime(bitLength, DEFAULT_PRIME_CERTAINTY, random) :
+        largePrime(bitLength, DEFAULT_PRIME_CERTAINTY, random));
+  }
+  
+  private static BigInt smallPrime(int bitLength, int certainty, Random rnd) {
+    final BigInt smallPrimeProduct =
+        valueOf(3L * 5 * 7 * 11 * 13 * 17 * 19 * 23 * 29 * 31 * 37 * 41);
+    
+    int magLen = (bitLength + 31) >>> 5;
+    int temp[] = new int[magLen];
+    int highBit = 1 << ((bitLength+31) & 0x1f);  // High bit of high int
+    int highMask = (highBit << 1) - 1;  // Bits to keep in high int
+
+    while (true) {
+      // Construct a candidate
+      for (int i=0; i < magLen; i++)
+        temp[i] = rnd.nextInt();
+      temp[0] = (temp[0] & highMask) | highBit;  // Ensure exact length
+      if (bitLength > 2)
+        temp[magLen-1] |= 1;  // Make odd if bitlen > 2
+
+      BigInt p = new BigInt(temp, (byte) 1);
+
+      // Do cheap "pre-test" if applicable
+      if (bitLength > 6) {
+        long r = p.remainder(smallPrimeProduct).longValue();
+        if ((r %  3 == 0) || (r %  5 == 0) || (r %  7 == 0) || (r % 11 == 0) ||
+            (r % 13 == 0) || (r % 17 == 0) || (r % 19 == 0) || (r % 23 == 0) ||
+            (r % 29 == 0) || (r % 31 == 0) || (r % 37 == 0) || (r % 41 == 0))
+          continue; // Candidate is composite; try another
+      }
+
+      // All candidates of bitLength 2 and 3 are prime by this point
+      if (bitLength < 4)
+        return p;
+
+      // Do expensive test if we survive pre-test (or it's inapplicable)
+      if (p.primeToCertainty(certainty, rnd))
+        return p;
+    }
+  }
+  
+  private static BigInt largePrime(int bitLength, int certainty, Random rnd) {
+    BigInt p = new BigInt(bitLength, rnd).setBit(bitLength-1);
+    p.mag[p.mag.length-1] &= 0xfffffffe;
+
+    // Use a sieve length likely to contain the next prime number
+    int searchLen = bitLength / 20 * 64;
+    BitSieve searchSieve = new BitSieve(p, searchLen);
+    BigInt candidate = searchSieve.retrieve(p, certainty, rnd);
+
+    while ((candidate == null) || (candidate.bitLength() != bitLength)) {
+      p = p.add(BigInt.valueOf(2 * searchLen));
+      if (p.bitLength() != bitLength)
+        p = new BigInt(bitLength, rnd).setBit(bitLength-1);
+      p.mag[p.mag.length-1] &= 0xfffffffe;
+      searchSieve = new BitSieve(p, searchLen);
+      candidate = searchSieve.retrieve(p, certainty, rnd);
+    }
+    return candidate;
   }
 
-  public boolean primeToCertainty(int certainty, Random random) {
+  public boolean isProbablePrime(int certainty) {
+    return isProbablePrime(certainty, random);
+  }
+
+  public boolean isProbablePrime(int certainty, Random random) {
+    if (certainty <= 0)
+      return true;
+    BigInt w = this.abs();
+    if (w.equals(TWO))
+      return true;
+    if (!w.testBit(0) || w.equals(ONE))
+      return false;
+
+    return w.primeToCertainty(certainty, random);
+  }
+
+  boolean primeToCertainty(int certainty, Random random) {
     int rounds;
     int n = (Math.min(certainty, Integer.MAX_VALUE-1)+1)/2;
 
@@ -868,6 +1073,28 @@ public class BigInt implements Comparable<BigInt> {
       lowestSetBit = lsb + 2;
     }
     return lsb;
+  }
+
+  public BigInt setBit(int n) {
+    if (n < 0)
+      throw new ArithmeticException("Negative bit address");
+
+    int intNum = n >>> 5;
+    int[] result = new int[Math.max((bitLength() >>> 5) + 1, intNum+2)];
+
+    for (int i=0; i < result.length; i++)
+      result[result.length-i-1] = getInt(i);
+
+    result[result.length-intNum-1] |= (1 << (n & 31));
+
+    return new BigInt(result);
+  }
+
+  public boolean testBit(int n) {
+    if (n < 0)
+      throw new ArithmeticException("Negative bit address");
+
+    return (getInt(n >>> 5) & (1 << (n & 31))) != 0;
   }
 
   private static byte[] randomBits(int numBits, Random rnd) {
