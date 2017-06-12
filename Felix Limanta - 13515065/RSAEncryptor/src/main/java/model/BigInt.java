@@ -21,7 +21,6 @@ public class BigInt extends Number implements Comparable<BigInt> {
   private final static long LONG_MASK = 0xffffffffL;
 
   private static final int KARATSUBA_THRESHOLD = 50;
-  private static final int SMALL_PRIME_THRESHOLD = 95;
   private static final int DEFAULT_PRIME_CERTAINTY = 100;
 
   private static int[] primesBelow100 = new int[] {
@@ -318,6 +317,23 @@ public class BigInt extends Number implements Comparable<BigInt> {
       return toString();
   }
 
+  public byte[] toByteArray() {
+    int byteLen = bitLength() / 8 + 1;
+    byte[] byteArray = new byte[byteLen];
+
+    for (int i = byteLen - 1, bytesCopied = 4, nextInt = 0, intIndex = 0; i >= 0; --i) {
+      if (bytesCopied == 4) {
+        nextInt = getInt(intIndex++);
+        bytesCopied = 1;
+      } else {
+        nextInt >>>= 8;
+        bytesCopied++;
+      }
+      byteArray[i] = (byte)nextInt;
+    }
+    return byteArray;
+  }
+
   @Override
   public int intValue() {
     int result = 0;
@@ -482,10 +498,10 @@ public class BigInt extends Number implements Comparable<BigInt> {
 
   @Override
   public int hashCode() {
-    int result = (int) sign;
-    result = 31 * result + Arrays.hashCode(mag);
-    result = 31 * result + lowestSetBit;
-    return result;
+    int hashCode = 0;
+    for (int n: mag)
+      hashCode = (int)(31 * hashCode + (n & LONG_MASK));
+    return hashCode * sign;
   }
 
   //------------------------------------------------------------------------------------------------
@@ -1248,12 +1264,10 @@ public class BigInt extends Number implements Comparable<BigInt> {
     if (bitLength < 2)
       throw new ArithmeticException("bitLength < 2");
 
-    return (bitLength < SMALL_PRIME_THRESHOLD ?
-        smallPrime(bitLength, DEFAULT_PRIME_CERTAINTY, random) :
-        largePrime(bitLength, DEFAULT_PRIME_CERTAINTY, random));
+    return generatePrime(bitLength, DEFAULT_PRIME_CERTAINTY, random);
   }
 
-  private static BigInt smallPrime(int bitLength, int certainty, Random rnd) {
+  private static BigInt generatePrime(int bitLength, int certainty, Random rnd) {
     long n = 1;
     for (int x: primesBelow100)
       n *= x;
@@ -1292,26 +1306,6 @@ public class BigInt extends Number implements Comparable<BigInt> {
       if (p.primeToCertainty(certainty, rnd))
         return p;
     }
-  }
-  
-  private static BigInt largePrime(int bitLength, int certainty, Random rnd) {
-    BigInt p = new BigInt(bitLength, rnd).setBit(bitLength-1);
-    p.mag[p.mag.length-1] &= 0xfffffffe;
-
-    // Use a sieve length likely to contain the next prime number
-    int searchLen = bitLength / 20 * 64;
-    BitSieve searchSieve = new BitSieve(p, searchLen);
-    BigInt candidate = searchSieve.retrieve(p, certainty, rnd);
-
-    while ((candidate == null) || (candidate.bitLength() != bitLength)) {
-      p = p.add(BigInt.valueOf(2 * searchLen));
-      if (p.bitLength() != bitLength)
-        p = new BigInt(bitLength, rnd).setBit(bitLength-1);
-      p.mag[p.mag.length-1] &= 0xfffffffe;
-      searchSieve = new BitSieve(p, searchLen);
-      candidate = searchSieve.retrieve(p, certainty, rnd);
-    }
-    return candidate;
   }
 
   public boolean isProbablePrime(int certainty) {

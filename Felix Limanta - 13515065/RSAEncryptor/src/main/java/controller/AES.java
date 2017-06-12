@@ -1,7 +1,8 @@
-package org.felixlimanta.RSAEncryptor.model;
+package org.felixlimanta.RSAEncryptor.controller;
 
 import java.security.SecureRandom;
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
@@ -20,11 +21,15 @@ public class AES {
   }
 
   public AES() {
-    key = new byte[16];
-    random.nextBytes(key);
+    try {
+      KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+      keyGen.init(128);
 
-    initVector = new byte[16];
-    random.nextBytes(initVector);
+      key = keyGen.generateKey().getEncoded();
+      initVector = keyGen.generateKey().getEncoded();
+    } catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
   public AES(byte[] key, byte[] initVector) {
@@ -32,17 +37,12 @@ public class AES {
     this.initVector = initVector;
   }
 
-  public AES(String key, String initVector) {
-    this.key = key.getBytes();
-    this.initVector = initVector.getBytes();
+  public byte[] getKey() {
+    return key;
   }
 
-  public String getKey() {
-    return new String(key);
-  }
-
-  public String getInitVector() {
-    return new String(initVector);
+  public byte[] getInitVector() {
+    return initVector;
   }
 
   public String encrypt(String plainText) {
@@ -54,7 +54,8 @@ public class AES {
       cipher.init(Cipher.ENCRYPT_MODE, sKeySpec, iv);
 
       byte[] cipherBytes = cipher.doFinal(plainText.getBytes());
-      return Base64.encodeBase64String(cipherBytes);
+      String cipherText = Base64.encodeBase64String(cipherBytes);
+      return cipherText;
     } catch (Exception e) {
       e.printStackTrace();
     }

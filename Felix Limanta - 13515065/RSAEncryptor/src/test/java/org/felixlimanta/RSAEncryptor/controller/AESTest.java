@@ -1,4 +1,5 @@
-package org.felixlimanta.RSAEncryptor.model;
+package org.felixlimanta.RSAEncryptor.controller;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -27,16 +28,16 @@ class AESTest {
   @BeforeAll
   static void setUpMessages() {
     messages = new String[5];
-    messages[0] = readFile("C:\\Users\\ASUS\\Documents\\The Situation in Hell.txt");
-    messages[1] = readFile("C:\\Programming\\Tugas2-Ca-IRK2015\\README.md");
-    messages[2] = readFile("C:\\Users\\ASUS\\Documents\\LoremIpsum1.txt");
-    messages[3] = readFile("C:\\Users\\ASUS\\Documents\\LoremIpsum2.txt");
-    messages[4] = readFile("C:\\Users\\ASUS\\Documents\\Lorem Ipsum.txt");
+    messages[0] = readFile("src/test/resources/test1.txt");
+    messages[1] = readFile("src/test/resources/test2.txt");
+    messages[2] = readFile("src/test/resources/test3.txt");
+    messages[3] = readFile("src/test/resources/test4.txt");
+    messages[4] = readFile("src/test/resources/test5.txt");
   }
 
   @Test
   void encryptDecrypt() {
-    final int k = 1000;
+    final int k = 10000;
     for (int i = 0; i < k; ++i) {
       AES aes = new AES();
       for (String message : messages) {
@@ -48,5 +49,13 @@ class AESTest {
                 + "Init Vector: " + aes.getInitVector());
       }
     }
+  }
+
+  private static String padLeftStringWithZeros(String s, int n) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < n; ++i)
+      sb.append('0');
+    sb.append(s);
+    return sb.substring(s.length());
   }
 }

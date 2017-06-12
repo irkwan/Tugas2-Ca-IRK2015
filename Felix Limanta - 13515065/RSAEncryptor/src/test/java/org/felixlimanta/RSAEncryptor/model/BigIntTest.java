@@ -32,13 +32,10 @@ class BigIntTest {
   }
 
   private String getRandomPosBigInt(int n) {
-    StringBuilder s = new StringBuilder();
-    for (int i = 0; i < getRandomInt() % n && s.length() <= n; ++i) {
-      s.append(Integer.toUnsignedLong(getRandomInt()));
-    }
-    if (s.toString().equals(""))
-      s.append(Integer.toUnsignedLong(getRandomInt()));
-    return s.toString();
+    byte[] b = new byte[n / 8];
+    random.nextBytes(b);
+    BigInteger b2 = new BigInteger(1, b);
+    return b2.toString();
   }
 
   @Test
@@ -69,6 +66,16 @@ class BigIntTest {
 
       b = new BigInt(s.toString());
       assertEquals(s.toString(), b.toString(), "String value mismatch");
+    }
+  }
+
+  @Test
+  void toStringTest() {
+    int k = 100;
+    for (int i = 0; i < k; ++i) {
+      BigInteger exp = BigInteger.probablePrime(1024, random);
+      BigInt act = new BigInt(exp.toString());
+      assertEquals(exp.toString(), act.toString(), "toString mismatch");
     }
   }
 
@@ -478,12 +485,28 @@ class BigIntTest {
   void gcd() {
     final int k = 10000;
     for (int i = 0; i < k; ++i) {
-      String s1 = getRandomPosBigInt(100);
-      String s2 = getRandomPosBigInt(100);
+      String s1 = BigInteger.probablePrime(1024, random).subtract(BigInteger.ONE).toString();
+      String s2 = BigInteger.probablePrime(1024, random).subtract(BigInteger.ONE).toString();
       BigInteger exp = new BigInteger(s1).gcd(new BigInteger(s2));
       BigInt act = new BigInt(s1).gcd(new BigInt(s2));
       assertEquals(exp.toString(), act.toString(),
           "GCD(" + s1 + ", " + s2 + ") mismatch");
+      //System.out.println(i + ". GCD(" + s1 + ", " + s2 + ")");
+    }
+  }
+
+  @Test
+  void lcm() {
+    final int k = 10000;
+    for (int i = 0; i < k; ++i) {
+      String s1 = getRandomPosBigInt(1024);
+      String s2 = getRandomPosBigInt(1024);
+
+      BigInteger exp = new BigInteger(s1).
+          divide(new BigInteger(s1).gcd(new BigInteger(s2))).multiply(new BigInteger(s2));
+      BigInt act = new BigInt(s1).lcm(new BigInt(s2));
+      assertEquals(exp.toString(), act.toString(),
+          "LCM(" + s1 + ", " + s2 + ") mismatch");
       //System.out.println(i + ". GCD(" + s1 + ", " + s2 + ")");
     }
   }
@@ -508,17 +531,18 @@ class BigIntTest {
   }
 
   @Test
-  void lcm() {
-    final int k = 10000;
+  void byteArrayOperation() {
+    final int k = 100;
     for (int i = 0; i < k; ++i) {
-      String s1 = getRandomPosBigInt(100);
-      String s2 = getRandomPosBigInt(100);
-      BigInteger exp = new BigInteger(s1).
-          divide(new BigInteger(s1).gcd(new BigInteger(s2))).multiply(new BigInteger(s2));
-      BigInt act = new BigInt(s1).lcm(new BigInt(s2));
-      assertEquals(exp.toString(), act.toString(),
-          "LCM(" + s1 + ", " + s2 + ") mismatch");
-      //System.out.println(i + ". GCD(" + s1 + ", " + s2 + ")");
+      byte[] bytes = new byte[16];
+      random.nextBytes(bytes);
+
+      String e = getRandomPosBigInt(1024);
+      String m = getRandomPosBigInt(1024);
+
+      BigInteger exp = new BigInteger(1, bytes).modPow(new BigInteger(e), new BigInteger(m));
+      BigInt act = new BigInt(bytes, (byte) 1).modExp(new BigInt(e), new BigInt(m));
+      assertEquals(exp.toString(2), act.toBinaryString());
     }
   }
 
@@ -526,7 +550,7 @@ class BigIntTest {
   void primeValidation() {
     final int k = 100;
     for (int i = 0; i < k; ++i) {
-      BigInteger b1 = BigInteger.probablePrime(128, random);
+      BigInteger b1 = BigInteger.probablePrime(1024, random);
       String s = b1.toString();
       BigInt b2 = new BigInt(s);
       boolean exp = b1.isProbablePrime(100);
@@ -538,9 +562,9 @@ class BigIntTest {
 
   @Test
   void primeGeneration() {
-    final int k = 100;
-    for (int i = 0;i < k; ++i) {
-      BigInt b1 = BigInt.probablePrime(128, random);
+    final int k = 1000;
+    for (int i = 0; i < k; ++i) {
+      BigInt b1 = BigInt.probablePrime(1024, random);
       BigInteger b2 = new BigInteger(b1.toBinaryString(), 2);
       String s = b2.toString();
       assertTrue(b2.isProbablePrime(100), "Composite number generated");
@@ -572,7 +596,5 @@ class BigIntTest {
       d = b.abs().add(d);
       System.out.println(b.multiply(c).add(d) + " = " + b + " * " + c + " + " + d);
     }
-
-    System.out.println(new BigInteger("65537").isProbablePrime(100));
   }
 }
