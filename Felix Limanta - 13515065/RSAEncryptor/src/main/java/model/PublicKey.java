@@ -40,7 +40,7 @@ public class PublicKey {
   //------------------------------------------------------------------------------------------------
 
   public static PublicKey fromXmlString(String xml) {
-    BigInt[] values = RsaXmlHelper.fromXmlString(xml, tagNames);
+    BigInt[] values = XmlHelper.fromXmlString(xml, tagNames);
     if (values != null)
       return new PublicKey(values[0], values[1]);
     return null;
@@ -48,7 +48,7 @@ public class PublicKey {
 
   public String toXmlString() {
     BigInt[] values = new BigInt[] { n, e };
-    return RsaXmlHelper.toXmlString(tagNames, values);
+    return XmlHelper.toXmlString(tagNames, values);
   }
 
   //------------------------------------------------------------------------------------------------

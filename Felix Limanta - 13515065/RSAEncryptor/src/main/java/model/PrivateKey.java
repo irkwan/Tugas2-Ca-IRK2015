@@ -277,7 +277,7 @@ public class PrivateKey {
   //------------------------------------------------------------------------------------------------
 
   public static PrivateKey fromXmlString(String xml) {
-    BigInt[] values = RsaXmlHelper.fromXmlString(xml, tagNames);
+    BigInt[] values = XmlHelper.fromXmlString(xml, tagNames);
     if (values != null)
       return new PrivateKey(values[0], values[1], values[7], values[2],
           values[3], values[4], values[5], values[6]);
@@ -286,7 +286,7 @@ public class PrivateKey {
 
   public String toXmlString() {
     BigInt[] values = new BigInt[] { n, e, p, q, dP, dQ, qInv, d };
-    return RsaXmlHelper.toXmlString(tagNames, values);
+    return XmlHelper.toXmlString(tagNames, values);
   }
 
   //------------------------------------------------------------------------------------------------

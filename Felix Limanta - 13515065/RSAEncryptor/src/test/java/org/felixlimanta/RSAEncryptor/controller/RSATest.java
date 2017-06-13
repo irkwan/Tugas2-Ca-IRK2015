@@ -89,9 +89,12 @@ class RSATest {
     String message = "hello world";
     String encrypted, decrypted;
     try {
-      encrypted = rsa.encrypt(message);
+      String[] s = rsa.encrypt(message);
+      String manifest = s[0];
+      encrypted = s[1];
+      System.out.println("Manifest: " + manifest);
       System.out.println("Encrypted: " + encrypted);
-      decrypted = rsa.decrypt(encrypted);
+      decrypted = rsa.decrypt(manifest, encrypted);
       System.out.println("Decrypted: " + decrypted);
     } catch (Exception e) {
       decrypted = "";
@@ -109,11 +112,11 @@ class RSATest {
       for (int i = 0; i < k; ++i) {
         System.out.print(i + " ");
         for (int j = 0; j < messages.length; ++j) {
-          String encrypted = rsa.encrypt(messages[j]);
+          String[] encrypted = rsa.encrypt(messages[j]);
           String key1 = Arrays.toString(rsa.getAes().getKey());
           String iv1 = Arrays.toString(rsa.getAes().getInitVector());
 
-          String decrypted = rsa.decrypt(encrypted);
+          String decrypted = rsa.decrypt(encrypted[0], encrypted[1]);
           assertEquals(messages[j], decrypted,
               "n = " + rsa.getN() + "\ne = " + rsa.getE() + "\nd = " + rsa.getD() + "\n"
                   + "Key1 = " + key1 + "\nIV2 = " + iv1 + "\n"

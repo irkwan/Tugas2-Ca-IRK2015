@@ -4,9 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.felixlimanta.RSAEncryptor.model.BigInt;
 import org.felixlimanta.RSAEncryptor.model.PrivateKey;
+import org.felixlimanta.RSAEncryptor.model.XmlHelper;
 
 /**
  * Created by ASUS on 10/06/17.
@@ -64,8 +64,7 @@ public class RSA {
     return aes;
   }
 
-  public String encrypt(String plainText) throws UnsupportedEncodingException {
-    StringBuilder s = new StringBuilder();
+  public String[] encrypt(String plainText) throws UnsupportedEncodingException {
     aes = new AES();
 
     // Encrypt key
@@ -74,62 +73,34 @@ public class RSA {
     BigInt cipherKeyInt = plainKeyInt.modExp(key.getE(), key.getN());
     byte[] cipherKey = cipherKeyInt.toByteArray();
 
-    // Append key and key length
-    String cipherKeyString = new String(Hex.encodeHex(cipherKey));
-    String cipherKeyStringLength =
-        padLeftStringWithZeros(Integer.toHexString(cipherKeyString.length()), 4);
-    s.append(cipherKeyStringLength).append(cipherKeyString);
-
     // Encrypt initialization vector
     byte[] plainIV = aes.getInitVector();
     BigInt plainIVInt = new BigInt(plainIV, (byte) 1);
     BigInt cipherIVInt = plainIVInt.modExp(key.getE(), key.getN());
     byte[] cipherIV = cipherIVInt.toByteArray();
 
-    // Append IV and IV length
-    String cipherIVString = new String(Hex.encodeHex(cipherIV));
-    String cipherIVStringLength =
-        padLeftStringWithZeros(Integer.toHexString(cipherIVString.length()), 4);
-    s.append(cipherIVStringLength).append(cipherIVString);
-
-
-    // Append text encrypted with AES
+    String manifest = XmlHelper.toXmlString(cipherKey, cipherIV);
     String cipherText = aes.encrypt(plainText);
-    s.append(cipherText);
-    return s.toString();
+    return new String[] { manifest, cipherText };
   }
 
-  public String decrypt(String cipherText) throws DecoderException, UnsupportedEncodingException {
-    int cursor = 0;
-
-    // Get key length and key
-    int cipherKeyStringLength =
-        Integer.parseInt(cipherText.substring(cursor, cursor += 4), 16);
-    String cipherKeyString =
-        cipherText.substring(cursor, cursor += cipherKeyStringLength);
+  public String decrypt(String manifest, String cipherText)
+      throws DecoderException, UnsupportedEncodingException {
+    byte[][] aesKeys = XmlHelper.fromXmlString(manifest);
 
     // Decrypt key
-    byte[] cipherKey = Hex.decodeHex(cipherKeyString.toCharArray());
-    BigInt cipherKeyInt = new BigInt(cipherKey, (byte) 1);
+    BigInt cipherKeyInt = new BigInt(aesKeys[0], (byte) 1);
     BigInt plainKeyInt = cipherKeyInt.modExp(key.getD(), key.getN());
     byte[] plainKey = leftTruncateOrPadByteArray(plainKeyInt.toByteArray(), 16);
 
-    // Get IV length and IV
-    int cipherIVStringLength =
-        Integer.parseInt(cipherText.substring(cursor, cursor += 4), 16);
-    String cipherIVString =
-        cipherText.substring(cursor, cursor += cipherIVStringLength);
-
     // Decrypt IV
-    byte[] cipherIV = Hex.decodeHex(cipherIVString.toCharArray());
-    BigInt cipherIVInt = new BigInt(cipherIV, (byte) 1);
+    BigInt cipherIVInt = new BigInt(aesKeys[1], (byte) 1);
     BigInt plainIVInt = cipherIVInt.modExp(key.getD(), key.getN());
     byte[] plainIV = leftTruncateOrPadByteArray(plainIVInt.toByteArray(), 16);
 
     // Decrypt text
     aes = new AES(plainKey, plainIV);
-    String message = cipherText.substring(cursor, cipherText.length());
-    return aes.decrypt(message);
+    return aes.decrypt(cipherText);
   }
 
   private static byte[] leftTruncateOrPadByteArray(byte[] b, int n) {
