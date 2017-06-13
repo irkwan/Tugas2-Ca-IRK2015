@@ -523,15 +523,7 @@ public class BigInt extends Number implements Comparable<BigInt> {
   }
 
   public BigInt increment() {
-    if (this.compareTo(ZERO) == 0)
-      return ONE;
-    if (this.compareTo(NEGATIVE_ONE) == 0)
-      return ZERO;
-
-    if (this.sign == -1)
-      return new BigInt(decrement(mag), sign);
-    else
-      return new BigInt(increment(mag), sign);
+    return add(ONE);
   }
 
   private static int[] increment(int[] val) {
@@ -552,24 +544,7 @@ public class BigInt extends Number implements Comparable<BigInt> {
   }
 
   public BigInt decrement() {
-    if (this.compareTo(ZERO) == 0)
-      return NEGATIVE_ONE;
-    else if (this.compareTo(ONE) == 0)
-      return ZERO;
-
-    if (this.sign == -1)
-      return new BigInt(increment(mag), sign);
-    else
-      return new BigInt(decrement(mag), sign);
-  }
-
-  private static int[] decrement(int[] val) {
-    int i = val.length - 1;
-    while (val[i] == 0) {
-      val[i--] = -1;
-    }
-    val[i]--;
-    return val;
+    return subtract(ONE);
   }
 
   public boolean isOdd() {
@@ -1411,6 +1386,22 @@ public class BigInt extends Number implements Comparable<BigInt> {
         return candidate;
       result = result.add(BigInt.valueOf(2 * searchLen));
     }
+  }
+
+  /**
+   * Generates a random BigInt in range [0, n - 1].
+   *
+   * @param n Upper limit (exclusive)
+   * @param rnd RNG
+   * @return Random BigInt
+   * @see <a href="http://stackoverflow.com/a/2290089">StackOverflow</a>
+   */
+  public static BigInt getRandomBigInt(BigInt n, Random rnd) {
+    BigInt r;
+    do {
+      r = new BigInt(n.bitLength(), rnd);
+    } while (r.compareTo(n) >= 0);
+    return r;
   }
 
   //------------------------------------------------------------------------------------------------

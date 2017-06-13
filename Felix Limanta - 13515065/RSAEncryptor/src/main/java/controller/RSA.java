@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.felixlimanta.RSAEncryptor.model.BigInt;
+import org.felixlimanta.RSAEncryptor.model.PrivateKey;
 
 /**
  * Created by ASUS on 10/06/17.
@@ -14,16 +15,9 @@ public class RSA {
   private static final int BIT_LENGTH = 1024;
   private static final BigInt DEFAULT_E_VALUE = new BigInt("65537");
   private static final int MAX_PLAINTEXT_LENGTH = BIT_LENGTH / 8;
-  private static final int MAX_CIPHERTEXT_LENGTH = MAX_PLAINTEXT_LENGTH * 2;
   private static SecureRandom random;
 
-  private BigInt p;
-  private BigInt q;
-  private BigInt n;
-  private BigInt lambda;
-  private BigInt e;
-  private BigInt d;
-
+  private PrivateKey key;
   private AES aes;
 
   static {
@@ -31,75 +25,43 @@ public class RSA {
   }
 
   public RSA() {
-    generateKeys();
+    key = new PrivateKey();
   }
 
   public RSA(BigInt n, BigInt e, BigInt d) {
-    this.n = n;
-    this.e = e;
-    this.d = d;
+    key = new PrivateKey(n, e, d);
   }
 
   public RSA(String n, String e, String d) {
-    this.n = new BigInt(n);
-    this.e = new BigInt(e);
-    this.d = new BigInt(d);
+    key = new PrivateKey(new BigInt(n), new BigInt(e), new BigInt(d));
   }
 
   BigInt getP() {
-    return p;
+    return key.getP();
   }
 
   BigInt getQ() {
-    return q;
+    return key.getQ();
   }
 
   BigInt getLambda() {
-    return lambda;
+    return key.getLambda();
   }
 
   public BigInt getN() {
-    return n;
+    return key.getN();
   }
 
   public BigInt getE() {
-    return e;
+    return key.getE();
   }
 
   BigInt getD() {
-    return d;
+    return key.getD();
   }
 
   AES getAes() {
     return aes;
-  }
-
-  public void generateKeys() {
-    // 4. Choose an integer e such that 1 < e < λ(n) and gcd(e, λ(n)) = 1;
-    //    i.e., e and λ(n) are coprime.
-    // e is predetermined
-    e = DEFAULT_E_VALUE;
-
-    // 1. Choose two distinct prime numbers p and q
-    do {
-      p = BigInt.probablePrime(BIT_LENGTH / 2, random);
-    } while (!e.gcd(p.subtract(BigInt.ONE)).equals(BigInt.ONE));
-    do {
-      q = BigInt.probablePrime(BIT_LENGTH / 2, random);
-    } while (!e.gcd(q.subtract(BigInt.ONE)).equals(BigInt.ONE));
-
-    // 2. Compute n = pq
-    n = p.multiply(q);
-
-    // 3. Compute λ(n) = lcm(λ(p), λ(q)) = lcm(p − 1, q − 1),
-    //    where λ is Carmichael’s totient function. This value is kept private. */
-    BigInt p2 = p.subtract(BigInt.ONE);
-    BigInt q2 = q.subtract(BigInt.ONE);
-    lambda = p2.divide(p2.gcd(q2)).multiply(q2);
-
-    // 5. Determine d as d ≡ e^-1 (mod λ(n));
-    //    i.e., d is the modular multiplicative inverse of e (modulo λ(n)).
-    d = e.modInverse(lambda);
   }
 
   public String encrypt(String plainText) throws UnsupportedEncodingException {
@@ -109,7 +71,7 @@ public class RSA {
     // Encrypt key
     byte[] plainKey = aes.getKey();
     BigInt plainKeyInt = new BigInt(plainKey, (byte) 1);
-    BigInt cipherKeyInt = plainKeyInt.modExp(e, n);
+    BigInt cipherKeyInt = plainKeyInt.modExp(key.getE(), key.getN());
     byte[] cipherKey = cipherKeyInt.toByteArray();
 
     // Append key and key length
@@ -121,7 +83,7 @@ public class RSA {
     // Encrypt initialization vector
     byte[] plainIV = aes.getInitVector();
     BigInt plainIVInt = new BigInt(plainIV, (byte) 1);
-    BigInt cipherIVInt = plainIVInt.modExp(e, n);
+    BigInt cipherIVInt = plainIVInt.modExp(key.getE(), key.getN());
     byte[] cipherIV = cipherIVInt.toByteArray();
 
     // Append IV and IV length
@@ -149,7 +111,7 @@ public class RSA {
     // Decrypt key
     byte[] cipherKey = Hex.decodeHex(cipherKeyString.toCharArray());
     BigInt cipherKeyInt = new BigInt(cipherKey, (byte) 1);
-    BigInt plainKeyInt = cipherKeyInt.modExp(d, n);
+    BigInt plainKeyInt = cipherKeyInt.modExp(key.getD(), key.getN());
     byte[] plainKey = leftTruncateOrPadByteArray(plainKeyInt.toByteArray(), 16);
 
     // Get IV length and IV
@@ -161,7 +123,7 @@ public class RSA {
     // Decrypt IV
     byte[] cipherIV = Hex.decodeHex(cipherIVString.toCharArray());
     BigInt cipherIVInt = new BigInt(cipherIV, (byte) 1);
-    BigInt plainIVInt = cipherIVInt.modExp(d, n);
+    BigInt plainIVInt = cipherIVInt.modExp(key.getD(), key.getN());
     byte[] plainIV = leftTruncateOrPadByteArray(plainIVInt.toByteArray(), 16);
 
     // Decrypt text

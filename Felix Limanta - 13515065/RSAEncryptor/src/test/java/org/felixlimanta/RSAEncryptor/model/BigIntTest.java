@@ -100,6 +100,19 @@ class BigIntTest {
   }
 
   @Test
+  void isOdd() {
+    final int k = 10000;
+    for (int i = 0; i < k; ++i) {
+      String s = getRandomPosBigInt(1024);
+      BigInteger exp = new BigInteger(s);
+      BigInt act = new BigInt(s);
+
+      assertEquals(exp.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE), act.isOdd(),
+          "Different oddness: " + s);
+    }
+  }
+
+  @Test
   void add() {
     BigInt b1 = new BigInt("99999999999999999999");
     BigInt b2 = new BigInt("11111111111111111111");
