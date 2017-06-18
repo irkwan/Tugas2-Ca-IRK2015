@@ -280,4 +280,41 @@ public class BigIntegerTest {
         "-1082152022374638", neg2.multiply(pos2).toString());
   }
 
+  /**
+   * Tests divide method.
+   */
+  @Test
+  public void testDivide() {
+    assertEquals("Test failed at division of zero with positive value",
+        "0", zero.divide(pos1).toString());
+    assertEquals("Test failed at division of zero with negative value",
+        "0", zero.divide(neg1).toString());
+    assertEquals("Test failed at division of 2 positive values",
+        "7", pos1.divide(pos2).toString());
+    assertEquals("Test failed at division of 2 negative values",
+        "7", neg2.divide(neg1).toString());
+    assertEquals("Test failed at division of positive value with negative value",
+        "-7", pos1.divide(neg1).toString());
+    assertEquals("Test failed at division of negative value with positive value",
+        "-7", neg2.divide(pos2).toString());
+  }
+
+  /**
+   * Tests mod method.
+   */
+  @Test
+  public void testMod() {
+    assertEquals("Test failed at modulo of zero with positive value",
+        "0", zero.mod(pos1).toString());
+    assertEquals("Test failed at modulo of zero with negative value",
+        "0", zero.mod(neg1).toString());
+    assertEquals("Test failed at modulo of 2 positive values",
+        "1234575", pos1.mod(pos2).toString());
+    assertEquals("Test failed at modulo of 2 negative values",
+        "-1234575", neg2.mod(neg1).toString());
+    assertEquals("Test failed at modulo of positive value with negative value",
+        "1234575", pos1.mod(neg1).toString());
+    assertEquals("Test failed at modulo of negative value with positive value",
+        "-1234575", neg2.mod(pos2).toString());
+  }
 }

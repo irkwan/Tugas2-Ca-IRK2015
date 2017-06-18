@@ -420,7 +420,7 @@ public class BigInteger implements Comparable<BigInteger> {
     }
     for (int i = 0; i < 2; i++) {
       if (result[i].digits.size() > 0) {
-        result[i].sign = 1;
+        result[i].sign = sign;
       }
     }
     return result;
@@ -442,6 +442,125 @@ public class BigInteger implements Comparable<BigInteger> {
     }
     result.digits.addAll(digits);
     return result;
+  }
+
+  /**
+   * Returns an array of two BigIntegers containing the quotient (b1 / b2)
+   * followed by the remainder (b1 % b2).
+   * @param b1 left hand side operand.
+   * @param b2 right hand side operand.
+   * @return an array of two BigIntegers containing the quotient (b1 / b2)
+   * followed by the remainder (b1 % b2).
+   * @throws ArithmeticException if val is zero.
+   */
+  public static BigInteger[] divideAndMod(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    if (b2.sign == 0) {
+      throw new ArithmeticException("division by zero");
+    }
+    BigInteger[] results = new BigInteger[2];
+    for (int i = 0; i < 2; i++) {
+      results[i] = new BigInteger();
+    }
+    if (b1.sign == 0) {
+      return results;
+    }
+    for (int i = b1.digits.size() - 1; i >= max(b1.digits.size() - b2.digits.size(), 0); i--) {
+      results[1].digits.add(0, b1.digits.get(i));
+    }
+    int pointer = b1.digits.size() - b2.digits.size();
+    if (pointer >= 0) {
+      results[1].sign = 1;
+      BigInteger temp;
+      if (b2.sign == -1) {
+        temp = negate(b2.clone());
+      } else {
+        temp = b2.clone();
+      }
+      while (pointer >= 0) {
+        int multiplier = 1;
+        BigInteger multiplyResult = temp.multiply(new BigInteger(multiplier));
+        BigInteger prev = new BigInteger();
+        while (results[1].isGreaterThanOrEquals(multiplyResult)) {
+          multiplier++;
+          prev = multiplyResult;
+          multiplyResult = temp.multiply(new BigInteger(multiplier));
+        }
+        if (multiplier > 1 || (multiplier == 1 && results[0].digits.size() != 0)) {
+          results[0] = results[0].multiplyByBasePow(1);
+          results[0] = results[0].add(new BigInteger(multiplier - 1));
+        }
+        results[1] = results[1].subtract(prev);
+        pointer--;
+        if (pointer >= 0) {
+          results[1] = results[1].multiplyByBasePow(1);
+          results[1] = results[1].add(new BigInteger(b1.digits.get(pointer)));
+        }
+      }
+    }
+    if (results[0].sign == 1 &&
+        ((b1.sign == -1 && b2.sign == 1) || (b1.sign == 1 && b2.sign == -1))) {
+      results[0].sign = -1;
+    }
+
+    if (results[1].sign == 1 &&
+        ((b1.sign == -1 && b2.sign == 1) || (b1.sign == -1 && b2.sign == -1))) {
+      results[1].sign = -1;
+    }
+    return results;
+  }
+
+  /**
+   * Returns an array of two BigIntegers containing the quotient (this / val)
+   * followed by the remainder (this % val).
+   * @param val value used to divide this BigInteger.
+   * @return an array of two BigIntegers containing the quotient (this / val)
+   * followed by the remainder (this % val).
+   * @throws ArithmeticException if val is zero.
+   */
+  public BigInteger[] divideAndMod(BigInteger val) throws ArithmeticException {
+    return divideAndMod(this, val);
+  }
+
+  /**
+   * Returns a BigInteger whose value is (b1 / b2).
+   * @param b1 left hand side operand.
+   * @param b2 right hand side operand.
+   * @return b1 / b2
+   * @throws ArithmeticException if val is zero.
+   */
+  public static BigInteger divide(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    return divideAndMod(b1, b2)[0];
+  }
+
+  /**
+   * Returns a BigInteger whose value is (this / val).
+   * @param val value used to divide this BigInteger.
+   * @return this / val
+   * @throws ArithmeticException if val is zero.
+   */
+  public BigInteger divide(BigInteger val) throws ArithmeticException {
+    return divide(this, val);
+  }
+
+  /**
+   * Returns a BigInteger whose value is (b1 % b2).
+   * @param b1 left hand side operand.
+   * @param b2 right hand side operand.
+   * @return b1 % b2
+   * @throws ArithmeticException if val is zero.
+   */
+  public static BigInteger mod(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    return divideAndMod(b1, b2)[1];
+  }
+
+  /**
+   * Returns a BigInteger whose value is (this % val).
+   * @param val value used to divide this BigInteger.
+   * @return this % val
+   * @throws ArithmeticException if val is zero.
+   */
+  public BigInteger mod(BigInteger val) throws ArithmeticException {
+    return mod(this, val);
   }
   
   /**
