@@ -317,4 +317,58 @@ public class BigIntegerTest {
     assertEquals("Test failed at modulo of negative value with positive value",
         "-1234575", neg2.mod(pos2).toString());
   }
+
+  /**
+   * Tests isOdd method.
+   */
+  @Test
+  public void testIsOdd() {
+    assertTrue("Test failed at checking odd value", pos1.isOdd());
+    assertFalse("Test failed at checking even value", pos2.isOdd());
+    assertFalse("Test failed at checking 0", zero.isOdd());
+  }
+
+  /**
+   * Tests isEven method.
+   */
+  @Test
+  public void testIsEven() {
+    assertFalse("Test failed at checking odd value", neg2.isEven());
+    assertTrue("Test failed at checking even value", neg1.isEven());
+    assertTrue("Test failed at checking 0", zero.isEven());
+  }
+
+  /**
+   * Tests pow method.
+   */
+  @Test
+  public void testPow() {
+    assertEquals("Test failed at power of positive with zero exponent",
+        "1", pos1.pow(zero).toString());
+    assertEquals("Test failed at power of negative with zero exponent",
+        "1", neg1.pow(zero).toString());
+    assertEquals("Test failed at power of negative with odd exponent",
+        "-1881675960266558605752", neg1.pow(new BigInteger(3)).toString());
+    assertEquals("Test failed at power of negative with even exponent",
+        "152415765279684", neg1.pow(new BigInteger(2)).toString());
+    assertEquals("Test failed at power of positive",
+        "1881675960266558605752", pos2.pow(new BigInteger(3)).toString());
+  }
+
+  /**
+   * Tests modPow method.
+   */
+  @Test
+  public void testModPow() {
+    assertEquals("Test failed at modPow of positive with zero exponent",
+        "0", pos1.modPow(zero, new BigInteger(1)).toString());
+    assertEquals("Test failed at modPow of negative with zero exponent",
+        "1", neg1.modPow(zero, new BigInteger(11)).toString());
+    assertEquals("Test failed at modPow of negative with odd exponent",
+        "0", neg1.modPow(new BigInteger(3), new BigInteger(3)).toString());
+    assertEquals("Test failed at modPow of negative with even exponent",
+        "0", neg1.modPow(new BigInteger(3), new BigInteger(2)).toString());
+    assertEquals("Test failed at modPow of positive",
+        "2", pos2.modPow(new BigInteger(3), new BigInteger(5)).toString());
+  }
 }

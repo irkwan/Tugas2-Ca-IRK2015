@@ -19,6 +19,8 @@ public class BigInteger implements Comparable<BigInteger> {
   private ArrayList<Integer> digits; //Digits of this BigInteger in little-endian order.
   private int sign; //Sign of this BigInteger. -1 for negative, 0 for zero, and 1 for positive.
   private static final int BASE = 10; //Base number used to represents the BigInteger.
+  private static BigInteger ONE = new BigInteger(1); //BigInteger representation for value 1.
+  private static BigInteger TWO = new BigInteger(2); //BigInteger representation for value 2.
 
   /**
    * Return the minimum integer between a and b.
@@ -467,9 +469,9 @@ public class BigInteger implements Comparable<BigInteger> {
     for (int i = b1.digits.size() - 1; i >= max(b1.digits.size() - b2.digits.size(), 0); i--) {
       results[1].digits.add(0, b1.digits.get(i));
     }
+    results[1].sign = 1;
     int pointer = b1.digits.size() - b2.digits.size();
     if (pointer >= 0) {
-      results[1].sign = 1;
       BigInteger temp;
       if (b2.sign == -1) {
         temp = negate(b2.clone());
@@ -562,7 +564,110 @@ public class BigInteger implements Comparable<BigInteger> {
   public BigInteger mod(BigInteger val) throws ArithmeticException {
     return mod(this, val);
   }
-  
+
+  /**
+   * Returns a BigInteger whose value is (b<sup>exponent</sup>).
+   * @param b the specified BigInteger.
+   * @param exponent exponent to which the specified BigInteger is to be raised.
+   * @return b<sup>exponent</sup>
+   * @throws ArithmeticException if exponent is negative (yields non-integer value) or 0<sup>0</sup>.
+   */
+  public static BigInteger pow(BigInteger b, BigInteger exponent) throws ArithmeticException {
+    if (exponent.sign == -1) {
+      throw new ArithmeticException("exponent cannot be negative");
+    }
+    if (b.sign == 0 && exponent.sign == 0) {
+      throw new ArithmeticException("indeterminate number");
+    }
+    if (exponent.sign == 0) {
+      return new BigInteger(1);
+    }
+    if (b.sign == 0) {
+      return new BigInteger();
+    }
+    if (exponent.equals(ONE)) {
+      return b.clone();
+    }
+    if (exponent.isEven()) {
+      return (pow(multiply(b, b), divide(exponent, TWO)));
+    } else {
+      return multiply(b, pow(multiply(b, b), divide(exponent, TWO)));
+    }
+  }
+
+  /**
+   * Returns a BigInteger whose value is (this<sup>exponent</sup>).
+   * @param exponent exponent to which this BigInteger is to be raised.
+   * @return this<sup>exponent</sup>
+   * @throws ArithmeticException if exponent is negative (yields non-integer value) or 0<sup>0</sup>..
+   */
+  public BigInteger pow(BigInteger exponent) throws ArithmeticException {
+    return pow(this, exponent);
+  }
+
+  /**
+   * Checks whether this BigInteger is odd or not.
+   * @return true if this BigInteger is odd. Otherwise false.
+   */
+  public boolean isOdd() {
+    return (sign != 0 && digits.get(0) % 2 == 1);
+  }
+
+  /**
+   * Checks whether this BigInteger is even or not.
+   * @return true if this BigInteger is even. Otherwise false.
+   */
+  public boolean isEven() {
+    return (sign == 0 || digits.get(0) % 2 == 0);
+  }
+
+  /**
+   * Returns a BigInteger whose value is (b<sup>exponent</sup> % m).
+   * @param b the specified BigInteger.
+   * @param exponent exponent to which the specified BigInteger is to be raised.
+   * @param m the modulus.
+   * @return b<sup>exponent</sup> % m
+   * @throws ArithmeticException if exponent is negative (yields non-integer value), 0<sup>0</sup>,
+   * or m <= 0.
+   */
+  public static BigInteger modPow(BigInteger b, BigInteger exponent, BigInteger m)
+      throws ArithmeticException {
+    if (exponent.sign == -1) {
+      throw new ArithmeticException("exponent cannot be negative");
+    }
+    if (m.sign <= 0) {
+      throw new ArithmeticException("modulus must be > 0");
+    }
+    if (b.sign == 0 && exponent.sign == 0) {
+      throw new ArithmeticException("indeterminate number");
+    }
+    if (exponent.sign == 0) {
+      return new BigInteger(1).mod(m);
+    }
+    if (b.sign == 0) {
+      return new BigInteger();
+    }
+    if (exponent.equals(ONE)) {
+      return b.clone().mod(m);
+    }
+    if (exponent.isEven()) {
+      return (pow(multiply(b, b).mod(m), divide(exponent, TWO)));
+    } else {
+      return multiply(b, pow(multiply(b, b).mod(m), divide(exponent, TWO))).mod(m);
+    }
+  }
+
+  /**
+   * Returns a BigInteger whose value is (this<sup>exponent</sup> % m).
+   * @param exponent exponent to which this BigInteger is to be raised.
+   * @param m the modulus.
+   * @return this<sup>exponent</sup> % m
+   * @throws ArithmeticException if exponent is negative (yields non-integer value) or m is zero.
+   */
+  public BigInteger modPow(BigInteger exponent, BigInteger m) {
+    return modPow(this, exponent, m);
+  }
+
   /**
    * Returns the String representation of this BigInteger.
    * @return String representation of this BigInteger.
