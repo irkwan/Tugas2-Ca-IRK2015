@@ -255,4 +255,29 @@ public class BigIntegerTest {
         "-99999999", neg2.subtract(pos2).toString());
   }
 
+  /**
+   * Tests multiply method.
+   */
+  @Test
+  public void testMultiply() {
+    assertEquals("Test failed at multiplication of zero with zero",
+        "0", zero.multiply(zero).toString());
+    assertEquals("Test failed at multiplication of zero with positive value",
+        "0", zero.multiply(pos1).toString());
+    assertEquals("Test failed at multiplication of zero with negative value",
+        "0", zero.multiply(neg1).toString());
+    assertEquals("Test failed at multiplication of positive value with zero",
+        "0", pos1.multiply(zero).toString());
+    assertEquals("Test failed at multiplication of negative value with zero",
+        "0", neg1.multiply(zero).toString());
+    assertEquals("Test failed at multiplication of 2 positive values",
+        "1082152022374638", pos1.multiply(pos2).toString());
+    assertEquals("Test failed at multiplication of 2 negative values",
+        "1082152022374638", neg1.multiply(neg2).toString());
+    assertEquals("Test failed at multiplication of positive value with negative value",
+        "-1082152022374638", pos1.multiply(neg1).toString());
+    assertEquals("Test failed at multiplication of negative value with positive value",
+        "-1082152022374638", neg2.multiply(pos2).toString());
+  }
+
 }

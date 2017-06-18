@@ -108,7 +108,7 @@ public class BigInteger implements Comparable<BigInteger> {
   }
 
   /**
-   * Returns a BigInteger whose value is -b.
+   * Returns a BigInteger whose value is (-b).
    * @return -b
    */
   public static BigInteger negate(BigInteger b) {
@@ -118,7 +118,7 @@ public class BigInteger implements Comparable<BigInteger> {
   }
 
   /**
-   * Returns a BigInteger whose value is -this.
+   * Returns a BigInteger whose value is (-this).
    * @return -this
    */
   public BigInteger negate() {
@@ -345,6 +345,105 @@ public class BigInteger implements Comparable<BigInteger> {
     return subtract(this, val);
   }
 
+  /**
+   * Returns a BigInteger whose value is (b1 * b2).
+   * @param b1 left hand side operand.
+   * @param b2 right hand side operand.
+   * @return b1 * b2
+   */
+  public static BigInteger multiply(BigInteger b1, BigInteger b2) {
+    if (b1.sign == 0 || b2.sign == 0) {
+      return new BigInteger();
+    }
+    if (b1.sign == -1 && b2.sign == 1) {
+      return negate(karatsuba(negate(b1), b2));
+    }
+    if (b1.sign == 1 && b2.sign == -1) {
+      return negate(karatsuba(b1, negate(b2)));
+    }
+    if (b1.sign == -1 && b2.sign == -1) {
+      return karatsuba(negate(b1), negate(b2));
+    }
+    return karatsuba(b1, b2);
+  }
+
+  /**
+   * Returns a BigInteger whose value is (this * val).
+   * @param val value to be multiplied by this BigInteger.
+   * @return this * val
+   */
+  public BigInteger multiply(BigInteger val) {
+    return multiply(this, val);
+  }
+
+  /**
+   * Karatsuba algorithm (multiplication algorithm), returns (b1 * b2).
+   *
+   * <p>Both b1 and b2 are positive BigInteger.
+   * @param b1 left hand side operand.
+   * @param b2 right hand side operand.
+   * @return b1 * b2
+   */
+  private static BigInteger karatsuba(BigInteger b1, BigInteger b2) {
+    if (b1.sign == 0 || b2.sign == 0) {
+      return new BigInteger();
+    }
+    if (b1.digits.size() == 1 && b2.digits.size() == 1) {
+      return new BigInteger(b1.digits.get(0) * b2.digits.get(0));
+    }
+    int m = max(b1.digits.size(), b2.digits.size()) / 2;
+    BigInteger[] x = b1.split(m);
+    BigInteger[] y = b2.split(m);
+    BigInteger z0 = karatsuba(x[0], y[0]);
+    BigInteger z2 = karatsuba(x[1], y[1]);
+    BigInteger z1 = karatsuba(add(x[1], x[0]), add(y[1], y[0])).subtract(z2).subtract(z0);
+    return (add(add(z2.multiplyByBasePow(2 * m), z1.multiplyByBasePow(m)), z0));
+  }
+
+  /**
+   * Split this BigInteger into the form (x<sub>1</sub> * 10<sup>index</sup> + x<sub>0</sub>) and
+   * returns x<sub>1</sub> and x<sub>0</sub>.
+   * @param index index / position to split this BigInteger.
+   * @return x<sub>1</sub> and x<sub>0</sub> in the form of an array (index 0 for x<sub>0</sub>
+   * and index 1 for x<sub>1</sub>).
+   */
+  private BigInteger[] split(int index) {
+    BigInteger[] result = new BigInteger[2];
+    for (int i = 0; i < 2; i++) {
+      result[i] = new BigInteger();
+    }
+    for (int i = 0; i < min(index, digits.size()); i++) {
+      result[0].digits.add(digits.get(i));
+    }
+    for (int i = index; i < digits.size(); i++) {
+      result[1].digits.add(digits.get(i));
+    }
+    for (int i = 0; i < 2; i++) {
+      if (result[i].digits.size() > 0) {
+        result[i].sign = 1;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns a BigInteger whose value is (this * 10<sup>exp</sup>).
+   * @param exponent exponent to which the base of this BigInteger is to be raised.
+   * @return this * 10<sup>exp</sup>
+   */
+  private BigInteger multiplyByBasePow(int exponent) {
+    if (digits.size() == 0) {
+      return new BigInteger();
+    }
+    BigInteger result = new BigInteger();
+    result.sign = sign;
+    for (int i = 0; i < exponent; i++) {
+      result.digits.add(0);
+    }
+    result.digits.addAll(digits);
+    return result;
+  }
+  
   /**
    * Returns the String representation of this BigInteger.
    * @return String representation of this BigInteger.
