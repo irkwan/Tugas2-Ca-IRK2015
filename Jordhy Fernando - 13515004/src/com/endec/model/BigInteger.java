@@ -68,6 +68,28 @@ public class BigInteger implements Comparable<BigInteger> {
   }
 
   /**
+   * Creates a BigInteger from the specified decimal String representation of a BigInteger.
+   * @param val decimal String representation of BigInteger.
+   */
+  public BigInteger(String val) {
+    digits = new ArrayList<>();
+    if (val.length() == 1 && val.charAt(0) == '0') {
+      sign = 0;
+    } else {
+      int limit = 0;
+      if (val.charAt(0) == '-') {
+        sign = -1;
+        limit = 1;
+      } else {
+        sign = 1;
+      }
+      for (int i = val.length() - 1; i >= limit; i--) {
+        digits.add(val.charAt(i) - '0');
+      }
+    }
+  }
+
+  /**
    * Copy Constructor.
    * @param b BigInteger to be copied.
    */
@@ -211,7 +233,7 @@ public class BigInteger implements Comparable<BigInteger> {
    * @param b2 right hand side operand.
    * @return b1 + b2
    */
-  public static BigInteger add (BigInteger b1, BigInteger b2) {
+  public static BigInteger add(BigInteger b1, BigInteger b2) {
     if (b1.sign == 0) {
       return b2.clone();
     }
