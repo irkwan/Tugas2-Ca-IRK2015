@@ -58,6 +58,7 @@ public class BigInteger implements Comparable<BigInteger> {
     digits = new ArrayList<>();
     if (val < 0) {
       sign = -1;
+      val = -val;
     } else if (val == 0) {
       sign = 0;
     } else {
@@ -666,6 +667,135 @@ public class BigInteger implements Comparable<BigInteger> {
    */
   public BigInteger modPow(BigInteger exponent, BigInteger m) {
     return modPow(this, exponent, m);
+  }
+
+  /**
+   * Returns a BigInteger whose value is GCD(b1, b2). Returns 0 if both Biginteger is zero.
+   * @param b1 value which the GCD is to be computed.
+   * @param b2 value which the GCD is to be computed.
+   * @return GCD(b1, b2)
+   */
+  public static BigInteger gcd(BigInteger b1, BigInteger b2) {
+    BigInteger temp1 = abs(b1);
+    BigInteger temp2 = abs(b2);
+    if (temp1.sign == 0) {
+      return temp2.clone();
+    }
+    return gcd(temp2.mod(temp1), temp1);
+  }
+
+  /**
+   * Returns a BigInteger whose value is GCD(this, val). Returns 0 if both Biginteger is zero.
+   * @param val value with which the GCD is to be computed.
+   * @return GCD(this, val)
+   */
+  public BigInteger gcd(BigInteger val) {
+    return gcd(this, val);
+  }
+
+  /**
+   * Returns a BigInteger whose value is abs(val).
+   * @param val value which the absolute value is to be computed.
+   * @return abs(val)
+   */
+  public static BigInteger abs(BigInteger val) {
+    if (val.sign >= 0) {
+      return val.clone();
+    } else {
+      return negate(val);
+    }
+  }
+
+  /**
+   * Returns a BigInteger whose value is abs(this).
+   * @return abs(this)
+   */
+  public BigInteger abs() {
+    return abs(this);
+  }
+
+  /**
+   * Returns an array of BigInteger [d, x, y] such that d = GCD(a, b) and ax + by = d.
+   * @param a value which the GCD is to be computed.
+   * @param b value which the GCD is to be computed.
+   * @return array of BigInteger [d, x, y] such that d = GCD(a, b) and ax + by = d.
+   */
+  public static BigInteger[] gcdExtended(BigInteger a, BigInteger b) {
+    BigInteger[] results = gcdExtended2(abs(a), abs(b));
+    if (a.sign == -1) {
+      results[1] = multiply(results[1], new BigInteger(-1));
+    }
+    if (b.sign == -1) {
+      results[2] = multiply(results[2], new BigInteger(-1));
+    }
+    return results;
+  }
+
+  /**
+   * Returns an array of BigInteger [d, x, y] such that d = GCD(a, b) and ax + by = d.
+   *
+   * <p>Both a and b are positive BigInteger.
+   * @param a value which the GCD is to be computed.
+   * @param b value which the GCD is to be computed.
+   * @return array of BigInteger [d, x, y] such that d = GCD(a, b) and ax + by = d.
+   */
+  private static BigInteger[] gcdExtended2(BigInteger a, BigInteger b) {
+    BigInteger[] results = new BigInteger[3];
+    if (a.sign == 0) {
+      results[0] = b.clone();
+      results[1] = new BigInteger();
+      results[2] = new BigInteger(1);
+      return results;
+    }
+    BigInteger[] vals = gcdExtended2(b.mod(a), a);
+    results[0] = vals[0];
+    results[2] = vals[1];
+    results[1] = vals[2].subtract(multiply(vals[1], divide(b, a)));
+    return results;
+  }
+
+  /**
+   * Returns an array of BigInteger [d, x, y] such that d = GCD(this, val) and
+   * this * x + val * y = d.
+   * @param val value with which the GCD is to be computed.
+   * @return array of BigInteger [d, x, y] s such that d = GCD(this, val) and
+   * this * x + val * y = d.
+   */
+  public BigInteger [] gcdExtended(BigInteger val) {
+    return gcdExtended(this, val);
+  }
+
+  /**
+   * Returns a BigInteger whose value is (b<sup>-1</sup> mod m).
+   * @param b the BigInteger which the modInverse is to be computed.
+   * @param m the modulus.
+   * @return b<sup>-1</sup> mod m
+   * @throws ArithmeticException if m <= 0 or b is not relatively prime to m (has no multiplicative
+   * inverse mod m).
+   */
+  public static BigInteger modInverse(BigInteger b, BigInteger m) throws ArithmeticException {
+    if (m.sign <= 0) {
+      throw new ArithmeticException("the modulo must be positive");
+    }
+    BigInteger[] temp = gcdExtended(b, m);
+    if (!temp[0].equals(ONE)) {
+      throw new ArithmeticException("this BigInteger has no multiplicative inverse mod m");
+    }
+    if (temp[1].sign == -1) {
+      return add(m, temp[1]);
+    }
+    return temp[1];
+  }
+
+  /**
+   * Returns a BigInteger whose value is (this<sup>-1</sup> mod m).
+   * @param m the modulus.
+   * @return this<sup>-1</sup> mod m
+   * @throws ArithmeticException if m <= 0 or
+   * this BigInteger is not relatively prime to m (has no multiplicative inverse mod m).
+   */
+  public BigInteger modInverse(BigInteger m) throws ArithmeticException {
+    return modInverse(this, m);
   }
 
   /**

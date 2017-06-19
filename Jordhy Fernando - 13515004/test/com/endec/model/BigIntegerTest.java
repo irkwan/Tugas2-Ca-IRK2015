@@ -371,4 +371,85 @@ public class BigIntegerTest {
     assertEquals("Test failed at modPow of positive",
         "2", pos2.modPow(new BigInteger(3), new BigInteger(5)).toString());
   }
+
+  /**
+   * Tests gcd method.
+   */
+  @Test
+  public void testGcd() {
+    assertEquals("Test failed at gcd of zero with zero",
+        "0", zero.gcd(zero).toString());
+    assertEquals("Test failed at gcd of positive value with zero",
+        "87654321", pos1.gcd(zero).toString());
+    assertEquals("Test failed at gcd of negative value with zero",
+        "12345678", neg1.gcd(zero).toString());
+    assertEquals("Test failed at gcd of positive value with positive value",
+        "9", pos2.gcd(pos1).toString());
+    assertEquals("Test failed at gcd of positive value with negative value",
+        "9", pos1.gcd(neg1).toString());
+    assertEquals("Test failed at gcd of negative value with negative value",
+        "9", neg2.gcd(neg1).toString());
+    assertEquals("Test failed at gcd of negative value with positive value",
+        "12345678", neg1.gcd(pos2).toString());
+  }
+
+  /**
+   * Tests gcdExtended method.
+   */
+  @Test
+  public void testGcdExtended() {
+    BigInteger[] temp;
+    temp = zero.gcdExtended(zero);
+    assertEquals("Test failed at gcdExtended of zero with zero",
+        "0", temp[0].toString());
+    assertTrue("Test failed at gcdExtended of zero with zero",
+        zero.multiply(temp[1]).add(zero.multiply(temp[2])).equals(temp[0]));
+
+    temp = pos1.gcdExtended(zero);
+    assertEquals("Test failed at gcdExtended of positive value with zero",
+        "87654321", temp[0].toString());
+    assertTrue("Test failed at gcdExtended of positive value with zero",
+        pos1.multiply(temp[1]).add(zero.multiply(temp[2])).equals(temp[0]));
+
+    temp = neg1.gcdExtended(zero);
+    assertEquals("Test failed at gcdExtended of negative value with zero",
+        "12345678", temp[0].toString());
+    assertTrue("Test failed at gcdExtended of negative value with zero",
+        neg1.multiply(temp[1]).add(zero.multiply(temp[2])).equals(temp[0]));
+
+    temp = pos2.gcdExtended(pos1);
+    assertEquals("Test failed at gcdExtended of positive value with positive value",
+        "9", temp[0].toString());
+    assertTrue("Test failed at gcdExtended of positive value value with positive value",
+        pos2.multiply(temp[1]).add(pos1.multiply(temp[2])).equals(temp[0]));
+
+    temp = pos1.gcdExtended(neg1);
+    assertEquals("Test failed at gcdExtended of positive value with negative value",
+        "9", temp[0].toString());
+    assertTrue("Test failed at gcdExtended of positive value value with negative value",
+        pos1.multiply(temp[1]).add(neg1.multiply(temp[2])).equals(temp[0]));
+
+    temp = neg2.gcdExtended(neg1);
+    assertEquals("Test failed at gcdExtended of negative value with negative value",
+        "9", temp[0].toString());
+    assertTrue("Test failed at gcdExtended of negative value value with negative value",
+        neg2.multiply(temp[1]).add(neg1.multiply(temp[2])).equals(temp[0]));
+
+    temp = neg1.gcdExtended(pos2);
+    assertEquals("Test failed at gcdExtended of negative value with positive value",
+        "12345678", temp[0].toString());
+    assertTrue("Test failed at gcdExtended of negative value value with positive value",
+        neg1.multiply(temp[1]).add(pos2.multiply(temp[2])).equals(temp[0]));
+  }
+
+  /**
+   * Tests modInverse method.
+   */
+  @Test
+  public void testModInverse() {
+   assertEquals("Test failed at ModInverse",
+       "5", new BigInteger(3).modInverse(new BigInteger(7)).toString());
+    assertEquals("Test failed at ModInverse",
+        "6", new BigInteger(6).modInverse(new BigInteger(7)).toString());
+  }
 }
