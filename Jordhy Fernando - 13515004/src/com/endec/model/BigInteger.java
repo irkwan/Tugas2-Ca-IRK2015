@@ -1,11 +1,12 @@
 package com.endec.model;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 /*
  * File name          : BigInteger.java
  * Created on         : 18/06/17
- * Modified on        : 18/06/17
+ * Modified on        : 19/06/17
  */
 
 /**
@@ -21,6 +22,7 @@ public class BigInteger implements Comparable<BigInteger> {
   private static final int BASE = 10; //Base number used to represents the BigInteger.
   private static BigInteger ONE = new BigInteger(1); //BigInteger representation for value 1.
   private static BigInteger TWO = new BigInteger(2); //BigInteger representation for value 2.
+  private static BigInteger THREE = new BigInteger(3); //BigInteger representation for value 3.
 
   /**
    * Return the minimum integer between a and b.
@@ -553,6 +555,15 @@ public class BigInteger implements Comparable<BigInteger> {
    * @throws ArithmeticException if val is zero.
    */
   public static BigInteger mod(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    if (b2.sign == 0) {
+      throw new ArithmeticException("division by zero");
+    }
+    if (b2.equals(ONE)) {
+      return new BigInteger();
+    }
+    if (b1.equals(ONE)) {
+      return b1.clone();
+    }
     return divideAndMod(b1, b2)[1];
   }
 
@@ -652,9 +663,9 @@ public class BigInteger implements Comparable<BigInteger> {
       return b.clone().mod(m);
     }
     if (exponent.isEven()) {
-      return (pow(multiply(b, b).mod(m), divide(exponent, TWO)));
+      return (modPow(multiply(b, b).mod(m), divide(exponent, TWO), m));
     } else {
-      return multiply(b, pow(multiply(b, b).mod(m), divide(exponent, TWO))).mod(m);
+      return multiply(b, modPow(multiply(b, b).mod(m), divide(exponent, TWO), m)).mod(m);
     }
   }
 
@@ -796,6 +807,164 @@ public class BigInteger implements Comparable<BigInteger> {
    */
   public BigInteger modInverse(BigInteger m) throws ArithmeticException {
     return modInverse(this, m);
+  }
+
+  /**
+   * Returns a random BigInteger within the range [0, n].
+   * @param n upper bound of the range.
+   * @return random BigInteger within the range [0, n].
+   * @throws IllegalArgumentException if n < 0.
+   */
+  public static BigInteger random(BigInteger n) throws IllegalArgumentException {
+    if (n.sign <= 0) {
+      throw new IllegalArgumentException("Invalid range");
+    }
+    BigInteger result = new BigInteger();
+    SecureRandom random = new SecureRandom();
+    int currDigit = n.digits.size() - 1;
+    boolean sameVal = true;
+    while(currDigit >= 0 && sameVal) {
+      int val = random.nextInt(n.digits.get(currDigit) + 1);
+      if (val != n.digits.get(currDigit)) {
+        sameVal = false;
+      }
+      result.digits.add(0, val);
+      currDigit--;
+    }
+    while(currDigit >= 0) {
+      int val = random.nextInt(10);
+      result.digits.add(0, val);
+      currDigit--;
+    }
+    //Remove trailing zeros
+    while(result.digits.size() > 0 && result.digits.get(result.digits.size() - 1) == 0) {
+      result.digits.remove(result.digits.size() - 1);
+    }
+    if (result.digits.size() == 0) {
+      result.sign = 0;
+    } else {
+      result.sign = 1;
+    }
+    return result;
+  }
+
+  /**
+   * Returns a random BigInteger within the range [a, b].
+   * @param a lower bound of the range.
+   * @param b upper bound of the range.
+   * @return random BigInteger within the range [a, b].
+   * @throws IllegalArgumentException if a is greater than b.
+   */
+  public static BigInteger random(BigInteger a, BigInteger b) throws IllegalArgumentException {
+    return add(a, random(subtract(b, a)));
+  }
+  
+  /**
+   * Returns true if b is probably prime, false if it's definitely composite.
+   * If uncertainty <= 0, returns true.
+   * @param b the BigInteger to be tested.
+   * @param uncertainty a measure of uncertainty that the caller is willing to tolerate.
+   * the probabilty that the BigInteger is not prime when
+   * it returns true is (1/4<sup>uncertainty</sup>).
+   * @return true if b is probably prime, false if it's definitely composite.
+   */
+  public static boolean isProbablePrime(BigInteger b, int uncertainty) {
+    if (uncertainty <= 0) {
+      return true;
+    }
+    if (b.isLessThan(TWO)) {
+      return false;
+    }
+    if (b.isGreaterThan(THREE)) {
+      if (b.isEven()) {
+        return false;
+      } else {
+        return rabinMiller(b, uncertainty);
+      }
+
+    }
+    return true;
+  }
+
+  /**
+   * Returns true if this BigInteger is probably prime, false if it's definitely composite.
+   * If uncertainty <= 0, returns true.
+   * @param uncertainty a measure of uncertainty that the caller is willing to tolerate.
+   * the probabilty that this BigInteger is not prime when
+   * it returns true is (1/4<sup>uncertainty</sup>).
+   * @return true if b is probably prime, false if it's definitely composite.
+   */
+  public boolean isProbablePrime(int uncertainty) {
+    return isProbablePrime(this, uncertainty);
+  }
+
+  /**
+   * Rabin Miller primality test.
+   * @param b the BigInteger to be tested.
+   * @param uncertainty a measure of uncertainty that the caller is willing to tolerate.
+   * the probabilty that this BigInteger is not prime when
+   * it returns true is (2<sup>-uncertainty</sup>).
+   * @return true if b is probably prime, false if it's definitely composite.
+   */
+  private static boolean rabinMiller(BigInteger b, int uncertainty) {
+    BigInteger d = subtract(b, ONE);
+    BigInteger temp = subtract(b, ONE);
+    int r = 0;
+    do {
+      d = divide(d, TWO);
+      r++;
+    }while (d.isEven());
+    int k = 0;
+    while (k < uncertainty) {
+      BigInteger a = random(TWO, subtract(b, TWO));
+      BigInteger x = modPow(a, d, b);
+      if (x.equals(ONE) || x.equals(temp)) {
+        k++;
+        continue;
+      }
+      boolean cont = false;
+      for (int i = 0; i < r - 1; i++) {
+        x = modPow(x, TWO, b);
+        if (x.equals(ONE)) {
+          return false;
+        }
+        if (x.equals(temp)) {
+          cont = true;
+          break;
+        }
+      }
+      if (cont) {
+        k++;
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns a positive BigInteger that is probably prime, with the specified number of digits.
+   * The probability that the BigInteger is composite is (4<sup>-uncertainty</sup>).
+   * @param digit number of digits for the generated probable prime BigInteger.
+   * @param uncertainty a measure of uncertainty that the caller is willing to tolerate.
+   * @return a positive BigInteger that is probably prime, with the specified number of digits.
+   * @throws IllegalArgumentException if digit <= 0.
+   */
+  public static BigInteger probablePrime(int digit, int uncertainty)
+      throws IllegalArgumentException {
+    if (digit <= 0) {
+      throw new IllegalArgumentException("digit must be > 0");
+    }
+    BigInteger lowerBound = ONE.multiplyByBasePow(digit - 1);
+    BigInteger upperBound = new BigInteger(9);
+    for (int i = 0; i < digit - 1; i++) {
+      upperBound.digits.add(9);
+    }
+    BigInteger probablePrime = random(lowerBound, upperBound);
+    while(!probablePrime.isProbablePrime(uncertainty)) {
+      probablePrime = random(lowerBound, upperBound);
+    }
+    return probablePrime;
   }
 
   /**

@@ -447,9 +447,84 @@ public class BigIntegerTest {
    */
   @Test
   public void testModInverse() {
-   assertEquals("Test failed at ModInverse",
+   assertEquals("Test failed at modInverse",
        "5", new BigInteger(3).modInverse(new BigInteger(7)).toString());
-    assertEquals("Test failed at ModInverse",
+    assertEquals("Test failed at modInverse",
         "6", new BigInteger(6).modInverse(new BigInteger(7)).toString());
+  }
+
+  /**
+   * Tests random method.
+   */
+  @Test
+  public void testRandom() {
+    BigInteger temp = BigInteger.random(neg2, neg1);
+    assertTrue("Test failed at random with range negative to negative",
+        temp.isGreaterThanOrEquals(neg2) && temp.isLessThanOrEquals(neg1));
+    temp = BigInteger.random(neg2, zero);
+    assertTrue("Test failed at random with range negative to zero",
+        temp.isGreaterThanOrEquals(neg2) && temp.isLessThanOrEquals(zero));
+    temp = BigInteger.random(neg2, pos1);
+    assertTrue("Test failed at random with range negative to positive",
+        temp.isGreaterThanOrEquals(neg2) && temp.isLessThanOrEquals(pos1));
+    temp = BigInteger.random(zero, pos1);
+    assertTrue("Test failed at random with range zero to positive",
+        temp.isGreaterThanOrEquals(zero) && temp.isLessThanOrEquals(pos1));
+    temp = BigInteger.random(pos2, pos1);
+    assertTrue("Test failed at random with range positive to positive",
+        temp.isGreaterThanOrEquals(pos2) && temp.isLessThanOrEquals(pos1));
+  }
+
+  /**
+   * Tests isProbable method.
+   *
+   * <p>Notes: Test may failed with probability (2<sup>-100</sup>).
+   */
+  @Test
+  public void testIsProbablePrime() {
+    assertTrue("Test failed at isProbablePrime",
+        new BigInteger(3).isProbablePrime(50));
+    assertTrue("Test failed at isProbablePrime",
+        new BigInteger(2147483647).isProbablePrime(50));
+    assertFalse("Test failed at isProbablePrime",
+        pos1.isProbablePrime(50));
+    assertFalse("Test failed at isProbablePrime",
+        pos2.isProbablePrime(50));
+  }
+
+  /**
+   * Tests probablePrime method.
+   *
+   * <p>Notes: Test may failed with probability (2<sup>-100</sup>).
+   */
+  @Test
+  public void testProbablePrime() {
+    BigInteger temp = BigInteger.probablePrime(1, 50);
+    assertTrue("Test failed at probablePrime",
+        temp.isProbablePrime(50));
+    assertTrue("Test failed at probablePrime",
+        temp.isGreaterThan(zero) && temp.isLessThan(new BigInteger(10)));
+
+    temp = BigInteger.probablePrime(2, 50);
+    assertTrue("Test failed at probablePrime",
+        temp.isProbablePrime(50));
+    assertTrue("Test failed at probablePrime",
+        temp.isGreaterThan(new BigInteger(9)) &&
+            temp.isLessThan(new BigInteger(100)));
+
+    temp = BigInteger.probablePrime(3, 50);
+    assertTrue("Test failed at probablePrime",
+        temp.isProbablePrime(50));
+    assertTrue("Test failed at probablePrime",
+        temp.isGreaterThan(new BigInteger(99)) &&
+            temp.isLessThan(new BigInteger(1000)));
+
+    temp = BigInteger.probablePrime(4, 50);
+    assertTrue("Test failed at probablePrime",
+        temp.isProbablePrime(50));
+    assertTrue("Test failed at probablePrime",
+        temp.isGreaterThan(new BigInteger(999)) &&
+            temp.isLessThan(new BigInteger(10000)));
+
   }
 }
