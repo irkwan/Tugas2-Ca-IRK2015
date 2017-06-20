@@ -199,8 +199,10 @@ BigNumber& BigNumber::operator-=(const BigNumber& number) {
 		} else {
 			negative = false;
 			operator-=(number.Negate());
-			if (num[0] != 0) {
-				negative = true;
+			if (num[0] == 0) {
+				negative = false;
+			} else {
+				negative = !negative;
 			}
 		}
 	} else {
@@ -209,8 +211,39 @@ BigNumber& BigNumber::operator-=(const BigNumber& number) {
 	return *this;
 }
 
-BigNumber& BigNumber::operator*=(const BigNumber& number) {
-
+BigNumber& BigNumber::operator*=(BigNumber number) {
+	bool neg = negative != number.negative;
+	negative = false;
+	number.negative = false;
+	int size1 = size(), size2 = number.size(), sze;
+	if (size1 > size2) {
+		number >> (size1 - size2);
+		sze = size1;
+	} else {
+		operator>>(size2 - size1);
+		sze = size2;
+	}
+	if (sze == 1) {
+		int result = num[0] * number.num[0];
+		num[0] = result;
+		if (result >= 10) {
+			num.push_back(result % 10);
+			num[0] /= 10;
+		}
+	} else { //Karatsuba
+		int m = (sze + 1) / 2;
+		BigNumber x = Truncate(m), y = number.Truncate(m), z = *this + x, z0 = x * y;
+		operator*=(number);
+		BigNumber z1 = (z * (y + number)) - z0 - *this;
+		operator<<(2*m);
+		operator+=(z1 << m);
+		operator+=(z0);
+	}
+	negative = neg;
+	if (num[0] == 0) {
+		negative = false;
+	}
+	return *this;
 }
 
 BigNumber& BigNumber::operator%=(const BigNumber& number) {
@@ -317,12 +350,14 @@ bool BigNumber::operator<(const BigNumber& number) const {
 
 /* Shift Operator */
 BigNumber& BigNumber::operator<<(int len) {
-	if (len >= 0) {
-		for (int i = 0; i < len; ++i) {
-			num.push_back(0);
+	if (num[0] != 0) {
+		if (len >= 0) {
+			for (int i = 0; i < len; ++i) {
+				num.push_back(0);
+			}
+		} else {
+			operator>>(-len);
 		}
-	} else {
-		operator>>(-len);
 	}
 	return *this;
 }
@@ -340,6 +375,35 @@ BigNumber& BigNumber::operator>>(int len) {
 
 BigNumber BigNumber::Negate() const {
 	BigNumber temp(*this);
-	temp.negative = !negative;
+	if (num[0] != 0) {
+		temp.negative = !negative;	
+	}
+	return temp;
+}
+
+BigNumber BigNumber::Truncate(int len) {
+	BigNumber temp;
+	if (len > 0 && len < size()) {
+		temp.num.pop_back();
+		for (int i = 0; i < len; ++i) {
+			temp.num.insert(temp.num.begin(), num[num.size()-1]);
+			num.pop_back();
+		}
+	}
+	while (!num.empty() && num[0] == 0) {
+		num.erase(num.begin());
+	}
+	if (num.empty()) {
+		negative = false;
+		num.push_back(0);
+	}
+	while (!temp.num.empty() && temp.num[0] == 0) {
+		temp.num.erase(temp.num.begin());
+	}
+	if (temp.num.empty()) {
+		temp.negative = false;
+		temp.num.push_back(0);
+	}
+	temp.negative = negative;
 	return temp;
 }

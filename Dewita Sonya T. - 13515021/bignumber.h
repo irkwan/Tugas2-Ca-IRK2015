@@ -28,7 +28,7 @@ public:
 	BigNumber operator+(BigNumber number) const {number += *this; return number;}
 	BigNumber& operator-=(const BigNumber& number);
 	BigNumber operator-(BigNumber number) const {number -= *this; return number.Negate();}
-	BigNumber& operator*=(const BigNumber& number);
+	BigNumber& operator*=(BigNumber number);
 	BigNumber operator*(BigNumber number) const {number *= *this; return number;}
 	BigNumber& operator%=(const BigNumber& number);
 	BigNumber operator%(const BigNumber& number) const {BigNumber temp(*this); temp.operator%=(number); return temp;}
@@ -55,12 +55,13 @@ public:
 	/* Other */
 	void Abs() {negative = true;}
 	long long size() const {return num.size();}
+	BigNumber Negate() const;
 
 private:
 	vector<int> num; //menyimpan angka, 0 <= num[i] <= 9.
 	bool negative;
 
-	BigNumber Negate() const;
+	BigNumber Truncate(int len);
 };
 
 #endif
