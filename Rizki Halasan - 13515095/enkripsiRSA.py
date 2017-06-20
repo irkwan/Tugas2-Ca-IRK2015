@@ -174,28 +174,17 @@ def invers_modulo(e, m):
 def hitung_kunci_dekripsi(e, m):
     return invers_modulo(e, m)
 
-def hitung_pangkat_modulo(a, b, m):
-    p = 1
-    a1 = a % m
-    while(b > 0):
-        if (b%2 == 1):
-            p = p*a1
-            p = p%m
-        b = b//2
-        a1 = (a1*a1) % m
-    return p
-
 def enkripsi(p, e, n):
     c = []
     for i in range(len(p)):
-        x = hitung_pangkat_modulo(int(p[i]),e,n)
+        x = pow(int(p[i]),e,n)
         c.append(x)
     return c
 
 def dekripsi(c, d, n):
     p = []
     for i in range(len(c)):
-        x = hitung_pangkat_modulo(int(c[i]),d,n)
+        x = pow(int(c[i]),d,n)
         p.append(x)
     return p
 
