@@ -9,5 +9,6 @@ Cara menggunakan program ini :
    enkripsi : berisi ciphertext dari plaintext yang berbentuk ascii
 
 Screenshot program : 
-![Screenshot1](Rizki Halasan - 13515095/screenshot1.jpg)
-![Screenshot2](Rizki Halasan - 13515095/screenshot2.jpg)
+![Screenshot1](https://github.com/rizkihalasan/Tugas2-Ca-IRK2015/blob/master/Rizki%20Halasan%20-%2013515095/screenshot1.jpg)
+![Screenshot2](https://github.com/rizkihalasan/Tugas2-Ca-IRK2015/blob/master/Rizki%20Halasan%20-%2013515095/screenshot2.jpg)
+
