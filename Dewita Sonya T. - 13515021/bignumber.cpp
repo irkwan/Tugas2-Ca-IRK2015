@@ -247,7 +247,37 @@ BigNumber& BigNumber::operator*=(BigNumber number) {
 }
 
 BigNumber& BigNumber::operator%=(const BigNumber& number) {
+	BigNumber temp(*this), dig;
+	num.clear();
+	num.push_back(0);
+	negative = false;
+	for (int i = 0; i < temp.size(); ++i) {
+		operator<<(1);
+		dig.num[0] = temp.num[i];
+		operator+=(dig);
+		while (operator>=(number)) {
+			operator-=(number);
+		}
+	}
+	return *this;
+}
 
+BigNumber& BigNumber::ModPow(BigNumber pow, const BigNumber& mod) {
+	if (mod.size() == 1 && mod.num[0] == 1) { // mod == 1 
+		num.clear();
+		negative = false;
+		num.push_back(0);
+	} else {
+		operator%=(mod);
+		BigNumber base(*this);
+		pow--;
+		while (pow.num[0] != 0) {
+			operator*=(base);
+			operator%=(mod);
+			pow--;
+		}
+	}
+	return *this;
 }
 
 /* Unary Arithmetic Operator */

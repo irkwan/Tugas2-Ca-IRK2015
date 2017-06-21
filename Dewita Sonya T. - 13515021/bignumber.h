@@ -32,7 +32,7 @@ public:
 	BigNumber operator*(BigNumber number) const {number *= *this; return number;}
 	BigNumber& operator%=(const BigNumber& number);
 	BigNumber operator%(const BigNumber& number) const {BigNumber temp(*this); temp.operator%=(number); return temp;}
-	BigNumber operator^(const BigNumber&);
+	BigNumber& ModPow(BigNumber pow, const BigNumber& mod);
 
 	/* Unary Arithmetic Operator */
 	BigNumber& operator++();
