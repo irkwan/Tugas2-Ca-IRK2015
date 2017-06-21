@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
-#include <string>
+#include <cstdlib>
+#include <ctime>
 #include "bignumber.h"
 using namespace std;
 
@@ -403,6 +404,55 @@ BigNumber& BigNumber::operator>>(int len) {
 	return *this;
 }
 
+/* Random */
+BigNumber BigNumber::Random() const {
+	BigNumber temp;
+	srand((unsigned)time(0));
+	temp.num[0] = rand() % num[0];
+	for (int i = 1; i < size(); ++i) {
+		temp.num.push_back(rand() % 10);
+	}
+	while (!temp.num.empty() && temp.num[0] == 0) {
+		temp.num.erase(temp.num.begin());
+	}
+	if (temp.num.empty() || (temp.num.size() == 1 && temp.num[0] == 1)) {
+		temp.num.resize(1);
+		temp.num[0] = 2;
+	}
+	temp.negative = negative;
+	return temp;
+}
+
+BigNumber BigNumber::GenerateRandomPrime(int digit) { //Fermat Primality Testing
+	BigNumber temp, cek, one("1");
+	bool prime = false, test;
+	srand((unsigned)time(0) + digit);
+	while (!prime) {
+		temp.num.clear();
+		temp.num.push_back(rand() % 9 + 1);
+		for (int i = 1; i < digit - 1; ++i) {
+			temp.num.push_back(rand() % 10);
+		}
+		temp.num.push_back(2 * (rand() % 5) + 1);
+		int i = 0;
+		test = true;
+		while (test && i < 5) {
+			cek = temp.Random();
+			cek.ModPow(temp - one, temp);
+			if (cek.size() != 1 || cek.num[0] != 1) {
+				test = false;
+			}
+			++i;
+		}
+		if (test) {
+			prime = true;
+		}
+	}
+	return temp;
+}
+
+
+/* Other */
 BigNumber BigNumber::Negate() const {
 	BigNumber temp(*this);
 	if (num[0] != 0) {

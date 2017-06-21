@@ -28,7 +28,7 @@ public:
 	BigNumber operator+(BigNumber number) const {number += *this; return number;}
 	BigNumber& operator-=(const BigNumber& number);
 	BigNumber operator-(BigNumber number) const {number -= *this; return number.Negate();}
-	BigNumber& operator*=(BigNumber number);
+	BigNumber& operator*=(BigNumber number); // Using Karatsuba Algorithm
 	BigNumber operator*(BigNumber number) const {number *= *this; return number;}
 	BigNumber& operator%=(const BigNumber& number);
 	BigNumber operator%(const BigNumber& number) const {BigNumber temp(*this); temp.operator%=(number); return temp;}
@@ -51,6 +51,10 @@ public:
 	/* Shift Operator */
 	BigNumber& operator<<(int len);
 	BigNumber& operator>>(int len);
+
+	/* Random */
+	BigNumber Random() const; // Generate random number from 2, less than this
+	BigNumber GenerateRandomPrime(int digit); //Using Fermat Primality Testing
 
 	/* Other */
 	void Abs() {negative = true;}
