@@ -45,7 +45,7 @@ def kpk(a, b) :
 # yang diberikan. Program ini mencari suatu bilangan yang relatif prima
 # dimulai dari bilangan kuadrat angka yang diberikan
 def primerelative(a):
-	x = a*a
+	x = a
 	while(fpb(x,a) != 1):
 		x = x + 1
 	return x
