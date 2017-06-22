@@ -267,6 +267,15 @@ BigNumber& BigNumber::operator*=(BigNumber number) {
 	return *this;
 }
 
+BigNumber BigNumber::operator/(const BigNumber& number) {
+	BigNumber quo, mod(*this);
+	while (mod >= number) {
+		++quo;
+		mod -= number;
+	}
+	return quo;
+}
+
 BigNumber& BigNumber::operator%=(const BigNumber& number) {
 	BigNumber temp(*this);
 	num.clear();
@@ -302,6 +311,26 @@ BigNumber& BigNumber::ModPow(BigNumber pow, const BigNumber& mod) {
 		}
 	}
 	return *this;
+}
+
+BigNumber BigNumber::GCD(const BigNumber& b, BigNumber& inv) { // Using Extended Euclidean Algorithm
+	BigNumber s, t0("1"), r0(b), t1, r1(*this),q;
+	inv.num.clear();
+	inv.num.push_back(1);
+	inv.negative = false;
+	while (r0.num[0] != 0) {
+		q = r1 / r0;
+		s.Swap(inv);
+		s -= (q * inv);
+		t0.Swap(t1);
+		t0 -= (q * t1);
+		r0.Swap(r1);
+		r0 -= (q * r1);
+	}
+	while (inv.negative) {
+		inv += b;
+	}
+	return r1;
 }
 
 /* Unary Arithmetic Operator */
@@ -490,6 +519,13 @@ BigNumber BigNumber::Negate() const {
 		temp.negative = !negative;	
 	}
 	return temp;
+}
+
+void BigNumber::Swap(BigNumber& number) {
+	bool temp = negative;
+	negative = number.negative;
+	number.negative = temp;
+	num.swap(number.num);
 }
 
 BigNumber BigNumber::Truncate(int len) {

@@ -35,9 +35,11 @@ public:
 	BigNumber operator-(BigNumber number) const {number -= *this; return number.Negate();}
 	BigNumber& operator*=(BigNumber number); // Using Karatsuba Algorithm
 	BigNumber operator*(BigNumber number) const {number *= *this; return number;}
+	BigNumber operator/(const BigNumber& number);
 	BigNumber& operator%=(const BigNumber& number);
 	BigNumber operator%(const BigNumber& number) const {BigNumber temp(*this); temp.operator%=(number); return temp;}
 	BigNumber& ModPow(BigNumber pow, const BigNumber& mod);
+	BigNumber GCD(const BigNumber& b, BigNumber& inv); // Using Extended Euclidean Algorithm
 
 	/* Unary Arithmetic Operator */
 	BigNumber& operator++();
@@ -65,6 +67,7 @@ public:
 	void Abs() {negative = true;}
 	int size() const {return num.size();}
 	BigNumber Negate() const;
+	void Swap(BigNumber& number);
 
 public:
 	vector<int> num; //menyimpan angka, 0 <= num[i] <= 9.
