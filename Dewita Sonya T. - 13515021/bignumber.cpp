@@ -38,6 +38,22 @@ BigNumber::BigNumber(string number) {
 	}
 }
 
+BigNumber::BigNumber(int number) {
+	num.clear();
+	negative = false;
+	if (number < 0) {
+		number = -number;
+		negative = true;
+	}
+	while (number > 0) {
+		num.insert(num.begin(), number % 10);
+		number /= 10;
+	}
+	if (num.empty()) {
+		num.push_back(0);
+	}
+}
+
 BigNumber::BigNumber(const BigNumber& number) {
 	if (this != &number) {
 		num.clear();
@@ -58,6 +74,18 @@ BigNumber& BigNumber::operator=(const BigNumber& number) {
 		negative = number.negative;	
 	}
 	return *this;
+}
+
+long long BigNumber::ConvertToInt() {
+	long long result = 0;
+	for (int i = 0; i < size(); ++i) {
+		result = result * 10 + num[i];
+	}
+	return result;
+}
+
+char BigNumber::ConvertToChar() {
+	return char(ConvertToInt());
 }
 
 /* Input Output */
@@ -387,7 +415,7 @@ BigNumber& BigNumber::operator<<(int len) {
 }
 
 BigNumber& BigNumber::operator>>(int len) {
-	for (int i = 0; i < len; ++i) {
+	for (int k = 0; k < len; ++k) {
 		int carry = 0, sze = size();
 		for (int i = 0; i < sze; ++i) {
 			num[i] += carry;

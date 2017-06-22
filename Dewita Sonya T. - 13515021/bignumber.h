@@ -14,10 +14,15 @@ public:
 	/* Constructor */
 	BigNumber();
 	BigNumber(string number);
+	BigNumber(int number);
 	BigNumber(const BigNumber& number);
 
 	/* operator= */
 	BigNumber& operator=(const BigNumber& number);
+
+	/* Converter */
+	long long ConvertToInt();
+	char ConvertToChar();
 
 	/* Input Output */
 	friend ostream& operator<< (ostream& os, const BigNumber& number);
@@ -58,10 +63,10 @@ public:
 
 	/* Other */
 	void Abs() {negative = true;}
-	long long size() const {return num.size();}
+	int size() const {return num.size();}
 	BigNumber Negate() const;
 
-private:
+public:
 	vector<int> num; //menyimpan angka, 0 <= num[i] <= 9.
 	bool negative;
 
