@@ -16,6 +16,7 @@ public:
 	static string ConvertToString(BigNumber number);
 	string EncryptString(string st);
 	string DecryptString(string st);
+	string EncryptFile(string namafile);
 
 private:
 	BigNumber prime1;
@@ -24,7 +25,6 @@ private:
 	BigNumber lambda; // = (prime1 - 1) * (prime2 - 1)
 	BigNumber enc;
 	BigNumber dec; // inverse of enc modulo lambda
-	const BigNumber ONE("1");
 };
 
 #endif
