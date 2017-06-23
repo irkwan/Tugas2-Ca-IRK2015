@@ -267,13 +267,9 @@ BigNumber& BigNumber::operator*=(BigNumber number) {
 	return *this;
 }
 
-BigNumber BigNumber::operator/(const BigNumber& number) {
-	BigNumber quo, mod(*this);
-	while (mod >= number) {
-		++quo;
-		mod -= number;
-	}
-	return quo;
+BigNumber& BigNumber::operator/=(const BigNumber& number) {
+	BigNumber temp;
+	return Divide(number, temp);
 }
 
 BigNumber& BigNumber::operator%=(const BigNumber& number) {
@@ -331,6 +327,40 @@ BigNumber BigNumber::GCD(const BigNumber& b, BigNumber& inv) { // Using Extended
 		inv += b;
 	}
 	return r1;
+}
+
+BigNumber& BigNumber::Divide(const BigNumber& number, BigNumber& mod) {
+	if (num[0] == 0) {
+		return *this;
+	}
+	BigNumber res;
+	res.num.pop_back();
+	mod.num.pop_back();
+	int size1 = size(), size2 = number.size(), i = 0, digit;
+	while (i < size1) {
+		mod.num.push_back(num[i]);
+		++i;
+		while (mod.size() < size2 && i < size1) {
+			mod.num.push_back(num[i]);
+			++i;
+		}
+		digit = -1;
+		while (!mod.negative) {
+			++digit;
+			mod -= number;
+		}
+		mod += number;
+		res.num.push_back(digit);
+	}
+	res.negative = (negative != number.negative);
+	if (res.num.empty()) {
+		res.num.push_back(0);
+		res.negative = false;
+	} else if (res.num[0] == 0 && res.size() > 1) {
+		res.num.erase(res.num.begin());
+	}
+	operator=(res);
+	return *this;
 }
 
 /* Unary Arithmetic Operator */

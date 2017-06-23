@@ -8,8 +8,8 @@
 /* Cpnstructor */
 RSA::RSA() {
 	BigNumber one("1");
-	prime1 = prime1.GenerateRandomPrime(5);
-	prime2 = prime2.GenerateRandomPrime(6);
+	prime1 = prime1.GenerateRandomPrime(20);
+	prime2 = prime2.GenerateRandomPrime(21);
 	mod = prime2 * prime1;
 	lambda = mod - prime2 - prime1 + one;
 	enc = lambda.Random();
@@ -29,11 +29,10 @@ BigNumber RSA::ConvertToNum(string st) {
 
 string RSA::ConvertToString(BigNumber number) {
 	string res;
-	BigNumber temp("128"), nol, mod;
-	while (number > nol) {
-		mod = number % temp;
-		res = (mod).ConvertToChar() + res;
-		number = number / temp;
+	BigNumber temp("128"), mod;
+	while (number.IsPositive()) {
+		number.Divide(temp, mod);
+		res = mod.ConvertToChar() + res;
 	}
 	return res;
 }
