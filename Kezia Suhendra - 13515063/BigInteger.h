@@ -16,6 +16,11 @@ public:
   BigInteger operator=(const BigInteger& opr);
   BigInteger absolute() const;
   BigInteger pow(int p);
+  friend BigInteger operator+=(const BigInteger&, const BigInteger&);
+  friend BigInteger operator-=(const BigInteger&, const BigInteger&);
+  friend BigInteger operator*=(const BigInteger&, const BigInteger&);
+  friend BigInteger operator/=(const BigInteger&, const BigInteger&);
+  friend BigInteger operator%=(const BigInteger&, const BigInteger&);
   friend BigInteger operator+(const BigInteger&, const BigInteger&);
   friend BigInteger operator++(BigInteger&);
   friend BigInteger operator++(BigInteger&, int);
@@ -26,11 +31,6 @@ public:
   friend BigInteger operator*(const BigInteger&, const BigInteger&);
   friend BigInteger operator/(const BigInteger&, const BigInteger&);
   friend BigInteger operator%(const BigInteger&, const BigInteger&);
-  friend BigInteger operator+=(const BigInteger&, const BigInteger&);
-  friend BigInteger operator-=(const BigInteger&, const BigInteger&);
-  friend BigInteger operator*=(const BigInteger&, const BigInteger&);
-  friend BigInteger operator/=(const BigInteger&, const BigInteger&);
-  friend BigInteger operator%=(const BigInteger&, const BigInteger&);
   friend bool operator>(const BigInteger&, const BigInteger&);
   friend bool operator<(const BigInteger&, const BigInteger&);
   friend bool operator>=(const BigInteger&, const BigInteger&);

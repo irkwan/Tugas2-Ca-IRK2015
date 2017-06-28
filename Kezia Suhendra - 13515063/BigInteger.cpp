@@ -81,6 +81,11 @@ BigInteger BigInteger::pow(int p) {
   return ex;
 }
 
+BigInteger operator+=(const BigInteger&, const BigInteger&);
+BigInteger operator-=(const BigInteger&, const BigInteger&);
+BigInteger operator*=(const BigInteger&, const BigInteger&);
+BigInteger operator/=(const BigInteger&, const BigInteger&);
+BigInteger operator%=(const BigInteger&, const BigInteger&);
 BigInteger operator+(const BigInteger&, const BigInteger&);
 BigInteger operator++(BigInteger&);
 BigInteger operator++(BigInteger&, int);
@@ -91,11 +96,6 @@ BigInteger operator--(BigInteger&, int);
 BigInteger operator*(const BigInteger&, const BigInteger&);
 BigInteger operator/(const BigInteger&, const BigInteger&);
 BigInteger operator%(const BigInteger&, const BigInteger&);
-BigInteger operator+=(const BigInteger&, const BigInteger&);
-BigInteger operator-=(const BigInteger&, const BigInteger&);
-BigInteger operator*=(const BigInteger&, const BigInteger&);
-BigInteger operator/=(const BigInteger&, const BigInteger&);
-BigInteger operator%=(const BigInteger&, const BigInteger&);
 bool operator>(const BigInteger&, const BigInteger&);
 bool operator<(const BigInteger&, const BigInteger&);
 bool operator>=(const BigInteger&, const BigInteger&);
