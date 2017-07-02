@@ -98,11 +98,13 @@ public:
 
 	/*Methods*/
 	string toString() const;
+	void negate();
 
 private:
 	/*Attributes*/
 	const static unsigned base = 1000000000;
-	vector <unsigned> digits; //little endian
+	const static unsigned maxDigitsComponentLength = 9;
+	deque <unsigned> digits; //little endian
 	bool isZero;
 	bool isNegative;
 
@@ -112,6 +114,7 @@ private:
 	friend BigNumber unsignedSum(const BigNumber& bn1, const BigNumber& bn2);
 	friend BigNumber unsignedDifference(const BigNumber& bn1, const BigNumber& bn2);
 	friend BigNumber unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2);
+	friend pair<BigNumber,BigNumber> unsignedDivide(const BigNumber& bn1, const BigNumber& bn2);
 };
 
 #endif

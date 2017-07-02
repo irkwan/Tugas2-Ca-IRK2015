@@ -3,8 +3,9 @@ Author : Arno Alexander
 */
 
 #include <iostream>
-#include <vector>
+#include <deque>
 #include <cmath>
+#include <utility>
 #include "BigNumber.h"
 
 BigNumber::BigNumber() {
@@ -419,12 +420,12 @@ string BigNumber::toString() const {
 	if (isZero) {
 		return "0";
 	} else {
-		vector <char> stringBuffer;
+		deque <char> stringBuffer;
 		bool isPrinted = false;
 		if (isNegative) {
 			stringBuffer.push_back('-');
 		}
-		for (vector<unsigned>::size_type i = digits.size(); i>0; i--) {
+		for (deque<unsigned>::size_type i = digits.size(); i>0; i--) {
 			unsigned digitComponent = digits[i-1];
 			unsigned tempBase = base / 10;
 			while (tempBase > 0) {
@@ -440,6 +441,12 @@ string BigNumber::toString() const {
 			}
 		}
 		return string(stringBuffer.begin(), stringBuffer.end());
+	}
+}
+
+void BigNumber::negate() {
+	if (!isZero) {
+		isNegative = !isNegative;
 	}
 }
 
@@ -462,7 +469,7 @@ void BigNumber::normalizeForm() {
 bool isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2) {
 	if (bn1.digits.size() == bn2.digits.size()) {
 		bool stopComparing = false;
-		vector<unsigned>::size_type index = bn1.digits.size();
+		deque<unsigned>::size_type index = bn1.digits.size();
 		while (index>0 && !stopComparing) {
 			index--;
 			stopComparing = bn1.digits[index] != bn2.digits[index];
@@ -476,8 +483,8 @@ bool isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2) {
 BigNumber unsignedSum(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	unsigned carry = 0;
-	vector<unsigned>::size_type index = 0;
-	vector<unsigned>::size_type maxIndex = (bn1.digits.size()>bn2.digits.size() ? bn1.digits.size()-1 : bn2.digits.size()-1);
+	deque<unsigned>::size_type index = 0;
+	deque<unsigned>::size_type maxIndex = (bn1.digits.size()>bn2.digits.size() ? bn1.digits.size()-1 : bn2.digits.size()-1);
 	result.digits.clear();
 	while (carry>0 || index<=maxIndex) {
 		carry += (index<bn1.digits.size() ? bn1.digits[index] : 0);
@@ -494,8 +501,8 @@ BigNumber unsignedDifference(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	bool needCarry = false, nextNeedCarry, isBn1Bigger = isUnsignedGreater(bn1,bn2);
 	unsigned resultComponent, subtractorComponent;
-	vector<unsigned>::size_type index = 0;
-	vector<unsigned>::size_type maxIndex = (isBn1Bigger ? bn1.digits.size()-1 : bn2.digits.size()-1);
+	deque<unsigned>::size_type index = 0;
+	deque<unsigned>::size_type maxIndex = (isBn1Bigger ? bn1.digits.size()-1 : bn2.digits.size()-1);
 	result.digits.clear();
 	while (index<=maxIndex) {
 		if (isBn1Bigger) {
@@ -519,10 +526,10 @@ BigNumber unsignedDifference(const BigNumber& bn1, const BigNumber& bn2) {
 BigNumber unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	unsigned long long carry;
-	vector<unsigned>::size_type additionalIndex;
+	deque<unsigned>::size_type additionalIndex;
 	result.digits.resize(bn1.digits.size()+bn2.digits.size());
-	for (vector<unsigned>::size_type i=0; i<bn1.digits.size(); i++) {
-		for (vector<unsigned>::size_type j=0; j<bn2.digits.size(); j++) {
+	for (deque<unsigned>::size_type i=0; i<bn1.digits.size(); i++) {
+		for (deque<unsigned>::size_type j=0; j<bn2.digits.size(); j++) {
 			carry = (unsigned long long)(bn1.digits[i])*(unsigned long long)(bn2.digits[j]);
 			additionalIndex = 0;
 			do {
@@ -535,4 +542,51 @@ BigNumber unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2) {
 	}
 	result.normalizeForm();
 	return result;
+}
+
+pair<BigNumber,BigNumber> unsignedDivide(const BigNumber& bn1, const BigNumber& bn2) {
+	if (bn2==0) {
+		throw "division by 0";
+	} else if (isUnsignedGreater(bn2,bn1)) {
+		return pair<BigNumber,BigNumber>(0,bn1);
+	} else {
+		unsigned long long mostSignificantDigitValue;
+		unsigned quotientDigitCandidate;
+		bool stopOperation = false;
+		BigNumber quotient, remainder, quotientDigit, subtractor, bigBase(BigNumber::base), tempBigNumber;
+		deque<unsigned>::size_type nextDigitIndex = bn1.digits.size();
+		remainder.digits.clear();
+		do {
+			nextDigitIndex--;
+			remainder.digits.push_front(bn1.digits[nextDigitIndex]);
+		} while (remainder.digits.size()<bn2.digits.size());
+		do {
+			if (remainder.digits.size()==bn2.digits.size()) {
+				mostSignificantDigitValue = (unsigned long long)(remainder.digits.back());
+			} else {
+				mostSignificantDigitValue = (unsigned long long)(BigNumber::base) * (unsigned long long)(remainder.digits.back()) + (unsigned long long)(remainder.digits[remainder.digits.size()-2]);
+			}
+			quotientDigitCandidate = (unsigned)(mostSignificantDigitValue/(unsigned long long)(bn2.digits.back()));
+			quotientDigit.digits.clear();
+			quotientDigit.digits.push_back(quotientDigitCandidate);
+			subtractor = unsignedMultiply(bn2,quotientDigit);
+			while (isUnsignedGreater(subtractor,remainder)) {
+				//TODO : make it binsearch
+				cout << quotientDigit.digits[0] << endl;
+				quotientDigit.digits[0]--;
+				subtractor = unsignedDifference(subtractor,bn2);
+			}
+			remainder = unsignedDifference(remainder,subtractor);
+			quotient = unsignedSum(quotientDigit,unsignedMultiply(quotient,bigBase));
+			cout << 'x' << endl;
+			stopOperation = nextDigitIndex==0;
+			if (!stopOperation) {
+				nextDigitIndex--;
+				remainder.digits.push_front(bn1.digits[nextDigitIndex]);
+			}
+		} while (!stopOperation);
+		quotient.normalizeForm();
+		remainder.normalizeForm();
+		return pair<BigNumber,BigNumber>(quotient,remainder);
+	}
 }
