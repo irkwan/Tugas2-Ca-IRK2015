@@ -551,9 +551,9 @@ pair<BigNumber,BigNumber> unsignedDivide(const BigNumber& bn1, const BigNumber& 
 		return pair<BigNumber,BigNumber>(0,bn1);
 	} else {
 		unsigned long long mostSignificantDigitValue;
-		unsigned quotientDigitCandidate;
-		bool stopOperation = false;
-		BigNumber quotient, remainder, quotientDigit, subtractor, bigBase(BigNumber::base), tempBigNumber;
+		unsigned quotientDigitCandidate, quotientDigitStep;
+		bool stopOperation = false, isSubtractorGreaterRemainder, isSubtractorRemainderDifferenceValid;
+		BigNumber quotient, remainder, quotientDigit, subtractor, bigBase(BigNumber::base), subtractorRemainderDifference;
 		deque<unsigned>::size_type nextDigitIndex = bn1.digits.size();
 		remainder.digits.clear();
 		do {
@@ -567,18 +567,25 @@ pair<BigNumber,BigNumber> unsignedDivide(const BigNumber& bn1, const BigNumber& 
 				mostSignificantDigitValue = (unsigned long long)(BigNumber::base) * (unsigned long long)(remainder.digits.back()) + (unsigned long long)(remainder.digits[remainder.digits.size()-2]);
 			}
 			quotientDigitCandidate = (unsigned)(mostSignificantDigitValue/(unsigned long long)(bn2.digits.back()));
+			quotientDigitStep = quotientDigitCandidate - (unsigned)(mostSignificantDigitValue/(unsigned long long)(bn2.digits.back()+1));
+			do {
+				quotientDigit.digits.clear();
+				quotientDigit.digits.push_back(quotientDigitCandidate);
+				subtractor = unsignedMultiply(bn2,quotientDigit);
+				subtractorRemainderDifference = unsignedDifference(remainder,subtractor);
+				isSubtractorGreaterRemainder = isUnsignedGreater(subtractor,remainder);
+				isSubtractorRemainderDifferenceValid = isUnsignedGreater(bn2,subtractorRemainderDifference);
+				if (isSubtractorGreaterRemainder) {
+					quotientDigitCandidate -= quotientDigitStep;
+				} else if (!isSubtractorRemainderDifferenceValid) {
+					quotientDigitCandidate += quotientDigitStep;
+				}
+				quotientDigitStep = (quotientDigitStep + 1) / 2;
+			} while (isSubtractorGreaterRemainder || !isSubtractorRemainderDifferenceValid);
 			quotientDigit.digits.clear();
 			quotientDigit.digits.push_back(quotientDigitCandidate);
-			subtractor = unsignedMultiply(bn2,quotientDigit);
-			while (isUnsignedGreater(subtractor,remainder)) {
-				//TODO : make it binsearch
-				cout << quotientDigit.digits[0] << endl;
-				quotientDigit.digits[0]--;
-				subtractor = unsignedDifference(subtractor,bn2);
-			}
 			remainder = unsignedDifference(remainder,subtractor);
 			quotient = unsignedSum(quotientDigit,unsignedMultiply(quotient,bigBase));
-			cout << 'x' << endl;
 			stopOperation = nextDigitIndex==0;
 			if (!stopOperation) {
 				nextDigitIndex--;

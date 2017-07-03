@@ -100,7 +100,7 @@ public:
 	string toString() const;
 	void negate();
 
-private:
+public: //TODO: make it private
 	/*Attributes*/
 	const static unsigned base = 1000000000;
 	const static unsigned maxDigitsComponentLength = 9;

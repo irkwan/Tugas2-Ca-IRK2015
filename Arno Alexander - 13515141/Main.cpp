@@ -11,6 +11,7 @@ Author : Arno Alexander
 using namespace std;
 
 int main() {
-	cout << "Hello bignum" << endl;
+	pair<BigNumber,BigNumber> res = unsignedDivide(BigNumber("99999999912312345700000000000000000000000000000000000000000000000000000"),BigNumber("1999999999999999999"));
+	cout << res.first << " " << res.second << endl;
 	return 0;
 }
