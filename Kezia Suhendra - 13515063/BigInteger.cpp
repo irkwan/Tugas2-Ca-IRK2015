@@ -82,7 +82,7 @@ BigInteger BigInteger::pow(int p) {
   return ex;
 }
 
-BigInteger operator+=(const BigInteger& num1, const BigInteger& num2) {
+BigInteger operator+=(BigInteger& num1, const BigInteger& num2) {
   if (num1.sign == num2.sign) {
     vector<char>::iterator idx1;
     vector<char>::const_iterator idx2;
@@ -122,7 +122,7 @@ BigInteger operator+=(const BigInteger& num1, const BigInteger& num2) {
   }
 }
 
-BigInteger operator-=(const BigInteger& num1, const BigInteger& num2) {
+BigInteger operator-=(BigInteger& num1, const BigInteger& num2) {
   if (num1.sign == num2.sign) {
     if (num1.sign) {
       if (num1 < num2) {
@@ -172,7 +172,7 @@ BigInteger operator-=(const BigInteger& num1, const BigInteger& num2) {
   }
 }
 
-BigInteger operator*=(const BigInteger& num1, const BigInteger& num2) {
+BigInteger operator*=(BigInteger& num1, const BigInteger& num2) {
   BigInteger res(0);
   if (num1 == BigInteger::BigInteger(0) || num2 == BigInteger::BigInteger(0)) {
     res = BigInteger::BigInteger(0);
@@ -212,9 +212,9 @@ BigInteger operator*=(const BigInteger& num1, const BigInteger& num2) {
   return num1;
 }
 
-BigInteger operator/=(const BigInteger& num1, const BigInteger& num2) {
-  BigInteger snoob1 = num1.abs();
-  BigInteger snoob2 = num2.abs();
+BigInteger operator/=(BigInteger& num1, const BigInteger& num2) {
+  BigInteger snoob1 = num1.absolute();
+  BigInteger snoob2 = num2.absolute();
   if (snoob1 < snoob2) {
     num1 = BigInteger::BigInteger(0);
     return num1;
@@ -240,7 +240,7 @@ BigInteger operator/=(const BigInteger& num1, const BigInteger& num2) {
   return num1;
 }
 
-BigInteger operator%=(const BigInteger& num1, const BigInteger& num2) {
+BigInteger operator%=(BigInteger& num1, const BigInteger& num2) {
   return num1 -= ((num1 / num2) * num2);
 }
 
