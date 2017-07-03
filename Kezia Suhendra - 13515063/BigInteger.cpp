@@ -1,3 +1,6 @@
+//NIM      : 13515063
+//Nama     : Kezia Suhendra
+
 #include "BigInteger.h"
 #include <string>
 #include <vector>

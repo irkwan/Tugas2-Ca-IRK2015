@@ -1,3 +1,6 @@
+//NIM     : 13515063
+//Nama    : Kezia Suhendra
+
 #ifndef BIGINT_H_
 #define BIGINT_H_
 
