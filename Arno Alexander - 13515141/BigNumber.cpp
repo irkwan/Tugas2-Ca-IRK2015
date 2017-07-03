@@ -351,9 +351,59 @@ BigNumber operator*(const string& str, const BigNumber& bn) {
 	return bn1*bn;
 }
 
-//
-//TODO: normal arithmetic
-//
+BigNumber operator/(const BigNumber& bn1, const BigNumber& bn2) {
+	BigNumber result = unsignedDivide(bn1,bn2).first;
+	result.isNegative = bn1.isNegative!=bn2.isNegative;
+	result.normalizeForm();
+	return result;
+}
+
+BigNumber operator/(const BigNumber& bn, long long n) {
+	BigNumber bn2(n);
+	return bn/bn2;
+}
+
+BigNumber operator/(long long n, const BigNumber& bn) {
+	BigNumber bn1(n);
+	return bn1/bn;
+}
+
+BigNumber operator/(const BigNumber& bn, const string& str) {
+	BigNumber bn2(str);
+	return bn/bn2;
+}
+
+BigNumber operator/(const string& str, const BigNumber& bn) {
+	BigNumber bn1(str);
+	return bn1/bn;
+}
+
+BigNumber operator%(const BigNumber& bn1, const BigNumber& bn2) {
+	BigNumber result = unsignedDivide(bn1,bn2).second;
+	result.isNegative = bn1.isNegative;
+	result.normalizeForm();
+	return result;
+}
+
+BigNumber operator%(const BigNumber& bn, long long n) {
+	BigNumber bn2(n);
+	return bn%bn2;
+}
+
+BigNumber operator%(long long n, const BigNumber& bn) {
+	BigNumber bn1(n);
+	return bn1%bn;
+}
+
+BigNumber operator%(const BigNumber& bn, const string& str) {
+	BigNumber bn2(str);
+	return bn%bn2;
+}
+
+BigNumber operator%(const string& str, const BigNumber& bn) {
+	BigNumber bn1(str);
+	return bn1%bn;
+}
 
 BigNumber& BigNumber::operator+=(const BigNumber& bn) {
 	*this = *this + bn;
@@ -400,9 +450,35 @@ BigNumber& BigNumber::operator*=(const string& str) {
 	return *this;
 }
 
-//
-//TODO: self arithmetic
-//
+BigNumber& BigNumber::operator/=(const BigNumber& bn) {
+	*this = *this / bn;
+	return *this;
+}
+
+BigNumber& BigNumber::operator/=(long long n) {
+	*this = *this / n;
+	return *this;
+}
+
+BigNumber& BigNumber::operator/=(const string& str) {
+	*this = *this / str;
+	return *this;
+}
+
+BigNumber& BigNumber::operator%=(const BigNumber& bn) {
+	*this = *this % bn;
+	return *this;
+}
+
+BigNumber& BigNumber::operator%=(long long n) {
+	*this = *this % n;
+	return *this;
+}
+
+BigNumber& BigNumber::operator%=(const string& str) {
+	*this = *this % str;
+	return *this;
+}
 
 istream& operator>>(istream& in, BigNumber& bn) {
 	string str;
