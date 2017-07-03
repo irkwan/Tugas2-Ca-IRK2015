@@ -302,11 +302,84 @@ BigInteger operator%(const BigInteger& num1, const BigInteger& num2) {
   return res;
 }
 
-bool operator>(const BigInteger&, const BigInteger&);
-bool operator<(const BigInteger&, const BigInteger&);
-bool operator>=(const BigInteger&, const BigInteger&);
-bool operator<=(const BigInteger&, const BigInteger&);
-bool operator!=(const BigInteger&, const BigInteger&);
-bool operator==(const BigInteger&, const BigInteger&);
-ostream& operator<<(ostream&, const BigInteger&);
-istream& operator>>(istream&, BigInteger&);
+bool operator>(const BigInteger& num1, const BigInteger& num2) {
+  return !(num1 <= num2);
+}
+
+bool operator<(const BigInteger& num1, const BigInteger& num2) {
+  if (num1.sign != num2.sign) {
+    return !num1.sign;
+  } else {
+    if (num1.number.size() != num2.number.size()) {
+      return ((num1.sign && num1.number.size() < num2.number.size()) || (!num1.sign && num1.number.size() > num2.number.size()));
+    }
+    vector<char>::const_reverse_iterator idx1;
+    idx1 = num1.number.rbegin();
+    vector<char>::const_reverse_iterator idx2;
+    idx2 = num2.number.rbegin();
+    while (idx1 != num1.number.rend()) {
+      if (num1.sign && *idx1 < *idx2) {
+        return true;
+      }
+      if (num1.sign && *idx1 > *idx2) {
+        return false;
+      }
+      if (!num1.sign && *idx1 < *idx2) {
+        return false;
+      }
+      if (!num1.sign && *idx1 > *idx2) {
+        return true;
+      }
+      ++idx1;
+      ++idx2;
+    }
+    return false;
+  }
+}
+
+bool operator>=(const BigInteger& num1, const BigInteger& num2) {
+  return ((num1 > num2) || (num1 == num2));
+}
+
+bool operator<=(const BigInteger& num1, const BigInteger& num2) {
+  return ((num1 < num2) || (num1 == num2));
+}
+
+bool operator!=(const BigInteger& num1, const BigInteger& num2) {
+  return !(num1 == num2);
+}
+
+bool operator==(const BigInteger& num1, const BigInteger& num2) {
+  if ((num1.number.size() != num2.number.size()) || (num1.sign != num2.sign)) {
+    return false;
+  }
+  vector<char>::const_iterator idx1;
+  idx1 = num1.number.begin();
+  vector<char>::const_iterator idx2;
+  idx2 = num2.number.begin();
+  while (idx1 != num1.number.end()) {
+    if ((*idx1) != (*idx2)) {
+      return false;
+    }
+    ++idx1;
+    ++idx2;
+  }
+  return true;
+}
+
+ostream& operator<<(ostream& os, const BigInteger& num) {
+  if (!num.sign) {
+    os << "-";
+  }
+  for (vector<char>::const_reverse_iterator i = num.number.rbegin(); i != num.number.rend(); ++i) {
+    os << (char)((*i) + '0');
+  }
+  return os;
+}
+
+istream& operator>>(istream& is, BigInteger& num) {
+  string str;
+  is >> str;
+  num = BigInteger(str);
+  return is;
+}
