@@ -1,3 +1,4 @@
+import java.security.SecureRandom;
 import java.util.Random;
 
 @SuppressWarnings("ALL")
@@ -25,6 +26,9 @@ public class BigNumber {
 
   public BigNumber (int size, BigNumber obj) {
     parts = new int[size];
+    for (int i = 0; i < size; ++i) {
+      parts[i] = 0;
+    }
     System.arraycopy(obj.parts, 0, parts, 0, obj.parts.length);
   }
 
@@ -42,7 +46,7 @@ public class BigNumber {
   }
 
   public boolean equalTo(BigNumber y) {
-    return compare(y) <= 0;
+    return compare(y) == 0;
   }
 
   public boolean lessOrEqualTo(BigNumber y) {
@@ -111,7 +115,7 @@ public class BigNumber {
   }
 
   public long getLongPart (int shift) {
-    return (shift + 1 < getSize() ? Integer.toUnsignedLong(parts[shift + 1]) << 32 : 0)| Integer.toUnsignedLong(parts[shift]);
+    return (shift + 1 < getSize() ? Integer.toUnsignedLong(parts[shift + 1]) << 32 : 0) | Integer.toUnsignedLong(parts[shift]);
   }
 
   public long getPartAsLong(int shift) {
@@ -123,7 +127,7 @@ public class BigNumber {
   }
 
   public int getPart(int shift) {
-    return parts[shift];
+    return shift < getSize() ? parts[shift] : 0;
   }
 
   public BigNumber getParts(int start, int length) {
@@ -148,8 +152,8 @@ public class BigNumber {
   public BigNumber rightBitShift (int shift) {
     if (shift < 32) {
       BigNumber result = new BigNumber(getSize());
-      for (int i = result.getSize() - 1; i >= 0 ; --i) {
-        result.setLongPart(getPartAsLong(i) >> shift | result.getPartAsLong(i), i);
+      for (int i = 0; i < result.getSize(); ++i) {
+        result.setLongPart(getLongPart(i) >> shift, i);
       }
       return result;
     }
@@ -239,7 +243,7 @@ public class BigNumber {
     return divideAndModulo(y)[1];
   }
 
-  public BigNumber modularExponent (BigNumber modulus, BigNumber exp) {
+  public BigNumber modularExponent (BigNumber exponent, BigNumber modulus) {
     BigNumber ZERO = new BigNumber(getSize(), 0);
     BigNumber ONE = new BigNumber(getSize(), 1);
 
@@ -249,31 +253,114 @@ public class BigNumber {
     else {
       BigNumber result = ONE;
       BigNumber base = modulo(modulus);
-      BigNumber exponent = new BigNumber(getSize(), exp);
+      BigNumber exp = new BigNumber(getSize(), exponent);
 
-      while (exponent.moreThan(ZERO)) {
-        if (exponent.getPart(0) % 2 == 1) {
-          result = result.multiply(base).modulo(modulus);
+      while (exp.moreThan(ZERO)) {
+        if (exp.getBit(0) == true) {
+          result = result.multiply(base);
+          result = result.modulo(modulus);
         }
-        exponent = exponent.rightBitShift(1);
-        base = base.multiply(base).modulo(modulus);
+        base = base.multiply(base);
+        base = base.modulo(modulus);
+        exp = exp.rightBitShift(1);
       }
       return result;
     }
   }
 
-  public static BigNumber generateRandom(int size) {
+  public static BigNumber generateRandom (int size) {
     BigNumber result = new BigNumber(size);
-    Random random = new Random();
+    Random random = new SecureRandom();
     for (int i = 0; i < result.getSize(); ++i) {
       result.parts[i] = random.nextInt();
     }
     return result;
   }
 
-  public static void main(String[] args) {
-    BigNumber a = new BigNumber(4, 4).modularExponent(new BigNumber(4, 497), new BigNumber(4, 13));
+  public static BigNumber generateRandom (BigNumber bound) {
+    BigNumber maxValue = getMaxValue(bound.getSize());
+    BigNumber result = generateRandom(bound.getSize());
 
-    System.out.println(a.toHexString());
+    if (bound.equalTo(maxValue)) {
+      return result;
+    }
+    else {
+      BigNumber modulus = bound.add(new BigNumber(1, 1));
+      BigNumber uniformBound = maxValue.subtract(maxValue.modulo(modulus));
+
+      while (result.moreOrEqualTo(uniformBound)) {
+        result = generateRandom(bound.getSize());
+      }
+      return result.modulo(modulus);
+    }
+  }
+
+  public static BigNumber generateRandom (BigNumber lowerBound, BigNumber upperBound) {
+    return generateRandom(upperBound.subtract(lowerBound)).add(lowerBound);
+  }
+
+  public static BigNumber getMaxValue (int size) {
+    BigNumber result = new BigNumber(size);
+    for (int i = 0; i < result.getSize(); ++i) {
+      result.parts[i] = 0xFFFFFFFF;
+    }
+    return result;
+  }
+
+  public boolean isProbablePrime (int k) {
+    BigNumber ONE = new BigNumber(getSize() * 2, 1);
+    BigNumber TWO = new BigNumber(getSize() * 2, 2);
+    BigNumber n = new BigNumber(getSize() * 2, this);
+    BigNumber N_MINUS_ONE = n.subtract(ONE);
+    BigNumber d = N_MINUS_ONE;
+    int r = 0;
+    while (d.getBit(0) == false) {
+      d = d.rightBitShift(1);
+      ++r;
+    }
+
+    witnessLoop: for (int i = 0; i < k; ++i) {
+      BigNumber a = generateRandom(TWO, n.subtract(TWO));
+      BigNumber x = a.modularExponent(d, n);
+
+      if (x.equalTo(ONE) || x.equalTo(N_MINUS_ONE)) {
+        continue witnessLoop;
+      }
+      for (int j = 0; j < r - 1; ++j) {
+        x = x.modularExponent(TWO, n);
+        if (x.equalTo(ONE)) {
+          return false;
+        }
+        else if (x.equalTo(N_MINUS_ONE)) {
+          continue witnessLoop;
+        }
+      }
+      return false;
+    }
+    return true;
+  }
+
+  public static BigNumber generatePrime (BigNumber lowerBound, BigNumber upperBound) {
+    BigNumber result;
+    do {
+      result = generateRandom(lowerBound, upperBound);
+      result.setBit(0);
+    }
+    while (!result.isProbablePrime(10));
+
+    return result;
+  }
+
+  public static void main(String[] args) {
+    BigNumber a = new BigNumber(8, 0);
+    BigNumber b = getMaxValue(8);
+
+    BigNumber x = new BigNumber(16, generatePrime(a, b));
+    System.out.println(x.toHexString());
+
+    BigNumber y = new BigNumber(16, generatePrime(a, b));
+    System.out.println(y.toHexString());
+
+    System.out.println(x.multiply(y).toHexString());
   }
 }
