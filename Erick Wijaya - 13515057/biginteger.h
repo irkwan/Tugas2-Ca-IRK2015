@@ -33,11 +33,11 @@ public:
 	biginteger& operator/=(const biginteger& rhs);
 	biginteger& operator%=(const biginteger& rhs);
 
-	biginteger add(const biginteger& rhs) const;
+	/*biginteger add(const biginteger& rhs) const;
 	biginteger min(const biginteger& rhs) const;
 	biginteger mul(const biginteger& rhs) const;
 	biginteger div(const biginteger& rhs) const;
-	biginteger mod(const biginteger& rhs) const;
+	biginteger mod(const biginteger& rhs) const;*/
 	biginteger abs() const;
 
 	/* Relational Operators */
@@ -60,4 +60,8 @@ private:
 
 	int max(int a, int b) const;
 	void delTrail0();
+	long long toLLInt() const;
+
+	static biginteger karatsubaMultiply(const biginteger& lhs, const biginteger& rhs);
+	static pair<biginteger, long long> divmod(const biginteger& v, long long den);
 };

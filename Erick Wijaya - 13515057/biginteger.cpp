@@ -22,6 +22,8 @@ biginteger::biginteger(long long v){
 		digits.push_back(dig);
 		v /= BASE;
 	}
+	if (digits.size() == 0)
+		digits.push_back(0);
 }
 
 biginteger::biginteger(const string& v){
@@ -136,11 +138,13 @@ biginteger biginteger::operator*(const biginteger& rhs) const{
 }
 
 biginteger biginteger::operator/(const biginteger& rhs) const{
-
+	biginteger res = divmod(*this, rhs.toLLInt()).first;
+	return res;
 }
 
 biginteger biginteger::operator%(const biginteger& rhs) const{
-
+	biginteger res(divmod(*this, rhs.toLLInt()).second);
+	return res;
 }
 
 biginteger& biginteger::operator+=(const biginteger& rhs){
@@ -154,17 +158,20 @@ biginteger& biginteger::operator-=(const biginteger& rhs){
 }
 
 biginteger& biginteger::operator*=(const biginteger& rhs){
-
+	*this = *this * rhs;
+	return *this;
 }
 
 biginteger& biginteger::operator/=(const biginteger& rhs){
-
+	*this = *this / rhs;
+	return *this;
 }
 
 biginteger& biginteger::operator%=(const biginteger& rhs){
-
+	*this = *this % rhs;
+	return *this;
 }
-
+/*
 biginteger biginteger::add(const biginteger& rhs) const{
 	return *this + rhs;
 }
@@ -183,7 +190,7 @@ biginteger biginteger::div(const biginteger& rhs) const{
 
 biginteger biginteger::mod(const biginteger& rhs) const{
 
-}
+}*/
 
 biginteger biginteger::abs() const{
 	biginteger res = *this;
@@ -254,4 +261,46 @@ void biginteger::delTrail0(){
 	while ((digits[digits.size()-1] == 0) && (digits.size() > 1)){
 		digits.pop_back();
 	}
+	if ((digits.size() == 1) && (digits[0] == 0)){
+		pos = true; // handle negative zero
+	}
+}
+
+long long biginteger::toLLInt() const{
+	long long res = 0;
+	for(int i=digits.size()-1; i>=0; i--){
+		res = (res * BASE) + digits[i];
+	}
+	if (!pos)
+		res = -res;
+	return res;
+}
+
+pair<biginteger, long long> biginteger::divmod(const biginteger& v, long long den){ // TODO: benerin kasus negatif
+	long long remainder = 0;
+	bool negativeDen = den < 0;
+	biginteger res;
+
+	if (den < 0)
+		den = -den;
+
+	for(int i=v.digits.size()-1; i>=0; i--){
+		remainder = (remainder * BASE) + v.digits[i];
+		res.digits.insert(res.digits.begin(), remainder / den);
+		remainder %= den;
+	}
+
+	//cout << v.pos << " " << den << endl;
+
+	if (!v.pos){
+		res.pos = negativeDen;
+	}
+	else if (v.pos && negativeDen){
+		res.pos = false;
+	}
+
+	res.delTrail0();
+
+	return make_pair(res, remainder);
+
 }

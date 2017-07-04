@@ -14,7 +14,7 @@ int main() {
 	biginteger b4(123456);
 
 	biginteger b5(-17364324723847238LL);
-	biginteger b6("1234567890");
+	biginteger b6(0);
 	biginteger b7("1");
 	biginteger b8("-2");
 
@@ -34,6 +34,10 @@ int main() {
 	cout << b1 - b2 << endl;
 	cout << b1 - b3 << endl;
 	cout << b1 - b4 << endl;
+
+	cout << b1 % b2 << " " << 54321%987 << endl;
+	cout << b3 % b1 << endl;
+	cout << b4 % b8 << endl;
 
 	return 0;
 }
