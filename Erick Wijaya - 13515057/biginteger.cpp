@@ -10,6 +10,9 @@ using namespace std;
 const biginteger biginteger::ZERO = biginteger();
 const biginteger biginteger::ONE = biginteger(1);
 const biginteger biginteger::TWO = biginteger(2);
+const biginteger biginteger::THREE = biginteger(3);
+const biginteger biginteger::FOUR = biginteger(4);
+const biginteger biginteger::FIVE = biginteger(5);
 const biginteger biginteger::TEN = biginteger(10);
 
 /* Constructors */

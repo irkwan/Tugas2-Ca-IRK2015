@@ -12,7 +12,7 @@ class biginteger {
 public:
 	/* Static Constants */
 	static const biginteger ZERO;
-	static const biginteger ONE, TWO;
+	static const biginteger ONE, TWO, THREE, FOUR, FIVE;
 	static const biginteger TEN;
 
 	/* Constructors */
