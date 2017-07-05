@@ -14,6 +14,9 @@ or
 ```
 depends on platform you use.
 
+## Result
+Coming soon
+
 ## Compile
 To compile the program, type
 ```
