@@ -2,6 +2,7 @@
 // File     : rsa.cpp
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -24,8 +25,9 @@ private:
 	biginteger eulerPhi;
 	biginteger e, d;
 	vector<char> plainText;
-	vector<char> cipherText;
+	vector<biginteger> cipherText;
 	char* filename;
+	double elapsedTime;
 
 	void readFile();
 	void initPrimeNumbers();
@@ -34,20 +36,33 @@ private:
 	void initPublicKey();
 	void initPrivateKey();
 
+	void encrypt();
+	vector<char> decrypt();
+
 	long long generateRandomPrimeNumber();
 	long long pow2(int n);
 	biginteger gcd(biginteger a, biginteger b);
+	biginteger gcdExtended(biginteger a, biginteger b, biginteger* x, biginteger* y);
 };
 
 RSA::RSA(char* filename) : filename(filename){
 	srand(time(NULL));
 	readFile();
 
-	initPrimeNumbers();
-	initSecurityParam();
-	initEulerPhi();
-	initPublicKey();
+	initPrimeNumbers();cout << "1";
+	initSecurityParam();cout << "2";
+	initEulerPhi();cout << "3";
 
+	// start counting time..
+	clock_t t = clock();
+
+	initPublicKey();cout << "4";
+	initPrivateKey();cout << "5";
+	encrypt();cout << "6";
+
+	t = clock() - t;
+	elapsedTime = (double)t/CLOCKS_PER_SEC;
+	// end of counting time.
 }
 
 void RSA::readFile(){
@@ -83,30 +98,71 @@ void RSA::initEulerPhi(){
 }
 
 void RSA::initPublicKey(){
-	e = biginteger::TEN + biginteger::ONE; // start from 11
-	while (gcd(e, biginteger(265766508)) != 1){
-		e += biginteger::TWO;
-	}
-	cout << e << endl;
+	e = biginteger::THREE;
+//	while (gcd(e, biginteger(265766508)) != 1){
+//		e += biginteger::TWO;
+//	}
+//	cout << e << endl;
 }
 
 void RSA::initPrivateKey(){
 
 }
 
+void RSA::encrypt(){
+
+}
+
+vector<char> RSA::decrypt(){
+
+}
+
 void RSA::createEncryptionFile(){
 	const int prefix = 2;
 	int len = sizeof(filename)/sizeof(char);
-	char efile[len+prefix];
+	char efile[len+prefix+1];
 
 	efile[0] = 'e';
 	efile[1] = '-';
+	efile[len+prefix] = '\0';
 	for(int i=prefix; i < len+prefix; i++){
 		efile[i] = filename[i-prefix];
 	}
 
 	ofstream outputFile(efile);
 	// insert ciphertext in file
+}
+
+void RSA::createDecryptionFile(){
+	const int prefix = 2;
+	int len = sizeof(filename)/sizeof(char);
+	char dfile[len+prefix+1];
+
+	dfile[0] = 'd';
+	dfile[1] = '-';
+	dfile[len+prefix] = '\0';
+	for(int i=prefix; i < len+prefix; i++){
+		dfile[i] = filename[i-prefix];
+	}
+
+	ofstream outputFile(dfile);
+	// decrypt
+}
+
+void RSA::createTimeFile(){
+	const int prefix = 2;
+	int len = sizeof(filename)/sizeof(char);
+	char tfile[len+prefix+1];
+
+	tfile[0] = 't';
+	tfile[1] = '-';
+	tfile[len+prefix] = '\0';
+	for(int i=prefix; i < len+prefix; i++){
+		tfile[i] = filename[i-prefix];
+	}
+
+	ofstream outputFile(tfile);
+	outputFile << "Time Elapsed: " << setprecision(4) << fixed << elapsedTime << endl;
 }
 
 long long RSA::generateRandomPrimeNumber(){
@@ -164,12 +220,31 @@ biginteger RSA::gcd(biginteger a, biginteger b){
 		return gcd(b%a, a);
 }
 
+biginteger RSA::gcdExtended(biginteger a, biginteger b, biginteger* x, biginteger* y){
+    if (a == biginteger::ZERO){
+        *x = biginteger::ZERO;
+        *y = biginteger::ONE;
+        return b;
+    }
+ 
+    biginteger x1, y1; // To store results of recursive call
+    biginteger gcd = gcdExtended(b%a, a, &x1, &y1);
+ 
+    // Update x and y using results of recursive call
+    *x = y1 - (b/a) * x1;
+    *y = x1;
+ 
+    return gcd;
+}
+
 /* ---------------------------------------------------------------------- */
 /* Main Program Start Here */
 
 int main(int argc, char* argv[]){
 	RSA myfile(argv[1]);
 	myfile.createEncryptionFile();
+	myfile.createDecryptionFile();
+	myfile.createTimeFile();
 
 	return 0;
 }
