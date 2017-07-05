@@ -1,4 +1,32 @@
-# Tugas2-Ca-IRK2015 RSA and Big Number Implementation 
+# RSA and Big Integer Implementation
+
+## Overview
+A simple RSA that can encrypt plaintext into ciphertext and decrypt it back to retrieve the text. Written in C++ languange, this project consists of Big Integer Library and RSA. The Big Integer Library can be used to create and operate very large integers. 
+
+## Run
+To run the application, you will need an input file (text file) that contains message needed to be encrypted. Run the cmd or shell and type
+```
+rsa <your-file.txt>
+```
+or
+```
+./rsa <your-file.txt>
+```
+depends on platform you use.
+
+## Compile
+To compile the program, type
+```
+g++ biginteger.cpp rsa.cpp -o rsa
+```
+
+## Screenshot
+Coming soon
+
+
+
+
+
 
 Halo Ca-IRK 2015 !
 
