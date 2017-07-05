@@ -10,6 +10,11 @@ using namespace std;
 
 class biginteger {
 public:
+	/* Static Constants */
+	static const biginteger ZERO;
+	static const biginteger ONE, TWO;
+	static const biginteger TEN;
+
 	/* Constructors */
 	biginteger();
 	biginteger(long long v);
