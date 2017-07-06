@@ -14,13 +14,13 @@ using namespace std;
 
 class BigNumber {
 public:
-	/*Constructor & Destructor*/
+	/*CONSTRUCTORS*/
 	BigNumber();
 	BigNumber(long long n);
 	BigNumber(const string& str);
 	BigNumber(const BigNumber& bn);
 
-	/*Operators*/
+	/*OPERATORS*/
 	BigNumber& operator=(long long n);
 	BigNumber& operator=(const string& str);
 	BigNumber& operator=(const BigNumber& bn);
@@ -101,19 +101,20 @@ public:
 	friend istream& operator>>(istream& in, BigNumber& bn);
 	friend ostream& operator<<(ostream& out, const BigNumber& bn);
 
-	/*Methods*/
+	/*METHODS*/
 	string toString() const;
-	void negate();
+	BigNumber absolute() const;
+	static BigNumber gcd(const BigNumber& bn1, const BigNumber& bn2);
+	static BigNumber lcm(const BigNumber& bn1, const BigNumber& bn2);
 
 private:
-	/*Attributes*/
+	/*ATTRIBUTES*/
 	const static unsigned base = 1000000000;
-	const static unsigned maxDigitsComponentLength = 9;
 	deque <unsigned> digits; //little endian
 	bool isZero;
 	bool isNegative;
 
-	/*Methods*/
+	/*METHODS*/
 	void normalizeForm();
 	static bool isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2);
 	static BigNumber unsignedSum(const BigNumber& bn1, const BigNumber& bn2);

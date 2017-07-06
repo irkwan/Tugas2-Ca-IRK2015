@@ -516,10 +516,28 @@ string BigNumber::toString() const {
 	}
 }
 
-void BigNumber::negate() {
-	if (!isZero) {
-		isNegative = !isNegative;
+BigNumber BigNumber::absolute() const {
+	BigNumber result = *this;
+	result.isNegative = false;
+	return result;
+}
+
+BigNumber BigNumber::gcd(const BigNumber& bn1, const BigNumber& bn2) {
+	if (bn1 != 0 && bn2 != 0) {
+		BigNumber zero(0), left(bn1), right(bn2), temp;
+		do {
+			temp = right;
+			right = unsignedDivide(left,right).second;
+			left = temp;
+		} while (right != zero);
+		return left;
+	} else {
+		return BigNumber(0);
 	}
+}
+
+BigNumber BigNumber::lcm(const BigNumber& bn1, const BigNumber& bn2) {
+	return unsignedDivide(unsignedMultiply(bn1,bn2),gcd(bn1,bn2)).first;
 }
 
 void BigNumber::normalizeForm() {
@@ -618,7 +636,7 @@ BigNumber BigNumber::unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2
 
 pair<BigNumber,BigNumber> BigNumber::unsignedDivide(const BigNumber& bn1, const BigNumber& bn2) {
 	if (bn2==0) {
-		throw "division by 0";
+		return pair<BigNumber,BigNumber>(0,0);
 	} else if (isUnsignedGreater(bn2,bn1)) {
 		return pair<BigNumber,BigNumber>(0,bn1);
 	} else {
