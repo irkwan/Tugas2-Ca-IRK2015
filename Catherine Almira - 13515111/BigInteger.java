@@ -611,6 +611,20 @@ public class BigInteger {
   }
 
   /*
+   * Mengembalikan nilai pembagi terbesar bilangan b1 dan b2.
+   */
+
+  public static BigInteger gcd(BigInteger b1, BigInteger b2) {
+    BigInteger abs1 = b1.abs();
+    BigInteger abs2 = b2.abs();
+    if (abs1.sign == 0) {
+      return new BigInteger(abs2);
+    } else {
+      return gcd(mod(abs2, abs1), abs1);
+    }
+  }
+
+  /*
    * Mengembalikan String yang merepresentasikan nilai BigInteger.
    */
 
@@ -630,10 +644,10 @@ public class BigInteger {
   }
 
   public static void main(String args[]) {
-    BigInteger bi = new BigInteger("1512314234134");
+    BigInteger bi = new BigInteger("748");
     
-    BigInteger b3 = new BigInteger("3134123");
-    BigInteger a = mod(bi, b3);
+    BigInteger b3 = new BigInteger("2024");
+    BigInteger a = gcd(bi, b3);
     System.out.println(a);
     
 
