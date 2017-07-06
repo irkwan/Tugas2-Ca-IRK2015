@@ -32,7 +32,7 @@ algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
 2. Segala operasi pada bilangan big number **TIDAK BOLEH MENGGUNAKAN LIBRARY BAWAAN BAHASA PEMROGRAMAN / BUATAN ORANG**. Anda harus mengimplementasikan library / algoritma big number sendiri, namun belajar dari algoritma yang sudah ada tidak dilarang.
 
 # Deadline
-Deadline pengerjaan tugas ini adalah ~~tanggal 30 Juni 2017 pukul 20.17 WIB, silahkan mulai dicicil mengerjakan dari sekarang karena waktu pengerjaan anda dipotong libur lebaran~~ Diundur menjadi tanggal 14 Juli 2017, pukul 23.59 WIB.
+Deadline pengerjaan tugas ini adalah tanggal 30 Juni 2017 pukul 20.17 WIB, silahkan mulai dicicil mengerjakan dari sekarang karena waktu pengerjaan anda dipotong libur lebaran.
 
 Apabila ada perubahan spesifikasi maupun deadline, maka akan diberitahukan lebih lanjut.
 
