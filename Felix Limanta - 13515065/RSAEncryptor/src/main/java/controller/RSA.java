@@ -1,82 +1,80 @@
 package org.felixlimanta.RSAEncryptor.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
+import java.io.IOException;
 import java.util.Arrays;
-import org.apache.commons.codec.DecoderException;
 import org.felixlimanta.RSAEncryptor.model.BigInt;
 import org.felixlimanta.RSAEncryptor.model.PrivateKey;
+import org.felixlimanta.RSAEncryptor.model.PublicKey;
 import org.felixlimanta.RSAEncryptor.model.XmlHelper;
+import org.xml.sax.SAXException;
 
 /**
  * Created by ASUS on 10/06/17.
  */
 public class RSA {
   private static final int BIT_LENGTH = 1024;
-  private static final BigInt DEFAULT_E_VALUE = new BigInt("65537");
-  private static final int MAX_PLAINTEXT_LENGTH = BIT_LENGTH / 8;
-  private static SecureRandom random;
 
-  private PrivateKey key;
+  private PublicKey publicKey;
+  private PrivateKey privateKey;
   private AES aes;
 
-  static {
-    random = new SecureRandom();
+  public void setPublicKey(PublicKey publicKey) {
+    this.publicKey = publicKey;
   }
 
-  public RSA() {
-    key = new PrivateKey();
+  public void setPrivateKey(PrivateKey privateKey) {
+    this.privateKey = privateKey;
   }
 
-  public RSA(BigInt n, BigInt e, BigInt d) {
-    key = new PrivateKey(n, e, d);
+  public PublicKey getPublicKey() {
+    return publicKey;
   }
 
-  public RSA(String n, String e, String d) {
-    key = new PrivateKey(new BigInt(n), new BigInt(e), new BigInt(d));
+  public PrivateKey getPrivateKey() {
+    return privateKey;
   }
 
   BigInt getP() {
-    return key.getP();
+    return privateKey.getP();
   }
 
   BigInt getQ() {
-    return key.getQ();
+    return privateKey.getQ();
   }
 
   BigInt getLambda() {
-    return key.getLambda();
+    return privateKey.getLambda();
   }
 
   public BigInt getN() {
-    return key.getN();
+    return privateKey.getN();
   }
 
   public BigInt getE() {
-    return key.getE();
+    return privateKey.getE();
   }
 
   BigInt getD() {
-    return key.getD();
+    return privateKey.getD();
   }
 
   AES getAes() {
     return aes;
   }
 
-  public String[] encrypt(String plainText) throws UnsupportedEncodingException {
+  public String[] encrypt(String plainText) {
     aes = new AES();
 
-    // Encrypt key
+    // Encrypt privateKey
     byte[] plainKey = aes.getKey();
     BigInt plainKeyInt = new BigInt(plainKey, (byte) 1);
-    BigInt cipherKeyInt = plainKeyInt.modExp(key.getE(), key.getN());
+    BigInt cipherKeyInt = plainKeyInt.modExp(publicKey.getE(), publicKey.getN());
     byte[] cipherKey = cipherKeyInt.toByteArray();
 
     // Encrypt initialization vector
     byte[] plainIV = aes.getInitVector();
     BigInt plainIVInt = new BigInt(plainIV, (byte) 1);
-    BigInt cipherIVInt = plainIVInt.modExp(key.getE(), key.getN());
+    BigInt cipherIVInt = plainIVInt.modExp(publicKey.getE(), publicKey.getN());
     byte[] cipherIV = cipherIVInt.toByteArray();
 
     String manifest = XmlHelper.toXmlString(cipherKey, cipherIV);
@@ -85,17 +83,17 @@ public class RSA {
   }
 
   public String decrypt(String manifest, String cipherText)
-      throws DecoderException, UnsupportedEncodingException {
+      throws SAXException, IOException {
     byte[][] aesKeys = XmlHelper.fromXmlString(manifest);
 
-    // Decrypt key
+    // Decrypt privateKey
     BigInt cipherKeyInt = new BigInt(aesKeys[0], (byte) 1);
-    BigInt plainKeyInt = cipherKeyInt.modExp(key.getD(), key.getN());
+    BigInt plainKeyInt = cipherKeyInt.modExp(privateKey.getD(), privateKey.getN());
     byte[] plainKey = leftTruncateOrPadByteArray(plainKeyInt.toByteArray(), 16);
 
     // Decrypt IV
     BigInt cipherIVInt = new BigInt(aesKeys[1], (byte) 1);
-    BigInt plainIVInt = cipherIVInt.modExp(key.getD(), key.getN());
+    BigInt plainIVInt = cipherIVInt.modExp(privateKey.getD(), privateKey.getN());
     byte[] plainIV = leftTruncateOrPadByteArray(plainIVInt.toByteArray(), 16);
 
     // Decrypt text

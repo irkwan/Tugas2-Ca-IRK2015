@@ -1,5 +1,8 @@
 package org.felixlimanta.RSAEncryptor.model;
 
+import java.io.IOException;
+import org.xml.sax.SAXException;
+
 /**
  * Created by ASUS on 13/06/17.
  */
@@ -39,7 +42,7 @@ public class PublicKey {
   //region To and From XML
   //------------------------------------------------------------------------------------------------
 
-  public static PublicKey fromXmlString(String xml) {
+  public static PublicKey fromXmlString(String xml) throws SAXException, IOException {
     BigInt[] values = XmlHelper.fromXmlString(xml, tagNames);
     if (values != null)
       return new PublicKey(values[0], values[1]);

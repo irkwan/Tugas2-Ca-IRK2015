@@ -1,6 +1,8 @@
 package org.felixlimanta.RSAEncryptor.model;
 
+import java.io.IOException;
 import java.security.SecureRandom;
+import org.xml.sax.SAXException;
 
 /**
  * Created by ASUS on 13/06/17.
@@ -276,7 +278,7 @@ public class PrivateKey {
   //region To and From XML
   //------------------------------------------------------------------------------------------------
 
-  public static PrivateKey fromXmlString(String xml) {
+  public static PrivateKey fromXmlString(String xml) throws SAXException, IOException {
     BigInt[] values = XmlHelper.fromXmlString(xml, tagNames);
     if (values != null)
       return new PrivateKey(values[0], values[1], values[7], values[2],

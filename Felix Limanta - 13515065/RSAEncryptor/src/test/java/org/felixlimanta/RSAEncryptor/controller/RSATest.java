@@ -10,8 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import org.felixlimanta.RSAEncryptor.model.BigInt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.felixlimanta.RSAEncryptor.model.PrivateKey;
 
 /**
  * Created by ASUS on 10/06/17.
@@ -107,7 +109,11 @@ class RSATest {
   @Test
   void encryptLongTexts() {
     final int k = 100;
-    rsa = new RSA(n, e, d);
+    PrivateKey key = new PrivateKey(new BigInt(n), new BigInt(e), new BigInt(d));
+    rsa = new RSA();
+    rsa.setPrivateKey(key);
+    rsa.setPublicKey(key.getPublicKey());
+
     try {
       for (int i = 0; i < k; ++i) {
         System.out.print(i + " ");

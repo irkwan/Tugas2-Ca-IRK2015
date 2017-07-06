@@ -5,12 +5,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
+import org.felixlimanta.RSAEncryptor.controller.RsaEncryptorController;
 
 /**
  * Created by ASUS on 13/06/17.
  */
 public class BaseView extends JFrame {
 
+  private RsaEncryptorController controller;
   private EncryptPanel encryptPanelObj;
   private DecryptPanel decryptPanelObj;
   private KeyPanel keyPanelObj;
@@ -26,6 +28,7 @@ public class BaseView extends JFrame {
   public BaseView() {
     super("RSA Encryptor");
     setUpFileChooser();
+    setUpController();
 
     setContentPane(rootPanel);
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -46,5 +49,17 @@ public class BaseView extends JFrame {
   private void setUpFileChooser() {
     fileChooser = new JFileChooser();
     encryptPanelObj.setFileChooser(fileChooser);
+    decryptPanelObj.setFileChooser(fileChooser);
+  }
+
+  private void setUpController() {
+    controller = new RsaEncryptorController();
+    controller.setEncryptPanel(encryptPanelObj);
+    controller.setDecryptPanel(decryptPanelObj);
+    controller.setKeyPanel(keyPanelObj);
+
+    encryptPanelObj.setController(controller);
+    decryptPanelObj.setController(controller);
+    keyPanelObj.setController(controller);
   }
 }
