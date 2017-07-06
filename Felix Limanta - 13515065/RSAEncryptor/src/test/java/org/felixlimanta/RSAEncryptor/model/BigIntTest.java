@@ -9,14 +9,19 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Created by ASUS on 07/06/17.
+ * Unit test class for {@code BigInt}.
+ * Testing is done with the java.lang.BigInteger library, where the results produced by
+ * this BigInt library is compared to results produced by java.lang.BigInteger.
+ *
+ * @author Felix Limanta
+ * @version 1.0
+ * @since 2017-06-07
  */
 class BigIntTest {
 
   private org.felixlimanta.RSAEncryptor.model.BigInt b;
 
   private static SecureRandom random;
-  static int n;
 
   @BeforeAll
   static void setUpAll() {
@@ -582,32 +587,6 @@ class BigIntTest {
       String s = b2.toString();
       assertTrue(b2.isProbablePrime(100), "Composite number generated");
       System.out.println(i + ". " + s);
-    }
-  }
-
-  @Test
-  void nextProbablePrime() {
-    final int k = 100;
-    for (int i = 0; i < k; ++i) {
-      BigInt b1 = BigInt.probablePrime(128, random);
-      BigInteger exp = new BigInteger(b1.toBinaryString(), 2).nextProbablePrime();
-      BigInt act = b1.nextProbablePrime();
-      assertEquals(exp.toString(2), act.toBinaryString(), "Diffrrent next primes");
-    }
-  }
-
-  @Test
-  void testWithJavaBigInteger() {
-    BigInteger a = new BigInteger("-5");
-    BigInteger b = new BigInteger("2");
-    BigInteger c = a.divide(b);
-    BigInteger d = a.remainder(b);
-    System.out.println(a + " = " + b + " * " + c + " + " + d);
-
-    if (d.compareTo(BigInteger.ZERO) == -1) {
-      c = c.subtract(BigInteger.ONE);
-      d = b.abs().add(d);
-      System.out.println(b.multiply(c).add(d) + " = " + b + " * " + c + " + " + d);
     }
   }
 }
