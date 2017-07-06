@@ -535,9 +535,7 @@ public class BigInteger {
   	  return new BigInteger();
   	}
   	if (b1.compareTo(b2) == 0) {
-  	  BigInteger one = new BigInteger();
-  	  one.sign = 1;
-  	  one.value.add(1);
+  	  BigInteger one = new BigInteger("1");
   	  return one;
   	}
   	BigInteger hasil = divideAbs(b1, b2);
@@ -625,6 +623,43 @@ public class BigInteger {
   }
 
   /*
+   * Mengembalikan array BigInteger [x, y] dimana b1 * x + b2 * y = gcd(b1, b2).
+   * Prekondisi: b1 dan b2 tidak negatif.
+   */
+
+  public static BigInteger[] gcdExtended(BigInteger b1, BigInteger b2) {
+    BigInteger[] hasil = new BigInteger[2];
+    if (b1.sign == 0) {
+      hasil[0] = new BigInteger();
+      hasil[1] = new BigInteger("1");
+      return hasil;
+    }
+    BigInteger[] temp = gcdExtended(mod(b2, b1), b1);
+    hasil[1] = temp[0];
+    hasil[0] = temp[1].subtract(multiply(temp[0], divide(b2, b1)));
+    return hasil;
+  }
+  
+  /*
+   * Mengembalikan nilai invers modulo b1^-1 mod b2.
+   */
+
+  public static BigInteger modInverse(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    if (b2.sign < 1) {
+      throw new ArithmeticException("mod by zero");
+    }
+    BigInteger[] temp = gcdExtended(b1, b2);
+    BigInteger one = new BigInteger("1");
+    if (gcd(b1, b2).compareTo(one) != 0) {
+      throw new ArithmeticException("not relative prime");
+    }
+    if (temp[0].sign == -1) {
+      return b2.add(temp[0]);
+    }
+    return temp[0];
+  }
+
+  /*
    * Mengembalikan String yang merepresentasikan nilai BigInteger.
    */
 
@@ -644,11 +679,11 @@ public class BigInteger {
   }
 
   public static void main(String args[]) {
-    BigInteger bi = new BigInteger("748");
+    BigInteger bi = new BigInteger("793123897953205984031123");
     
-    BigInteger b3 = new BigInteger("2024");
-    BigInteger a = gcd(bi, b3);
-    System.out.println(a);
+    BigInteger b3 = new BigInteger("322023142389179237819238491823");
+    BigInteger b = modInverse(bi, b3);
+    System.out.println(b);
     
 
   }
