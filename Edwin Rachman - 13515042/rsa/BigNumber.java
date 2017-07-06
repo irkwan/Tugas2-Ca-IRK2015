@@ -1,3 +1,5 @@
+package rsa;
+
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -29,7 +31,7 @@ public class BigNumber {
     for (int i = 0; i < size; ++i) {
       parts[i] = 0;
     }
-    System.arraycopy(obj.parts, 0, parts, 0, obj.parts.length);
+    System.arraycopy(obj.parts, 0, parts, 0, size < obj.parts.length ? size : obj.parts.length);
   }
 
   public BigNumber(BigNumber obj) {
@@ -55,6 +57,10 @@ public class BigNumber {
 
   public boolean lessThan(BigNumber y) {
     return compare(y) < 0;
+  }
+
+  public boolean isNegative () {
+    return getBit(getSize() * 32 - 1) == true;
   }
 
   public BigNumber inverse() {
@@ -174,7 +180,6 @@ public class BigNumber {
     setPart(getPart(shift / 32) & ~(1 << (shift % 32)), shift / 32);
   }
 
-
   public BigNumber add (long y) {
     BigNumber result = new BigNumber(getSize());
     result.setLongPart(getPartAsLong(0) + y, 0);
@@ -244,28 +249,56 @@ public class BigNumber {
   }
 
   public BigNumber modularExponent (BigNumber exponent, BigNumber modulus) {
-    BigNumber ZERO = new BigNumber(getSize(), 0);
-    BigNumber ONE = new BigNumber(getSize(), 1);
+    BigNumber ZERO = new BigNumber(getSize() * 2, 0);
+    BigNumber ONE = new BigNumber(getSize() * 2, 1);
 
     if (modulus.equalTo(ONE)) {
       return ZERO;
     }
     else {
       BigNumber result = ONE;
-      BigNumber base = modulo(modulus);
-      BigNumber exp = new BigNumber(getSize(), exponent);
+      BigNumber modu = new BigNumber(getSize() * 2, modulus);
+      BigNumber base = new BigNumber(getSize() * 2, this).modulo(modu);
+      BigNumber exp = new BigNumber(getSize() * 2, exponent);
 
       while (exp.moreThan(ZERO)) {
         if (exp.getBit(0) == true) {
-          result = result.multiply(base);
-          result = result.modulo(modulus);
+          result = result.multiply(base).modulo(modu);
         }
-        base = base.multiply(base);
-        base = base.modulo(modulus);
+        base = base.multiply(base).modulo(modu);
         exp = exp.rightBitShift(1);
       }
-      return result;
+      return new BigNumber(getSize(), result);
     }
+  }
+
+  public BigNumber modularInverse (BigNumber modulus) {
+    BigNumber ZERO = new BigNumber(getSize(), 0);
+    BigNumber ONE = new BigNumber(getSize(), 1);
+
+    BigNumber t0 = ZERO;
+    BigNumber t1 = ONE;
+    BigNumber r0 = modulus;
+    BigNumber r1 = this;
+
+    while (!r1.equalTo(ZERO)) {
+      BigNumber quotient = r0.divide(r1);
+      BigNumber temp;
+      temp = t1;
+      t1 = t0.subtract(quotient.multiply(t1));
+      t0 = temp;
+      temp = r1;
+      r1 = r0.subtract(quotient.multiply(r1));
+      r0 = temp;
+    }
+
+    if (r0.moreThan(ONE)) {
+      return null;
+    }
+    if (t0.isNegative()) {
+      t0 = t0.add(modulus);
+    }
+    return t0;
   }
 
   public static BigNumber generateRandom (int size) {
@@ -308,10 +341,9 @@ public class BigNumber {
   }
 
   public boolean isProbablePrime (int k) {
-    BigNumber ONE = new BigNumber(getSize() * 2, 1);
-    BigNumber TWO = new BigNumber(getSize() * 2, 2);
-    BigNumber n = new BigNumber(getSize() * 2, this);
-    BigNumber N_MINUS_ONE = n.subtract(ONE);
+    BigNumber ONE = new BigNumber(getSize(), 1);
+    BigNumber TWO = new BigNumber(getSize(), 2);
+    BigNumber N_MINUS_ONE = subtract(ONE);
     BigNumber d = N_MINUS_ONE;
     int r = 0;
     while (d.getBit(0) == false) {
@@ -320,14 +352,14 @@ public class BigNumber {
     }
 
     witnessLoop: for (int i = 0; i < k; ++i) {
-      BigNumber a = generateRandom(TWO, n.subtract(TWO));
-      BigNumber x = a.modularExponent(d, n);
+      BigNumber a = generateRandom(TWO, subtract(TWO));
+      BigNumber x = a.modularExponent(d, this);
 
       if (x.equalTo(ONE) || x.equalTo(N_MINUS_ONE)) {
         continue witnessLoop;
       }
       for (int j = 0; j < r - 1; ++j) {
-        x = x.modularExponent(TWO, n);
+        x = x.modularExponent(TWO, this);
         if (x.equalTo(ONE)) {
           return false;
         }
@@ -340,27 +372,81 @@ public class BigNumber {
     return true;
   }
 
-  public static BigNumber generatePrime (BigNumber lowerBound, BigNumber upperBound) {
-    BigNumber result;
-    do {
-      result = generateRandom(lowerBound, upperBound);
-      result.setBit(0);
+  public BigNumber greatestCommonDivisor (BigNumber other) {
+    BigNumber ZERO = new BigNumber(getSize(), 0);
+    BigNumber a = this;
+    BigNumber b = other;
+
+    while (!b.equalTo(ZERO)) {
+      BigNumber temp = b;
+      b = a.modulo(b);
+      a = temp;
     }
-    while (!result.isProbablePrime(10));
+
+    return a;
+  }
+
+  public static BigNumber generatePrime (BigNumber lowerBound, BigNumber upperBound) {
+    BigNumber TWO = new BigNumber(upperBound.getSize(), 2);
+    BigNumber result = generateRandom(lowerBound, upperBound);
+    result.setBit(0);
+    while (!result.isProbablePrime(10)) {
+      result = result.add(TWO);
+    }
 
     return result;
   }
 
   public static void main(String[] args) {
-    BigNumber a = new BigNumber(8, 0);
-    BigNumber b = getMaxValue(8);
+/*
+    rsa.BigNumber base = new rsa.BigNumber(new int[] {0x2, 0x0, 0x0, 0x0});
+    System.out.println(base.toHexString());
 
-    BigNumber x = new BigNumber(16, generatePrime(a, b));
-    System.out.println(x.toHexString());
+    rsa.BigNumber exponent = new rsa.BigNumber(new int[] {0x10001, 0x0, 0x0, 0x0});
+    System.out.println(exponent.toHexString());
 
-    BigNumber y = new BigNumber(16, generatePrime(a, b));
-    System.out.println(y.toHexString());
+    rsa.BigNumber modulus = new rsa.BigNumber(new int[] {0x998ddef1, 0x4b7f11ba, 0x0, 0x0});
+    System.out.println(modulus.toHexString());
 
-    System.out.println(x.multiply(y).toHexString());
+    rsa.BigNumber result = base.modularExponent(exponent, modulus);
+    System.out.println(result.toHexString());
+
+*/
+
+    BigNumber ONE = new BigNumber(32, 1);
+
+    BigNumber a = new BigNumber(16, 0);
+    BigNumber b = getMaxValue(16);
+
+    BigNumber p = new BigNumber(32, generatePrime(a, b));
+    System.out.println(p.toHexString());
+
+    BigNumber q = new BigNumber(32, generatePrime(a, b));
+    System.out.println(q.toHexString());
+
+    BigNumber n = p.multiply(q);
+    System.out.println(n.toHexString());
+
+    BigNumber phi = new BigNumber(32, p.subtract(ONE).multiply(q.subtract(ONE)));
+    System.out.println(phi.toHexString());
+
+    BigNumber e = new BigNumber(32, 0x10001);
+    System.out.println(e.toHexString());
+
+    System.out.println(e.greatestCommonDivisor(phi).toHexString());
+
+    BigNumber d = e.modularInverse(phi);
+    System.out.println(d.toHexString());
+
+    BigNumber m = new BigNumber(32, 123);
+    System.out.println(m.toHexString());
+
+    BigNumber c = m.modularExponent(e, n);
+    System.out.println(c.toHexString());
+
+    BigNumber out = c.modularExponent(d, n);
+    System.out.println(out.toHexString());
   }
 }
+
+
