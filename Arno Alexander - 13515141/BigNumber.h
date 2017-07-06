@@ -5,6 +5,11 @@ Author : Arno Alexander
 #ifndef BIGNUMBER_H
 #define BIGNUMBER_H
 
+#include <iostream>
+#include <deque>
+#include <cmath>
+#include <utility>
+
 using namespace std;
 
 class BigNumber {
@@ -110,11 +115,11 @@ private:
 
 	/*Methods*/
 	void normalizeForm();
-	friend bool isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2);
-	friend BigNumber unsignedSum(const BigNumber& bn1, const BigNumber& bn2);
-	friend BigNumber unsignedDifference(const BigNumber& bn1, const BigNumber& bn2);
-	friend BigNumber unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2);
-	friend pair<BigNumber,BigNumber> unsignedDivide(const BigNumber& bn1, const BigNumber& bn2);
+	static bool isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2);
+	static BigNumber unsignedSum(const BigNumber& bn1, const BigNumber& bn2);
+	static BigNumber unsignedDifference(const BigNumber& bn1, const BigNumber& bn2);
+	static BigNumber unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2);
+	static pair<BigNumber,BigNumber> unsignedDivide(const BigNumber& bn1, const BigNumber& bn2);
 };
 
 #endif

@@ -2,11 +2,8 @@
 Author : Arno Alexander
 */
 
-#include <iostream>
-#include <deque>
-#include <cmath>
-#include <utility>
 #include "BigNumber.h"
+#include "RSA.h"
 
 using namespace std;
 

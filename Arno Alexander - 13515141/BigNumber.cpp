@@ -2,10 +2,6 @@
 Author : Arno Alexander
 */
 
-#include <iostream>
-#include <deque>
-#include <cmath>
-#include <utility>
 #include "BigNumber.h"
 
 BigNumber::BigNumber() {
@@ -151,9 +147,9 @@ bool operator>(const BigNumber& bn1, const BigNumber& bn2) {
 	int sign2 = 1 - bn2.isNegative * 2 - bn2.isZero;
 	if (sign1 == sign2) {
 		if (sign1 > 0) {
-			return isUnsignedGreater(bn1,bn2);
+			return BigNumber::isUnsignedGreater(bn1,bn2);
 		} else if (sign1 < 0) {
-			return isUnsignedGreater(bn2,bn1);
+			return BigNumber::isUnsignedGreater(bn2,bn1);
 		} else {
 			return false;
 		}
@@ -207,9 +203,9 @@ bool operator<(const BigNumber& bn1, const BigNumber& bn2) {
 	int sign2 = 1 - bn2.isNegative * 2 - bn2.isZero;
 	if (sign1 == sign2) {
 		if (sign1 > 0) {
-			return isUnsignedGreater(bn2,bn1);
+			return BigNumber::isUnsignedGreater(bn2,bn1);
 		} else if (sign1 < 0) {
-			return isUnsignedGreater(bn1,bn2);
+			return BigNumber::isUnsignedGreater(bn1,bn2);
 		} else {
 			return false;
 		}
@@ -261,11 +257,11 @@ bool operator<=(const string& str, const BigNumber& bn) {
 BigNumber operator+(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	if (bn1.isNegative == bn2.isNegative) {
-		result = unsignedSum(bn1,bn2);
+		result = BigNumber::unsignedSum(bn1,bn2);
 		result.isNegative = bn1.isNegative;
 	} else {
-		result = unsignedDifference(bn1,bn2);
-		result.isNegative = isUnsignedGreater(bn1,bn2) == bn1.isNegative;
+		result = BigNumber::unsignedDifference(bn1,bn2);
+		result.isNegative = BigNumber::isUnsignedGreater(bn1,bn2) == bn1.isNegative;
 	}
 	result.normalizeForm();
 	return result;
@@ -294,11 +290,11 @@ BigNumber operator+(const string& str, const BigNumber& bn) {
 BigNumber operator-(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	if (bn1.isNegative != bn2.isNegative) {
-		result = unsignedSum(bn1,bn2);
+		result = BigNumber::unsignedSum(bn1,bn2);
 		result.isNegative = bn1.isNegative;
 	} else {
-		result = unsignedDifference(bn1,bn2);
-		result.isNegative = isUnsignedGreater(bn1,bn2) == bn1.isNegative;
+		result = BigNumber::unsignedDifference(bn1,bn2);
+		result.isNegative = BigNumber::isUnsignedGreater(bn1,bn2) == bn1.isNegative;
 	}
 	result.normalizeForm();
 	return result;
@@ -325,7 +321,7 @@ BigNumber operator-(const string& str, const BigNumber& bn) {
 }
 
 BigNumber operator*(const BigNumber& bn1, const BigNumber& bn2) {
-	BigNumber result = unsignedMultiply(bn1,bn2);
+	BigNumber result = BigNumber::unsignedMultiply(bn1,bn2);
 	result.isNegative = bn1.isNegative!=bn2.isNegative;
 	result.normalizeForm();
 	return result;
@@ -352,7 +348,7 @@ BigNumber operator*(const string& str, const BigNumber& bn) {
 }
 
 BigNumber operator/(const BigNumber& bn1, const BigNumber& bn2) {
-	BigNumber result = unsignedDivide(bn1,bn2).first;
+	BigNumber result = BigNumber::unsignedDivide(bn1,bn2).first;
 	result.isNegative = bn1.isNegative!=bn2.isNegative;
 	result.normalizeForm();
 	return result;
@@ -379,7 +375,7 @@ BigNumber operator/(const string& str, const BigNumber& bn) {
 }
 
 BigNumber operator%(const BigNumber& bn1, const BigNumber& bn2) {
-	BigNumber result = unsignedDivide(bn1,bn2).second;
+	BigNumber result = BigNumber::unsignedDivide(bn1,bn2).second;
 	result.isNegative = bn1.isNegative;
 	result.normalizeForm();
 	return result;
@@ -542,7 +538,7 @@ void BigNumber::normalizeForm() {
 	}
 }
 
-bool isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2) {
+bool BigNumber::isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2) {
 	if (bn1.digits.size() == bn2.digits.size()) {
 		bool stopComparing = false;
 		deque<unsigned>::size_type index = bn1.digits.size();
@@ -556,7 +552,7 @@ bool isUnsignedGreater(const BigNumber& bn1, const BigNumber& bn2) {
 	}
 }
 
-BigNumber unsignedSum(const BigNumber& bn1, const BigNumber& bn2) {
+BigNumber BigNumber::unsignedSum(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	unsigned carry = 0;
 	deque<unsigned>::size_type index = 0;
@@ -573,7 +569,7 @@ BigNumber unsignedSum(const BigNumber& bn1, const BigNumber& bn2) {
 	return result;
 }
 
-BigNumber unsignedDifference(const BigNumber& bn1, const BigNumber& bn2) {
+BigNumber BigNumber::unsignedDifference(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	bool needCarry = false, nextNeedCarry, isBn1Bigger = isUnsignedGreater(bn1,bn2);
 	unsigned resultComponent, subtractorComponent;
@@ -599,7 +595,7 @@ BigNumber unsignedDifference(const BigNumber& bn1, const BigNumber& bn2) {
 	return result;
 }
 
-BigNumber unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2) {
+BigNumber BigNumber::unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2) {
 	BigNumber result;
 	unsigned long long carry;
 	deque<unsigned>::size_type additionalIndex;
@@ -620,7 +616,7 @@ BigNumber unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2) {
 	return result;
 }
 
-pair<BigNumber,BigNumber> unsignedDivide(const BigNumber& bn1, const BigNumber& bn2) {
+pair<BigNumber,BigNumber> BigNumber::unsignedDivide(const BigNumber& bn1, const BigNumber& bn2) {
 	if (bn2==0) {
 		throw "division by 0";
 	} else if (isUnsignedGreater(bn2,bn1)) {
