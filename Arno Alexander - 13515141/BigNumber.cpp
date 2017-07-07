@@ -4,6 +4,8 @@ Author : Arno Alexander
 
 #include "BigNumber.h"
 
+bool BigNumber::isRandomInitialized = false;
+
 BigNumber::BigNumber() {
 	digits.clear();
 	digits.push_back(0);
@@ -540,6 +542,69 @@ BigNumber BigNumber::lcm(const BigNumber& bn1, const BigNumber& bn2) {
 	return unsignedDivide(unsignedMultiply(bn1,bn2),gcd(bn1,bn2)).first;
 }
 
+BigNumber BigNumber::generateRandom(unsigned length) {
+	unsigned long long generatedDigitValue = 0, randomMultiplier = 1;
+	unsigned generatedDigit, randomIdentifier;
+	BigNumber result;
+	result.digits.clear();
+	initializeRandom();
+	while (length > 0) {
+		randomIdentifier = (rand() + length) % 4;
+		switch (randomIdentifier) {
+			case 0 : generatedDigit = (rand() * 3) % 10; break;
+			case 1 : generatedDigit = (rand() * 9) % 10; break;
+			case 2 : generatedDigit = (rand() * 7) % 10; break;
+			default : generatedDigit = rand() % 10; break;
+		}
+		if (generatedDigit == 0 && length == 1) {
+			generatedDigit = 1;
+		}
+		generatedDigitValue += randomMultiplier * generatedDigit;
+		randomMultiplier *= 10;
+		if (randomMultiplier >= base) {
+			generatedDigit = (unsigned)(generatedDigitValue);
+			result.digits.push_back(generatedDigit);
+			generatedDigitValue = 0;
+			randomMultiplier = 1;
+		}
+		length--;
+	}
+	generatedDigit = (unsigned)(generatedDigitValue % base);
+	result.digits.push_back(generatedDigit);
+	result.normalizeForm();
+	return result;
+}
+
+BigNumber BigNumber::generateProbablePrime(unsigned minLength) {
+	BigNumber result = generateRandom(minLength);
+	return result.nextProbablePrime();
+}
+
+BigNumber BigNumber::nextProbablePrime() {
+	BigNumber result = *this;
+	if (result.digits.front() % 2 == 0) {
+		result -= 1;
+	}
+	BigNumber two(2), three(3), five(5), seven(7);
+	bool found = false;
+	do {
+		result += two;
+		if (result.digits.front() % 5 != 0) {
+			found = unsignedPowMod(two,result,result) == two;
+			if (found) {
+				found = unsignedPowMod(three,result,result) == three;
+				if (found) {
+					found = unsignedPowMod(five,result,result) == five;
+					if (found) {
+						found = unsignedPowMod(seven,result,result) == seven;
+					}
+				}
+			}
+		}
+	} while (!found);
+	return result;
+}
+
 void BigNumber::normalizeForm() {
 	if (digits.size() == 0) {
 		digits.push_back(0);
@@ -553,6 +618,13 @@ void BigNumber::normalizeForm() {
 		}
 		isZero = digits.size()==1 && digits.back()==0;
 		isNegative = isNegative && !isZero;
+	}
+}
+
+void BigNumber::initializeRandom() {
+	if (!isRandomInitialized) {
+		srand(time(NULL));
+		isRandomInitialized = true;
 	}
 }
 
@@ -635,9 +707,7 @@ BigNumber BigNumber::unsignedMultiply(const BigNumber& bn1, const BigNumber& bn2
 }
 
 pair<BigNumber,BigNumber> BigNumber::unsignedDivide(const BigNumber& bn1, const BigNumber& bn2) {
-	if (bn2==0) {
-		return pair<BigNumber,BigNumber>(0,0);
-	} else if (isUnsignedGreater(bn2,bn1)) {
+	if (isUnsignedGreater(bn2,bn1)) {
 		return pair<BigNumber,BigNumber>(0,bn1);
 	} else {
 		unsigned long long mostSignificantDigitValue;
@@ -685,5 +755,27 @@ pair<BigNumber,BigNumber> BigNumber::unsignedDivide(const BigNumber& bn1, const 
 		quotient.normalizeForm();
 		remainder.normalizeForm();
 		return pair<BigNumber,BigNumber>(quotient,remainder);
+	}
+}
+
+BigNumber BigNumber::unsignedPowMod(const BigNumber& num, const BigNumber& pow, const BigNumber& mod) {
+	if (pow.isZero) {
+		if (isUnsignedGreater(mod,1)) {
+			return BigNumber(1);
+		} else {
+			return BigNumber(0);
+		}
+	} else {
+		if (num.isZero) {
+			return BigNumber(0);
+		} else {
+			pair<BigNumber,BigNumber> halfpow = unsignedDivide(pow,2);
+			BigNumber result = unsignedPowMod(num, halfpow.first, mod);
+			result = unsignedMultiply(result,result);
+			if (!halfpow.second.isZero) {
+				result = unsignedMultiply(result,num);
+			}
+			return unsignedDivide(result,mod).second;
+		}
 	}
 }
