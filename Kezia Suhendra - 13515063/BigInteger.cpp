@@ -386,3 +386,17 @@ istream& operator>>(istream& is, BigInteger& num) {
   num = BigInteger(str);
   return is;
 }
+
+BigInteger gcd(BigInteger a, BigInteger b) {
+  if (a < b) {
+    swap(a,b);
+  }
+  if (b == BigInteger(0)) {
+    return b;
+  }
+  return gcd(b, a%b);
+}
+
+BigInteger lcm(BigInteger a, BigInteger b) {
+  return a * b / gcd(a,b);
+}

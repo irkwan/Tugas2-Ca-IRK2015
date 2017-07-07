@@ -42,6 +42,8 @@ public:
   friend bool operator==(const BigInteger&, const BigInteger&);
   friend ostream& operator<<(ostream&, const BigInteger&);
   friend istream& operator>>(istream&, BigInteger&);
+  friend BigInteger gcd(BigInteger, BigInteger);
+  friend BigInteger lcm(BigInteger, BigInteger);
 
 private:
   vector<char> number;
