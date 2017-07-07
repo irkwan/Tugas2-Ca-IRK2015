@@ -353,8 +353,14 @@ BigNumber& BigNumber::Divide(const BigNumber& number, BigNumber& mod) {
 			mod -= number;
 		}
 		mod += number;
+		if (mod.num[0] == 0) {
+			mod.num.pop_back();
+		}
 		res.num.push_back(digit);
 		notfirst = true;
+	}
+	if (mod.num.empty()) {
+		mod.num.push_back(0);
 	}
 	res.negative = (negative != number.negative);
 	if (res.num.empty()) {
