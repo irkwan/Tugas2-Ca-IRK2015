@@ -9,7 +9,7 @@
 RSA::RSA() {
 	BigNumber one("1");
 	prime1 = prime1.GenerateRandomPrime(20);
-	prime2 = prime2.GenerateRandomPrime(21);
+	prime2 = prime2.GenerateRandomPrime(25);
 	mod = prime2 * prime1;
 	lambda = mod - prime2 - prime1 + one;
 	enc = lambda.Random();
