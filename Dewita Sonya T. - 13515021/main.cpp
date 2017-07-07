@@ -1,22 +1,25 @@
 #include "rsa.h"
 #include "bignumber.h"
 #include <map>
+#include <stdlib.h>
 using namespace std;
 
 int main() {
+	system("CLS");
+	cout << "Setting up. Please wait" << endl;
 	RSA rsa;
 	map<string, string> ss;
 	map<string, bool> sb;
-	int in = 0;
-	string file, enc;
-	while (in != 3) {
+	string file, enc, in;
+	cout << endl;
+	while (in != "3") {
 		cout << "Menu :" << endl;
 		cout << "1. Encrypt Files" << endl;
 		cout << "2. Decrypt Files" << endl;
 		cout << "3. Exit" << endl << endl;
 		cout << "Input : ";
 		cin >> in;
-		if (in == 1) {
+		if (in == "1") {
 			cout << endl << "Enter file's name : ";
 			cin >> file;
 			cout << "Please wait until the process is done." << endl;
@@ -25,7 +28,7 @@ int main() {
 			cout << enc << endl << endl;
 			ss[file] = enc;
 			sb[file] = true;
-		} else if (in == 2) {
+		} else if (in == "2") {
 			cout << endl << "Enter file's name : ";
 			cin >> file;
 			if (sb[file]) {
@@ -36,7 +39,7 @@ int main() {
 			} else {
 				cout << "File has not been encrypted" << endl << endl;
 			}
-		} else if (in != 3) {
+		} else if (in != "3") {
 			cout << endl << "The input is not valid." << endl;
 			cout << "Please enter number from 1 to 3." << endl << endl;
 		}
