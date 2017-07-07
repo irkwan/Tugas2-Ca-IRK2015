@@ -2,12 +2,15 @@
 #include "bignumber.h"
 #include <map>
 #include <stdlib.h>
+#include <time.h>
 using namespace std;
 
 int main() {
 	system("CLS");
 	cout << "Setting up. Please wait" << endl;
+	clock_t start = clock();
 	RSA rsa;
+	cout << "Generation time : " << (double)(clock() - start)/CLOCKS_PER_SEC << endl;
 	map<string, string> ss;
 	map<string, bool> sb;
 	string file, enc, in;
@@ -23,9 +26,11 @@ int main() {
 			cout << endl << "Enter file's name : ";
 			cin >> file;
 			cout << "Please wait until the process is done." << endl;
+			start = clock();
 			enc = rsa.EncryptFile(file);
 			cout << endl << "Ciphertext : " << endl;
 			cout << enc << endl << endl;
+			cout << "Encryption time : " << (double)(clock() - start)/CLOCKS_PER_SEC << endl << endl;
 			ss[file] = enc;
 			sb[file] = true;
 		} else if (in == "2") {
@@ -33,9 +38,11 @@ int main() {
 			cin >> file;
 			if (sb[file]) {
 				cout << "Please wait until the process is done." << endl;
+				start = clock();
 				enc = rsa.DecryptString(ss[file]);
 				cout << endl << "Plaintext : " << endl;
 				cout << enc << endl << endl;
+				cout << "Decryption time : " << (double)(clock() - start)/CLOCKS_PER_SEC << endl << endl;
 			} else {
 				cout << "File has not been encrypted" << endl << endl;
 			}
