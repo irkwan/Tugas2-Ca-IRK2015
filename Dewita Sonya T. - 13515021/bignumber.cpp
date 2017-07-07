@@ -330,19 +330,22 @@ BigNumber BigNumber::GCD(const BigNumber& b, BigNumber& inv) { // Using Extended
 }
 
 BigNumber& BigNumber::Divide(const BigNumber& number, BigNumber& mod) {
+	mod.num.clear();
 	if (num[0] == 0) {
+		mod.num.push_back(0);
 		return *this;
 	}
 	BigNumber res;
 	res.num.pop_back();
-	mod.num.pop_back();
 	int size1 = size(), size2 = number.size(), i = 0, digit;
+	bool notfirst = false;
 	while (i < size1) {
 		mod.num.push_back(num[i]);
 		++i;
 		while (mod.size() < size2 && i < size1) {
 			mod.num.push_back(num[i]);
 			++i;
+			if (notfirst) res.num.push_back(0);
 		}
 		digit = -1;
 		while (!mod.negative) {
@@ -351,6 +354,7 @@ BigNumber& BigNumber::Divide(const BigNumber& number, BigNumber& mod) {
 		}
 		mod += number;
 		res.num.push_back(digit);
+		notfirst = true;
 	}
 	res.negative = (negative != number.negative);
 	if (res.num.empty()) {
