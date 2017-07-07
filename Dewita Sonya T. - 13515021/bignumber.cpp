@@ -502,7 +502,7 @@ BigNumber BigNumber::Random() const {
 			temp.num[0] += 4;
 		}
 	} else {
-		int digit = rand() % (sze - 1) + 1;
+		int digit = rand() % (sze - 2) + 2;
 		temp.num[0] = rand() % 9 + 1;
 		for (int i = 1; i < digit; ++i) {
 			temp.num.push_back(rand() % 10);
