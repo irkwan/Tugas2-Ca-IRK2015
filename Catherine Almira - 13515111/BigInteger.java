@@ -7,9 +7,14 @@
 
 import java.util.ArrayList;
 
+import java.util.Random;
+
 public class BigInteger {
   private ArrayList<Integer> value;
   private int sign;
+  private static BigInteger zero = new BigInteger();
+  private static BigInteger one = new BigInteger("1");
+  private static BigInteger two = new BigInteger("2");
 
   /*
    * Menghilangkan angka 0 di depan BigInteger b.
@@ -501,7 +506,6 @@ public class BigInteger {
   	}
   	BigInteger hasil = new BigInteger();
     BigInteger temp = new BigInteger();
-    BigInteger zero = new BigInteger();
     int count = 0;
     hasil.sign = 1;
     temp.sign = 1;
@@ -509,11 +513,14 @@ public class BigInteger {
       temp.value.add(b1.value.get(i));
     }
     for (int i = b1.value.size() - b2.value.size(); i >= 0; i--) {
-      while (temp.subtract(b2).compareTo(zero) > 0) {
+      while (temp.subtract(b2).compareTo(zero) >= 0) {
         count++;
         temp = temp.subtract(b2);
       }
       if (i > 0) {
+        if (temp.sign == 0) {
+          temp.sign = 1;
+        }
       	temp.value.add(0, b1.value.get(i - 1));
       }
       hasil.value.add(0, count);
@@ -534,9 +541,11 @@ public class BigInteger {
   	if (b1.sign == 0) {
   	  return new BigInteger();
   	}
+    if (b1.compareTo(b2) < 0) {
+      return new BigInteger();
+    }
   	if (b1.compareTo(b2) == 0) {
-  	  BigInteger one = new BigInteger("1");
-  	  return one;
+  	  return new BigInteger(one);
   	}
   	BigInteger hasil = divideAbs(b1, b2);
     if (b1.sign != b2.sign) {
@@ -545,6 +554,47 @@ public class BigInteger {
       hasil.sign = 1;
     }
   	return hasil;
+  }
+
+  /*
+   * Mengembalikan nilai modulus b1 mod b2.
+   * Prekondisi: b1 dan b2 bilangan positif.
+   */
+
+  public static BigInteger modAbs(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    if (b2.sign == 0) {
+      throw new ArithmeticException("divide by zero");
+    }
+    if (b1.sign == 0) {
+      return new BigInteger();
+    }
+    if (b1.abs().compareTo(b2.abs()) == -1) { //b1 < b2
+      return new BigInteger();
+    }
+    BigInteger hasil = new BigInteger();
+    BigInteger temp = new BigInteger();
+    int count = 0;
+    hasil.sign = 1;
+    temp.sign = 1;
+    for (int i = b1.value.size() - b2.value.size(); i < b1.value.size(); i++) {
+      temp.value.add(b1.value.get(i));
+    }
+    for (int i = b1.value.size() - b2.value.size(); i >= 0; i--) {
+      while (temp.subtract(b2).compareTo(zero) >= 0) {
+        count++;
+        temp = temp.subtract(b2);
+      }
+      if (i > 0) {
+        if (temp.sign == 0) {
+          temp.sign = 1;
+        }
+        temp.value.add(0, b1.value.get(i - 1));
+      }
+      hasil.value.add(0, count);
+      count = 0;
+    }
+    normalize(temp);
+    return temp;
   }
 
   /*
@@ -564,18 +614,14 @@ public class BigInteger {
       	if (b1.compareTo(b2) == -1) {
       	  return b1;
       	} else {
-      	  BigInteger temp1 = divide(b1, b2);
-      	  BigInteger temp2 = multiply(temp1, b2);
-      	  hasil = b1.subtract(temp2);
+      	  hasil = modAbs(b1, b2);
       	}
       }
       if (b2.sign == -1) {
       	if (b1.compareTo(b2.negate()) < 1) {
       	  hasil = b2.add(b1);
       	} else {
-      	  BigInteger temp1 = divide(b1, b2.negate());
-      	  BigInteger temp2 = multiply(temp1, b2.negate());
-      	  BigInteger temphasil = b1.subtract(temp2);
+          BigInteger temphasil = modAbs(b1, b2.negate());
       	  hasil = b2.add(temphasil);
       	}
       }
@@ -585,9 +631,7 @@ public class BigInteger {
       	if (b1.negate().compareTo(b2) < 1) {
       	  hasil = b2.add(b1);
       	} else {
-      	  BigInteger temp1 = divide(b1.negate(), b2);
-      	  BigInteger temp2 = multiply(temp1, b2);
-      	  BigInteger temphasil = b1.negate().subtract(temp2);
+      	  BigInteger temphasil = modAbs(b1.negate(), b2.negate());
       	  hasil = b2.subtract(temphasil);
       	}
       }
@@ -598,7 +642,6 @@ public class BigInteger {
       	  BigInteger temp1 = divide(b1.negate(), b2.negate());
       	  BigInteger temp2 = multiply(temp1, b2.negate());
       	  hasil = b1.negate().subtract(temp2);
-      	  BigInteger zero = new BigInteger();
       	  if (hasil.compareTo(zero) != 0) {
       	  	hasil.sign = -1;
       	  }
@@ -649,7 +692,6 @@ public class BigInteger {
       throw new ArithmeticException("mod by zero");
     }
     BigInteger[] temp = gcdExtended(b1, b2);
-    BigInteger one = new BigInteger("1");
     if (gcd(b1, b2).compareTo(one) != 0) {
       throw new ArithmeticException("not relative prime");
     }
@@ -658,6 +700,179 @@ public class BigInteger {
     }
     return temp[0];
   }
+  
+  /*
+   * Mengembalikan akar dari BigInteger.
+   * keterangan: nilai akar tidak presisi.
+   */
+
+  public static BigInteger sqrt(BigInteger b) {
+    BigInteger temp;
+    BigInteger hasil = divide(b, two);
+    do {
+      temp = hasil;
+      hasil = divide((temp.add(divide(b, temp))), two);
+    } while ((temp.subtract(hasil)).compareTo(zero) > 0);
+    return hasil;
+  }
+  
+  /*
+   * Mengembalikan nilai b1 ^ b2.
+   */
+
+  public static BigInteger pow(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    if (b2.sign == -1) {
+      throw new ArithmeticException("negative exponent");
+    }
+    if (b1.sign == 0 && b2.sign == 0) {
+      throw new ArithmeticException("undefine");
+    }
+    if (b1.sign == 0) {
+      return new BigInteger();
+    }
+    if (b2.sign == 0) {
+      return new BigInteger(one);
+    }
+    if (b2.compareTo(one) == 0) {
+      return new BigInteger(b1);
+    }
+    if (mod(b2, two).compareTo(zero) == 0) {
+      return (pow(multiply(b1, b1), divide(b2, two)));
+    } else {
+      return multiply(b1, pow(multiply(b1, b1), divide(b2, two)));
+    }
+  }
+
+  /*
+   * Mengembalikan nilai b1 ^ b2 mod b3.
+   */
+
+  public static BigInteger modPow(BigInteger b1, BigInteger b2, BigInteger b3) throws ArithmeticException {
+    BigInteger hasil;
+    if (b2.sign == -1) {
+      throw new ArithmeticException("negative exponent");
+    }
+    if (b3.sign <= 0) {
+      throw new ArithmeticException("negative modulo");
+    }
+    if (b1.sign == 0 && b2.sign == 0) {
+      throw new ArithmeticException("undefine");
+    }
+    if (b1.sign == 0) {
+      return new BigInteger();
+    }
+    if (b2.sign == 0) {
+      hasil = mod(one, b3);
+    }
+    if (b2.compareTo(one) == 0) {
+      hasil = mod(b1, b3);
+    }
+    if (mod(b2, two).compareTo(zero) == 0) {
+      hasil =  pow(mod(multiply(b1, b1), b3), divide(b2, two));
+    } else {
+      hasil = mod(multiply(b1, pow(mod(multiply(b1, b1), b3), divide(b2, two))), b3);
+    }
+    return hasil;
+  }
+
+  /*
+   * Mengembalikan true apabila this adalah BigInteger yang kemungkinan besar merupakan
+   * bilangan prima dengan menggunakan Miller Rabin Test.
+   */
+
+  public static boolean isProbablePrime(BigInteger b) {
+    if (b.compareTo(zero) == 0 || b.compareTo(one) == 0) { //b = 0 atau b = 1
+      return false;
+    }
+    if (b.compareTo(two) == 0) { //b = 2
+      return true;
+    }
+    if (mod(b, two).compareTo(zero) == 0) { //b mod 2 = 0
+      return false;
+    }
+    BigInteger m = b.subtract(one);
+    int k = 0;
+    while (mod(m, two).compareTo(zero) == 0) {
+      m = mod(m, two);
+      k++;
+    }
+    BigInteger rand;
+    BigInteger a;
+    BigInteger temp;
+    BigInteger t;
+    for (int i = 0; i < k; i++) {
+      rand = generateRandom(b.value.size());
+      a = mod(rand, b.subtract(one)).add(one);
+      temp = new BigInteger(m);
+      t = modPow(a, temp, b);
+      while (temp.compareTo(b.subtract(one)) != 0 && t.compareTo(one) != 0 && t.compareTo(b.subtract(one)) != 0) {
+        t = modPow(t, two, b);
+        temp = multiply(temp, two);
+      }
+      if (t.compareTo(b.subtract(one)) != 0 && mod(temp, two).compareTo(zero) == 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /*
+   * Mengembalikan BigInteger ganjil secara acak dengan jumlah digit n.
+   * Digit terakhir bukanlah angka 5.
+   */
+
+  public static BigInteger generateRandomEven(int n) {
+    BigInteger hasil = new BigInteger();
+    Random rand = new Random();
+    int temp;
+    hasil.sign = 1;
+    //digit terakhir adalah bilangan ganjil yang bukan 5
+    do {
+      temp = rand.nextInt(5);
+    } while (temp == 2);
+    hasil.value.add(temp * 2 + 1);
+    for (int i = 1; i < n; i++) {
+      if (i == n - 1) { //digit pertama bukan angka 0
+        temp = rand.nextInt(9) + 1;
+      } else {
+        temp = rand.nextInt(10);
+      }
+      hasil.value.add(temp);
+    }
+    return hasil;
+  }
+
+  /*
+   * Mengembalikan BigInteger secara acak dengan jumlah digit n.
+   */
+
+  public static BigInteger generateRandom(int n) {
+    BigInteger hasil = new BigInteger();
+    Random rand = new Random();
+    int temp;
+    hasil.sign = 1;
+      for (int i = 0; i < n; i++) {
+        if (i == n - 1) { //digit pertama bukan angka 0
+          temp = rand.nextInt(9) + 1;
+        } else {
+          temp = rand.nextInt(10);
+        }
+        hasil.value.add(temp);
+      }
+    return hasil;
+  }
+
+  /*
+   * Mengembalikan BigInteger prima secara acak dengan jumlah digit n.
+   */
+
+  public static BigInteger generateRandomPrime(int n) {
+    BigInteger hasil = generateRandomEven(n);
+    while (!isProbablePrime(hasil)) {
+      hasil = hasil.add(two);
+    }
+    return hasil;
+  }  
 
   /*
    * Mengembalikan String yang merepresentasikan nilai BigInteger.
@@ -679,11 +894,16 @@ public class BigInteger {
   }
 
   public static void main(String args[]) {
-    BigInteger bi = new BigInteger("793123897953205984031123");
-    
-    BigInteger b3 = new BigInteger("322023142389179237819238491823");
-    BigInteger b = modInverse(bi, b3);
+    BigInteger bi = new BigInteger("2");
+    BigInteger b2 = new BigInteger("12");
+    BigInteger an = new BigInteger("2");
+    BigInteger b3 = new BigInteger("322");
+    BigInteger b = divide(b3, b2);
+    BigInteger as = modPow(b3, b2, an);
+    System.out.println(as);
+    //boolean a = bi.isProbablePrime();
     System.out.println(b);
+    
     
 
   }
