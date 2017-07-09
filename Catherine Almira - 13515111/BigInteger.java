@@ -793,27 +793,22 @@ public class BigInteger {
     BigInteger m = b.subtract(one);
     int k = 0;
     while (mod(m, two).compareTo(zero) == 0) {
-      m = mod(m, two);
+      m = divide(m, two);
       k++;
     }
-    BigInteger rand;
-    BigInteger a;
-    BigInteger temp;
-    BigInteger t;
-    for (int i = 0; i < k; i++) {
-      rand = generateRandom(b.value.size());
-      a = mod(rand, b.subtract(one)).add(one);
-      temp = new BigInteger(m);
-      t = modPow(a, temp, b);
-      while (temp.compareTo(b.subtract(one)) != 0 && t.compareTo(one) != 0 && t.compareTo(b.subtract(one)) != 0) {
-        t = modPow(t, two, b);
-        temp = multiply(temp, two);
-      }
-      if (t.compareTo(b.subtract(one)) != 0 && mod(temp, two).compareTo(zero) == 0) {
+    BigInteger temp = modPow(two, m, b);
+    if (temp.compareTo(one) == 0 || temp.compareTo(b.subtract(one)) == 0) {
+      return true;
+    }
+    for (int i = 1; i < k; i++) {
+      temp = modPow(temp, two, b);      
+      if (temp.compareTo(one) == 0) {
         return false;
+      } else if (temp.compareTo(b.subtract(one)) == 0) {
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   /*
@@ -894,15 +889,15 @@ public class BigInteger {
   }
 
   public static void main(String args[]) {
-    BigInteger bi = new BigInteger("2");
+    BigInteger bi = new BigInteger("27");
     BigInteger b2 = new BigInteger("12");
     BigInteger an = new BigInteger("2");
     BigInteger b3 = new BigInteger("322");
-    BigInteger b = divide(b3, b2);
-    BigInteger as = modPow(b3, b2, an);
+    //BigInteger b = generateRandomPrime(2);
+    BigInteger as = generateRandomPrime(20);
     System.out.println(as);
-    //boolean a = bi.isProbablePrime();
-    System.out.println(b);
+    boolean a = isProbablePrime(bi);
+    System.out.println(a);
     
     
 
