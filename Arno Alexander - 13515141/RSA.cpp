@@ -77,27 +77,46 @@ void RSA::generateNew(const BigNumber& prime1, const BigNumber& prime2) {
 }
 
 BigNumber RSA::asciiToBigNumber(char character) {
-	return BigNumber(character);
+	return BigNumber((unsigned char)(character));
 }
 
 char RSA::bigNumberToAscii(const BigNumber& bn) {
-	return (char)(bn.toLongLong());
+	return ((char)(bn.toLongLong()));
 }
 
-void RSA::encrypt(const string& originPath, const string& destinationPath) const {
+void RSA::encryptAscii(const string& originPath, const string& destinationPath) const {
+	BigNumber multiplier = (n - 255) / 256;
+	unsigned multiplierLength = multiplier.toString().length();
+	if (multiplierLength > 0) {
+		multiplierLength--;
+	}
 	ifstream inf(originPath.c_str());
 	ofstream outf(destinationPath.c_str());
 	char chr;
 	while (inf.get(chr)) {
-		outf << BigNumber::powMod(asciiToBigNumber(chr),e,n) << " ";
+		outf << BigNumber::powMod(BigNumber::generateRandom(multiplierLength)*256+asciiToBigNumber(chr),e,n) << " ";
 	}
 }
 
-void RSA::decrypt(const string& originPath, const string& destinationPath) const {
+void RSA::decryptAscii(const string& originPath, const string& destinationPath) const {
 	ifstream inf(originPath.c_str());
 	ofstream outf(destinationPath.c_str());
 	BigNumber chr;
 	while (inf >> chr) {
-		outf << bigNumberToAscii(BigNumber::powMod(chr,d,n));
+		outf << bigNumberToAscii(BigNumber::powMod(chr,d,n)%256);
 	}
+}
+
+void RSA::encryptAscii(const string& originPath, const string& destinationPath, const BigNumber& n_value, const BigNumber& e_value) {
+	RSA rsa;
+	rsa.n = n_value;
+	rsa.e = e_value;
+	rsa.encryptAscii(originPath, destinationPath);
+}
+
+void RSA::decryptAscii(const string& originPath, const string& destinationPath, const BigNumber& n_value, const BigNumber& d_value) {
+	RSA rsa;
+	rsa.n = n_value;
+	rsa.d = d_value;
+	rsa.decryptAscii(originPath, destinationPath);
 }

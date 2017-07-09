@@ -31,19 +31,16 @@ public:
 	static char bigNumberToAscii(const BigNumber& bn);
 
 	//TODO: make these
-	void encrypt(const string& originPath, const string& destinationPath) const;
-	void decrypt(const string& originPath, const string& destinationPath) const;
-	static void encrypt(const string& originPath, const string& destinationPath, const BigNumber& n_value, const BigNumber& e_value);
-	static void decrypt(const string& originPath, const string& destinationPath, const BigNumber& n_value, const BigNumber& d_value);
+	void encryptAscii(const string& originPath, const string& destinationPath) const;
+	void decryptAscii(const string& originPath, const string& destinationPath) const;
+	static void encryptAscii(const string& originPath, const string& destinationPath, const BigNumber& n_value, const BigNumber& e_value);
+	static void decryptAscii(const string& originPath, const string& destinationPath, const BigNumber& n_value, const BigNumber& d_value);
 
 private:
 	/*ATTRIBUTES*/
 	BigNumber n; //public, for encryption and decryption
 	BigNumber e; //public, for encryption
 	BigNumber d; //secret, for decryption
-
-	/*METHODS*/
-	
 };
 
 #endif
