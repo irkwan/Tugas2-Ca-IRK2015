@@ -518,10 +518,43 @@ string BigNumber::toString() const {
 	}
 }
 
+long long BigNumber::toLongLong() const {
+	if (isZero) {
+		return 0;
+	} else {
+		long long result = 0;
+		for (deque<unsigned>::size_type i = 0; i < digits.size(); i++) {
+			result = (long long)(base) * result + (long long)(digits[i]);
+		}
+		if (isNegative) result *= -1;
+		return result;
+	}
+}
+
 BigNumber BigNumber::absolute() const {
 	BigNumber result = *this;
 	result.isNegative = false;
 	return result;
+}
+
+pair<BigNumber,BigNumber> BigNumber::divMod(const BigNumber& bn1, const BigNumber& bn2) {
+	pair<BigNumber,BigNumber> result = unsignedDivide(bn1,bn2);
+	result.first.isNegative = bn1.isNegative!=bn2.isNegative;
+	result.first.normalizeForm();
+	result.second.isNegative = bn1.isNegative;
+	result.second.normalizeForm();
+	return result;
+}
+
+BigNumber BigNumber::powMod(const BigNumber& num, const BigNumber& pow, const BigNumber& mod) {
+	if (pow.isNegative) {
+		return BigNumber(0);
+	} else {
+		BigNumber result = unsignedPowMod(num, pow, mod);
+		result.isNegative = num.isNegative && pow.digits.front()%2==1;
+		result.normalizeForm();
+		return result;
+	}
 }
 
 BigNumber BigNumber::gcd(const BigNumber& bn1, const BigNumber& bn2) {
@@ -580,28 +613,45 @@ BigNumber BigNumber::generateProbablePrime(unsigned minLength) {
 	return result.nextProbablePrime();
 }
 
-BigNumber BigNumber::nextProbablePrime() {
+BigNumber BigNumber::nextProbablePrime() const {
 	BigNumber result = *this;
-	if (result.digits.front() % 2 == 0) {
-		result -= 1;
-	}
-	BigNumber two(2), three(3), five(5), seven(7);
-	bool found = false;
-	do {
-		result += two;
-		if (result.digits.front() % 5 != 0) {
-			found = unsignedPowMod(two,result,result) == two;
-			if (found) {
-				found = unsignedPowMod(three,result,result) == three;
-				if (found) {
-					found = unsignedPowMod(five,result,result) == five;
-					if (found) {
-						found = unsignedPowMod(seven,result,result) == seven;
-					}
+ 	if (result.digits.front() % 2 == 0) {
+ 		result -= 1;
+ 	}
+ 	BigNumber two(2), three(3), five(5), seven(7);
+ 	bool found = false;
+ 	do {
+ 		result += two;
+ 		if (result.digits.front() % 5 != 0) {
+ 			found = unsignedPowMod(two,result,result) == two;
+ 			if (found) {
+ 				found = unsignedPowMod(three,result,result) == three;
+ 				if (found) {
+ 					found = unsignedPowMod(five,result,result) == five;
+ 					if (found) {
+ 						found = unsignedPowMod(seven,result,result) == seven;
+ 					}
+ 				}
+ 			}
+ 		}
+ 	} while (!found);
+ 	return result;
+}
+
+bool BigNumber::isProbablePrime() const {
+	bool result = true;
+	if (digits.front() % 5 != 0) {
+		result = unsignedPowMod(2,result,result) == 2;
+		if (result) {
+			result = unsignedPowMod(3,result,result) == 3;
+			if (result) {
+				result = unsignedPowMod(5,result,result) == 5;
+				if (result) {
+					result = unsignedPowMod(7,result,result) == 7;
 				}
 			}
 		}
-	} while (!found);
+	}
 	return result;
 }
 

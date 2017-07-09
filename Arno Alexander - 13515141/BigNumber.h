@@ -105,12 +105,18 @@ public:
 
 	/*METHODS*/
 	string toString() const;
+	long long toLongLong() const; //beware of overflowing
+
 	BigNumber absolute() const;
+	static pair<BigNumber,BigNumber> divMod(const BigNumber& bn1, const BigNumber& bn2); //result = <quotient,remainder>; bn2!=0
+	static BigNumber powMod(const BigNumber& num, const BigNumber& pow, const BigNumber& mod); //calculate (num**pow)%mod; mod!=0; cant calculate inverse mod
 	static BigNumber gcd(const BigNumber& bn1, const BigNumber& bn2);
 	static BigNumber lcm(const BigNumber& bn1, const BigNumber& bn2);
-	static BigNumber generateRandom(unsigned length); //non-negative only
+
+	static BigNumber generateRandom(unsigned length); //generating the non-negative only
 	static BigNumber generateProbablePrime(unsigned minLength);
-	BigNumber nextProbablePrime(); //this has >=2 digits
+	BigNumber nextProbablePrime() const; //this has >=2 digits and positive
+	bool isProbablePrime() const; //this has >=2 digits and positive
 
 private:
 	/*ATTRIBUTES*/

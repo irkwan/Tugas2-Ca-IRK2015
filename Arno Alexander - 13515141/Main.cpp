@@ -8,11 +8,15 @@ Author : Arno Alexander
 using namespace std;
 
 int main() {
-	unsigned le;
-	cin >> le;
-	BigNumber b = BigNumber::generateProbablePrime(le);
-	cout << b << endl;
-	b = b.nextProbablePrime();
-	cout << b << endl;
+	string a = "a.txt", b = "b.txt", c = "c.txt" , d = "d.txt" , e = "e.txt";
+	RSA rsa(20);
+	cout << "encrypting" << endl;
+	rsa.encrypt(a,b);
+	cout << "decrypting" << endl;
+	rsa.decrypt(b,c);
+	cout << "encrypting" << endl;
+	rsa.encrypt(c,d);
+	cout << "decrypting" << endl;
+	rsa.decrypt(d,e);
 	return 0;
 }
