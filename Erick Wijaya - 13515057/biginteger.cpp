@@ -3,7 +3,7 @@
 
 #include "biginteger.h"
 #include <iostream>
-#include <vector>
+#include <deque>
 #include <string>
 using namespace std;
 
@@ -50,8 +50,6 @@ biginteger::biginteger(const string& v){
 		for(int i=v.length()-1; i>=end; i--){
 			int dig = v[i] - '0';
 			digits.push_back(dig);
-			//cout << v[i] << " " << dig << " " << endl;
-			//cout << *this << endl;
 		}
 	}
 }
@@ -119,7 +117,7 @@ biginteger biginteger::operator-(const biginteger& rhs) const{
 					res.digits[i] += BASE;
 			}
 
-			res.delTrail0();
+			res.normalize();
 
 			return res;
 		}
@@ -155,12 +153,12 @@ biginteger biginteger::operator*(const biginteger& rhs) const{
 }
 
 biginteger biginteger::operator/(const biginteger& rhs) const{
-	biginteger res = divmod(*this, rhs.toLLInt()).first;
+	biginteger res = divmod(*this, rhs).first;
 	return res;
 }
 
 biginteger biginteger::operator%(const biginteger& rhs) const{
-	biginteger res(divmod(*this, rhs.toLLInt()).second);
+	biginteger res = divmod(*this, rhs).second;
 	return res;
 }
 
@@ -278,11 +276,22 @@ ostream& operator<<(ostream &os, const biginteger& v){
 	return os;
 }
 
+biginteger biginteger::subDigit(int pos, int n) const{
+	biginteger res;
+	int index = digits.size() - pos - 1;
+	
+	res.digits[0] += digits[index];
+	for(int i=index-1; i>index-n; i--){
+		res.digits.push_front(digits[i]);
+	}
+	return res;
+}
+
 int biginteger::max(int a, int b) const{
 	return (a > b) ? a : b;
 }
 
-void biginteger::delTrail0(){
+void biginteger::normalize(){
 	while ((digits[digits.size()-1] == 0) && (digits.size() > 1)){
 		digits.pop_back();
 	}
@@ -301,31 +310,42 @@ long long biginteger::toLLInt() const{
 	return res;
 }
 
-pair<biginteger, long long> biginteger::divmod(const biginteger& v, long long den){ // TODO: benerin kasus negatif
-	long long remainder = 0;
-	bool negativeDen = den < 0;
+pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const biginteger& rhs){ // TODO: benerin kasus negatif
+	biginteger den(rhs); // denominator
 	biginteger res;
+	biginteger remainder;
+	bool negativeDen = den < 0;
+
+	if (lhs < den){
+		return make_pair(biginteger::ZERO, lhs);
+	}
 
 	if (den < 0)
 		den = -den;
 
-	for(int i=v.digits.size()-1; i>=0; i--){
-		remainder = (remainder * BASE) + v.digits[i];
-		res.digits.insert(res.digits.begin(), remainder / den);
-		remainder %= den;
+	remainder = lhs.subDigit(0, den.digits.size());
+	for(int i=lhs.digits.size() - den.digits.size(); i>=0; /* No Decrement */){
+//		cout << remainder << " " << i << " " << res << endl; cin.get();
+		if (remainder < den){
+			if (i > 0){
+				res.digits.push_front(0);
+				remainder.digits.push_front(lhs.digits[i-1]);
+				remainder.normalize();
+			}
+			i--;
+		}
+		else{
+			int count = 0;
+			while (remainder >= den){
+				remainder -= den;
+				count++;
+			}
+			res.digits[0] = count;
+		}
 	}
 
-	//cout << v.pos << " " << den << endl;
-
-	if (!v.pos){
-		res.pos = negativeDen;
-	}
-	else if (v.pos && negativeDen){
-		res.pos = false;
-	}
-
-	res.delTrail0();
+	res.normalize();
+	remainder.normalize();
 
 	return make_pair(res, remainder);
-
 }

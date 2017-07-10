@@ -43,6 +43,8 @@ int main() {
 	cin >> b1 >> b2;
 	cout << "b1 + b2 = " << b1 + b2 << endl;
 	cout << "b1 - b2 = " << b1 - b2 << endl;
+	cout << "b1 / b2 = " << b1 / b2 << endl;
+	cout << "b1 %% b2 = " << b1 % b2 << endl;
 	cout << endl;
 	cout << "b1 > b2 = " << (b1 > b2) << endl;
 	cout << "b1 >= b2 = " << (b1 >= b2) << endl;

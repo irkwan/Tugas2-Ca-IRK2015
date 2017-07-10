@@ -4,19 +4,19 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
+#include <deque>
 #include <string>
 using namespace std;
 
 class biginteger {
 public:
-	/* Static Constants */
+	/* Commonly Used Constants */
 	static const biginteger ZERO;
 	static const biginteger ONE, TWO, THREE, FOUR, FIVE;
 	static const biginteger SIX, SEVEN, EIGHT, NINE, TEN;
 
 	/* Constructors */
-	biginteger();
+	biginteger(); // zero
 	biginteger(long long v);
 	biginteger(const string& v);
 	biginteger(const biginteger& v);
@@ -26,7 +26,7 @@ public:
 
 	/* Arithmetic Operators */
 	biginteger operator+(const biginteger& rhs) const;
-	biginteger operator-() const;
+	biginteger operator-() const; // unary operator
 	biginteger operator-(const biginteger& rhs) const;
 	biginteger operator*(const biginteger& rhs) const;
 	biginteger operator/(const biginteger& rhs) const;
@@ -44,6 +44,8 @@ public:
 	biginteger div(const biginteger& rhs) const;
 	biginteger mod(const biginteger& rhs) const;*/
 	biginteger abs() const;
+	biginteger pow() const;
+	biginteger modpow() const;
 
 	/* Relational Operators */
 	bool operator==(const biginteger& rhs) const;
@@ -57,16 +59,19 @@ public:
 	friend istream& operator>>(istream &is, biginteger& v);
 	friend ostream& operator<<(ostream &os, const biginteger& v);
 
+	/* Other */
+	biginteger subDigit(int pos, int n) const; // always yield positive biginteger
+
 private:
-	vector<int> digits;
-	bool pos;
+	deque<int> digits; // reverse order
+	bool pos; // positive
 
 	static const int BASE = 10;
 
 	int max(int a, int b) const;
-	void delTrail0();
+	void normalize();
 	long long toLLInt() const;
 
 	static biginteger karatsubaMultiply(const biginteger& lhs, const biginteger& rhs);
-	static pair<biginteger, long long> divmod(const biginteger& v, long long den);
+	static pair<biginteger, biginteger> divmod(const biginteger& lhs, const biginteger& rhs);
 };
