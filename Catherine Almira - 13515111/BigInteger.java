@@ -477,6 +477,14 @@ public class BigInteger {
   }
 
   /*
+   * Mengembalikan hasil perkalian this * b.
+   */
+
+  public BigInteger multiply(BigInteger b) {
+    return multiply(this, b);
+  }
+
+  /*
    * Mengembalikan nilai absolut dari this.
    */
 
@@ -700,6 +708,10 @@ public class BigInteger {
     }
     return temp[0];
   }
+
+  public BigInteger modInverse(BigInteger b) throws ArithmeticException {
+    return modInverse(this, b);
+  }
   
   /*
    * Mengembalikan akar dari BigInteger.
@@ -856,6 +868,36 @@ public class BigInteger {
       }
     return hasil;
   }
+  
+  /*
+   * Mengembalikan array of BigInteger yang berisi pecahan this sebesar n digit.
+   */
+
+  public ArrayList<BigInteger> convertToSmallBlock(int n) {
+    BigInteger temp = new BigInteger(this);
+    BigInteger temp2 = new BigInteger();
+    temp2.sign = 1;
+    ArrayList<BigInteger> hasil = new ArrayList<BigInteger>();
+    int i = temp.value.size() - 1;
+    while (temp.value.size() >= n && i >= 0) {
+      for (int j = 0; j < n; j++) {
+        temp2.value.add(0, temp.value.get(i));
+        i--;
+      }
+      temp = temp.removeNDigitForward(n);
+      hasil.add(temp2);
+      temp2 = new BigInteger();
+      temp2.sign = 1;
+    }
+    if (temp.value.size() > 0) {
+      normalize(temp);
+      System.out.println(temp);
+      hasil.add(temp);
+    } else if (this.value.size() % n != 0) {
+      hasil.add(zero);
+    }
+    return hasil;
+  }
 
   /*
    * Mengembalikan BigInteger prima secara acak dengan jumlah digit n.
@@ -888,19 +930,23 @@ public class BigInteger {
   	return output;
   }
 
-  public static void main(String args[]) {
-    BigInteger bi = new BigInteger("27");
+  /*public static void main(String args[]) {
+    BigInteger bi = new BigInteger("2712323415435123412341231");
     BigInteger b2 = new BigInteger("12");
     BigInteger an = new BigInteger("2");
     BigInteger b3 = new BigInteger("322");
     //BigInteger b = generateRandomPrime(2);
-    BigInteger as = generateRandomPrime(20);
-    System.out.println(as);
+    //BigInteger as = generateRandomPrime(10);
+    //System.out.println(as);
     boolean a = isProbablePrime(bi);
     System.out.println(a);
-    
-    
-
-  }
+    BigInteger b = new BigInteger("1234567890");
+    ArrayList<BigInteger> alb = b.convertToSmallBlock(3);
+    System.out.println(alb.get(0));
+    System.out.println(alb.get(1));
+    System.out.println(alb.get(2));
+    System.out.println(alb.size());
+    System.out.println(alb.get(3));
+  }*/
 }
 
