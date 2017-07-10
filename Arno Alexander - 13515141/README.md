@@ -11,13 +11,18 @@ RSA membutuhkan dua buah bilangan prima untuk membangkitkan kunci enkripsi (n,e)
 ## Cara Penggunaan
 
 **Kompilasi:**
-1. Buka direktori source code di terminal
-2. Masukkan command `g++ *.cpp -o program`
+1. Pastikan compiler C++ telah terpasang. Disarankan untuk menggunakan compiler dari [MinGW](http://www.mingw.org/ "Minimalist GNU for Windows")
+2. Buka direktori source code di terminal
+3. Masukkan command `g++ *.cpp -o program`
 
 **Menjalankan program:**
-1. Masukkan path untuk file yang ingin dienkripsi, file hasil enkripsi, dan file hasil dekripsi
-2. Tunggu hingga proses selesai
+1. Eksekusi program
+2. Masukkan path untuk file yang ingin dienkripsi, file hasil enkripsi, dan file hasil dekripsi
+3. Tunggu hingga proses selesai
 
 ## Screenshot
 
-TBD
+![plaintext](https://github.com/arnoalexander/Tugas2-Ca-IRK2015/blob/master/Arno%20Alexander%20-%2013515141/Screenshot/plain.JPG "Plaintext")
+![ciphertext](https://github.com/arnoalexander/Tugas2-Ca-IRK2015/blob/master/Arno%20Alexander%20-%2013515141/Screenshot/encrypt.JPG "Ciphertext hasil enkripsi plaintext")
+![plaintext2](https://github.com/arnoalexander/Tugas2-Ca-IRK2015/blob/master/Arno%20Alexander%20-%2013515141/Screenshot/decrypt.JPG "Plaintext hasil dekripsi ciphertext")
+![program](https://github.com/arnoalexander/Tugas2-Ca-IRK2015/blob/master/Arno%20Alexander%20-%2013515141/Screenshot/program.JPG "Tampilan program saat dijalankan")
