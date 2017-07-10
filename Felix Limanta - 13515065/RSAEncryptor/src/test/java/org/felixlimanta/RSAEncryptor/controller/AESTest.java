@@ -10,11 +10,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Created by ASUS on 12/06/17.
+ * Tests AES-128 encryption process.
+ *
+ * @author Felix Limanta
+ * @version 1.0
+ * @since 2017-06-12
  */
 class AESTest {
   private static String[] messages;
 
+  /**
+   * Reads entire file as string
+   *
+   * @param path File path
+   * @return File contents as string
+   */
   private static String readFile(String path) {
     try {
       byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -25,16 +35,24 @@ class AESTest {
     }
   }
 
+  /**
+   * Reads texts to be encrypted from file
+   */
   @BeforeAll
   static void setUpMessages() {
-    messages = new String[5];
+    messages = new String[6];
     messages[0] = readFile("src/test/resources/test1.txt");
     messages[1] = readFile("src/test/resources/test2.txt");
     messages[2] = readFile("src/test/resources/test3.txt");
     messages[3] = readFile("src/test/resources/test4.txt");
     messages[4] = readFile("src/test/resources/test5.txt");
+    messages[5] = readFile("src/test/resources/test6.txt");
   }
 
+  /**
+   * Tests encryption process on large texts (3KB -- 9MB).
+   * Message before and after encryption/decryption should be equal.
+   */
   @Test
   void encryptDecrypt() {
     final int k = 10000;
@@ -45,17 +63,9 @@ class AESTest {
         String decrypted = aes.decrypt(encrypted);
         assertEquals(message, decrypted,
             "Encryption-decryption failure\n"
-                + "Key: " + aes.getKey() + "\n"
-                + "Init Vector: " + aes.getInitVector());
+                + "Key: " + new String(aes.getKey()) + "\n"
+                + "Init Vector: " + new String(aes.getInitVector()));
       }
     }
-  }
-
-  private static String padLeftStringWithZeros(String s, int n) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < n; ++i)
-      sb.append('0');
-    sb.append(s);
-    return sb.substring(s.length());
   }
 }

@@ -1,7 +1,5 @@
 package org.felixlimanta.RSAEncryptor.view;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -18,9 +16,13 @@ import org.felixlimanta.RSAEncryptor.controller.RsaEncryptorController;
 import org.felixlimanta.RSAEncryptor.model.XmlHelper;
 
 /**
- * Created by ASUS on 13/06/17.
+ * Handles user interaction with key generation, saving, and loading
+ *
+ * @author Felix Limanta
+ * @version 1.0
+ * @since 2017-06-13
  */
-public class KeyPanel {
+class KeyPanel {
 
   private RsaEncryptorController controller;
   private JPanel rootPanel;
@@ -39,7 +41,7 @@ public class KeyPanel {
 
   private JFileChooser fileChooser;
 
-  public KeyPanel() {
+  KeyPanel() {
     setUpFileChooser();
     setUpKeyGenerationButton();
     setUpPublicKeySaveButton();
@@ -48,11 +50,11 @@ public class KeyPanel {
     setUpPrivateKeyOpenButton();
   }
 
-  public void setController(RsaEncryptorController controller) {
+  void setController(RsaEncryptorController controller) {
     this.controller = controller;
   }
 
-  public JPanel getRootPanel() {
+  JPanel getRootPanel() {
     return rootPanel;
   }
 
@@ -65,155 +67,142 @@ public class KeyPanel {
   }
 
   private void setUpKeyGenerationButton() {
-    generateKeysButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        long elapsedTime = controller.generateKeys();
+    generateKeysButton.addActionListener(e -> {
+      long elapsedTime = controller.generateKeys();
 
-        publicKeyTextArea.setText(XmlHelper.formatXml(
-            controller.getRsa().getPublicKey().toXmlString(), 4
-        ));
-        privateKeyTextArea.setText(XmlHelper.formatXml(
-            controller.getRsa().getPrivateKey().toXmlString(), 4
-        ));
-        savePublicKeyButton.doClick();
-        savePrivateKeyButton.doClick();
+      publicKeyTextArea.setText(XmlHelper.formatXml(
+          controller.getRsa().getPublicKey().toXmlString(), 4
+      ));
+      privateKeyTextArea.setText(XmlHelper.formatXml(
+          controller.getRsa().getPrivateKey().toXmlString(), 4
+      ));
+      savePublicKeyButton.doClick();
+      savePrivateKeyButton.doClick();
 
-        JOptionPane.showMessageDialog(rootPanel,
-            "Keys generated in " + elapsedTime / 1000000 + " ms.");
-      }
+      JOptionPane.showMessageDialog(rootPanel,
+          "Keys generated in " + elapsedTime / 1000000 + " ms.");
     });
   }
 
   private void setUpPublicKeySaveButton() {
-    savePublicKeyButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        String xml;
-        try {
-          xml = XmlHelper.formatXml(
-              controller.getRsa().getPublicKey().toXmlString(), 4
-          );
-        } catch (NullPointerException npe) {
-          JOptionPane.showMessageDialog(rootPanel,
-              "Public key is not set. Generate or load public key first.",
-              "Error",
-              JOptionPane.ERROR_MESSAGE);
-          npe.printStackTrace();
-          return;
+    savePublicKeyButton.addActionListener(e -> {
+      String xml;
+      try {
+        xml = XmlHelper.formatXml(
+            controller.getRsa().getPublicKey().toXmlString(), 4
+        );
+      } catch (NullPointerException npe) {
+        JOptionPane.showMessageDialog(rootPanel,
+            "Public key is not set. Generate or load public key first.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        npe.printStackTrace();
+        return;
+      }
+
+      fileChooser.setDialogTitle("Save public key");
+      int returnVal = fileChooser.showSaveDialog(rootPanel);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        if (!FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("xml")) {
+          file = new File(file.toString() + ".xml");
         }
 
-        fileChooser.setDialogTitle("Save public key");
-        int returnVal = fileChooser.showSaveDialog(rootPanel);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          File file = fileChooser.getSelectedFile();
-          if (!FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("xml")) {
-            file = new File(file.toString() + ".xml");
-          }
-
-          try (FileWriter fw = new FileWriter(file)) {
-            fw.write(xml);
-          } catch (Exception ex) {
-            JOptionPane.showMessageDialog(rootPanel,
-                "Error saving file to specified path.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-          }
+        try (FileWriter fw = new FileWriter(file)) {
+          fw.write(xml);
+          publicKeyPathLabel.setText(file.getPath());
+        } catch (Exception ex) {
+          JOptionPane.showMessageDialog(rootPanel,
+              "Error saving file to specified path.",
+              "Error",
+              JOptionPane.ERROR_MESSAGE);
+          ex.printStackTrace();
         }
       }
     });
   }
 
   private void setUpPrivateKeySaveButton() {
-    savePrivateKeyButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        String xml;
-        try {
-          xml = XmlHelper.formatXml(
-              controller.getRsa().getPrivateKey().toXmlString(), 4
-          );
-        } catch (NullPointerException npe) {
-          JOptionPane.showMessageDialog(rootPanel,
-              "Private key is not set. Generate or load private key first.",
-              "Error",
-              JOptionPane.ERROR_MESSAGE);
-          npe.printStackTrace();
-          return;
+    savePrivateKeyButton.addActionListener(e -> {
+      String xml;
+      try {
+        xml = XmlHelper.formatXml(
+            controller.getRsa().getPrivateKey().toXmlString(), 4
+        );
+      } catch (NullPointerException npe) {
+        JOptionPane.showMessageDialog(rootPanel,
+            "Private key is not set. Generate or load private key first.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        npe.printStackTrace();
+        return;
+      }
+
+      fileChooser.setDialogTitle("Save private key");
+      int returnVal = fileChooser.showSaveDialog(rootPanel);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        if (!FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("xml")) {
+          file = new File(file.toString() + ".xml");
         }
 
-        fileChooser.setDialogTitle("Save private key");
-        int returnVal = fileChooser.showSaveDialog(rootPanel);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          File file = fileChooser.getSelectedFile();
-          if (!FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("xml")) {
-            file = new File(file.toString() + ".xml");
-          }
-
-          try (FileWriter fw = new FileWriter(file)) {
-            fw.write(xml);
-          } catch (Exception ex) {
-            JOptionPane.showMessageDialog(rootPanel,
-                "Error saving file to specified path.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-          }
+        try (FileWriter fw = new FileWriter(file)) {
+          fw.write(xml);
+          privateKeyPathLabel.setText(file.getPath());
+        } catch (Exception ex) {
+          JOptionPane.showMessageDialog(rootPanel,
+              "Error saving file to specified path.",
+              "Error",
+              JOptionPane.ERROR_MESSAGE);
+          ex.printStackTrace();
         }
       }
     });
   }
 
   private void setUpPublicKeyOpenButton() {
-    publicKeyBrowseButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        fileChooser.setDialogTitle("Open public key");
-        int returnVal = fileChooser.showOpenDialog(rootPanel);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          String path = fileChooser.getSelectedFile().getPath();
-          publicKeyPathLabel.setText(path);
-          String xml = loadFileAsString(path);
-          xml = XmlHelper.formatXml(xml, 4);
+    publicKeyBrowseButton.addActionListener(e -> {
+      fileChooser.setDialogTitle("Open public key");
+      int returnVal = fileChooser.showOpenDialog(rootPanel);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        String path = fileChooser.getSelectedFile().getPath();
+        publicKeyPathLabel.setText(path);
+        String xml = loadFileAsString(path);
+        xml = XmlHelper.formatXml(xml, 4);
 
-          try {
-            controller.setRsaPublicKey(xml);
-            publicKeyTextArea.setText(xml);
-          } catch (Exception ex) {
-            JOptionPane.showMessageDialog(rootPanel,
-                "XML cannot be parsed.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-          }
+        try {
+          controller.setRsaPublicKey(xml);
+          publicKeyTextArea.setText(xml);
+        } catch (Exception ex) {
+          JOptionPane.showMessageDialog(rootPanel,
+              "XML cannot be parsed.",
+              "Error",
+              JOptionPane.ERROR_MESSAGE);
+          ex.printStackTrace();
         }
       }
     });
   }
 
   private void setUpPrivateKeyOpenButton() {
-    privateKeyBrowseButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        fileChooser.setDialogTitle("Open private key");
-        int returnVal = fileChooser.showOpenDialog(rootPanel);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          String path = fileChooser.getSelectedFile().getPath();
-          privateKeyPathLabel.setText(path);
-          String xml = loadFileAsString(path);
-          xml = XmlHelper.formatXml(xml, 4);
+    privateKeyBrowseButton.addActionListener(e -> {
+      fileChooser.setDialogTitle("Open private key");
+      int returnVal = fileChooser.showOpenDialog(rootPanel);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        String path = fileChooser.getSelectedFile().getPath();
+        privateKeyPathLabel.setText(path);
+        String xml = loadFileAsString(path);
+        xml = XmlHelper.formatXml(xml, 4);
 
-          try {
-            controller.setRsaPrivateKey(xml);
-            privateKeyTextArea.setText(xml);
-          } catch (Exception ex) {
-            JOptionPane.showMessageDialog(rootPanel,
-                "XML cannot be parsed.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-          }
+        try {
+          controller.setRsaPrivateKey(xml);
+          privateKeyTextArea.setText(xml);
+        } catch (Exception ex) {
+          JOptionPane.showMessageDialog(rootPanel,
+              "XML cannot be parsed.",
+              "Error",
+              JOptionPane.ERROR_MESSAGE);
+          ex.printStackTrace();
         }
       }
     });

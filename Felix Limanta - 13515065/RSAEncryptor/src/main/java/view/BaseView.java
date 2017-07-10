@@ -8,7 +8,11 @@ import javax.swing.WindowConstants;
 import org.felixlimanta.RSAEncryptor.controller.RsaEncryptorController;
 
 /**
- * Created by ASUS on 13/06/17.
+ * Top-level container for all View classes
+ *
+ * @author Felix Limanta
+ * @version 1.0
+ * @since 2017-06-13
  */
 public class BaseView extends JFrame {
 
@@ -17,14 +21,17 @@ public class BaseView extends JFrame {
   private DecryptPanel decryptPanelObj;
   private KeyPanel keyPanelObj;
 
-  private JTabbedPane tabbedPane;
   private JPanel rootPanel;
+  private JTabbedPane tabbedPane;
   private JPanel encryptPanel;
   private JPanel decryptPanel;
   private JPanel keyPanel;
 
   private JFileChooser fileChooser;
 
+  /**
+   * Initializes components, sets up file chooser and controller, and make panel visible
+   */
   public BaseView() {
     super("RSA Encryptor");
     setUpFileChooser();
@@ -54,10 +61,6 @@ public class BaseView extends JFrame {
 
   private void setUpController() {
     controller = new RsaEncryptorController();
-    controller.setEncryptPanel(encryptPanelObj);
-    controller.setDecryptPanel(decryptPanelObj);
-    controller.setKeyPanel(keyPanelObj);
-
     encryptPanelObj.setController(controller);
     decryptPanelObj.setController(controller);
     keyPanelObj.setController(controller);

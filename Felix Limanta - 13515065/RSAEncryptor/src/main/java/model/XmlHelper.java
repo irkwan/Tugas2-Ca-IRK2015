@@ -2,7 +2,6 @@ package org.felixlimanta.RSAEncryptor.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,10 +25,33 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Created by ASUS on 13/06/17.
+ * Static class containing XML utility functions
+ *
+ * @author Felix Limanta
+ * @version 1.0
+ * @since 2017-06-13
  */
 public class XmlHelper {
-  public static BigInt[] fromXmlString(String xml, String[] tagNames) throws SAXException, IOException {
+
+  /**
+   * Private constructor to prevent class instantiation.
+   */
+  private XmlHelper() {}
+
+  //region XML to and from RSA key conversion
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Parses RSA key data from XML string.
+   *
+   * @param xml XML string containing key data
+   * @param tagNames Tag names of components used in XML string
+   * @return Array of {@code BigInt}s parsed from XML
+   * @throws SAXException XML parsing error
+   * @throws IOException XML parsing error
+   */
+  public static BigInt[] rsaKeyFromXmlString(String xml, String[] tagNames)
+      throws SAXException, IOException {
     Document doc = XmlHelper.loadXml(xml);
     doc.getDocumentElement().normalize();
 
@@ -42,42 +64,14 @@ public class XmlHelper {
     return values;
   }
 
-  public static byte[][] fromXmlString(String xml) throws SAXException, IOException {
-    Document doc = XmlHelper.loadXml(xml);
-    doc.getDocumentElement().normalize();
-    byte[][] values = new byte[2][];
-
-    String keyVal = doc.getElementsByTagName("Key").item(0).getTextContent();
-    values[0] = Base64.decodeBase64(keyVal);
-
-    String ivVal = doc.getElementsByTagName("IV").item(0).getTextContent();
-    values[1] = Base64.decodeBase64(ivVal);
-
-    return values;
-  }
-
-  private static Document loadXml(String xml) throws SAXException, IOException {
-    xml = xml.trim().replaceFirst("^([\\W]+)<","<");
-    return loadXml(new ByteArrayInputStream(xml.getBytes()));
-  }
-
-  private static Document loadXml(InputStream is) throws SAXException, IOException {
-    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-    docFactory.setNamespaceAware(true);
-
-    try {
-      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-      Document doc = docBuilder.parse(is);
-
-      is.close();
-      return doc;
-    } catch (ParserConfigurationException pce) {
-      pce.printStackTrace();
-      return null;
-    }
-  }
-
-  public static String toXmlString(String[] tagNames, BigInt[] values) {
+  /**
+   * Generates an XML string representation of an RSA key given its tag names and values
+   *
+   * @param tagNames Array of strings containing tag names
+   * @param values Array of {@code BigInt}s containing key values
+   * @return XML string representation of key
+   */
+  public static String rsaKeyToXmlString(String[] tagNames, BigInt[] values) {
     assert (tagNames.length == values.length);
     try {
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -105,7 +99,42 @@ public class XmlHelper {
     }
   }
 
-  public static String toXmlString(byte[] key, byte[] iv) {
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region XML to and from AES key conversion
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Parses AES key data from XML string.
+   *
+   * @param xml XML string containing key data
+   * @return Array of byte arrays parsed from XML
+   * @throws SAXException XML parsing error
+   * @throws IOException XML parsing error
+   */
+  public static byte[][] aesKeyFromXmlString(String xml) throws SAXException, IOException {
+    Document doc = XmlHelper.loadXml(xml);
+    doc.getDocumentElement().normalize();
+    byte[][] values = new byte[2][];
+
+    String keyVal = doc.getElementsByTagName("Key").item(0).getTextContent();
+    values[0] = Base64.decodeBase64(keyVal);
+
+    String ivVal = doc.getElementsByTagName("IV").item(0).getTextContent();
+    values[1] = Base64.decodeBase64(ivVal);
+
+    return values;
+  }
+
+  /**
+   * Generates an XML string representation of an AES key
+   *
+   * @param key AES encryption key
+   * @param iv AES initialization vector
+   * @return XML string representation of key
+   */
+  public static String aesKeyToXmlString(byte[] key, byte[] iv) {
     try {
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -152,6 +181,45 @@ public class XmlHelper {
     }
   }
 
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region Common XML functions
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Loads an XML document from an XML string
+   *
+   * @param xml XML string
+   * @return XML document
+   * @throws SAXException XML parsing error
+   * @throws IOException XML parsing error
+   */
+  private static Document loadXml(String xml) throws SAXException, IOException {
+    xml = xml.trim().replaceFirst("^([\\W]+)<","<");
+    ByteArrayInputStream is = new ByteArrayInputStream(xml.getBytes());
+
+    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+    docFactory.setNamespaceAware(true);
+
+    try {
+      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+      Document doc = docBuilder.parse(is);
+
+      is.close();
+      return doc;
+    } catch (ParserConfigurationException pce) {
+      pce.printStackTrace();
+      return null;
+    }
+  }
+
+  /**
+   * Formats a raw XML string to a human-readable format with proper line breaks and indentations
+   * @param xml Raw XML string
+   * @param indent Number of spaces in one indentation
+   * @return Formatted XML string
+   */
   public static String formatXml(String xml, int indent) {
     try {
       // Turn xml string into a document
@@ -186,5 +254,8 @@ public class XmlHelper {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+
+    //------------------------------------------------------------------------------------------------
+    //endregion
   }
 }

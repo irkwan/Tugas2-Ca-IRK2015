@@ -1,7 +1,5 @@
 package org.felixlimanta.RSAEncryptor.view;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,140 +13,138 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.felixlimanta.RSAEncryptor.controller.RsaEncryptorController;
 
 /**
- * Created by ASUS on 13/06/17.
+ * Handles user interaction with text decryption
+ *
+ * @author Felix Limanta
+ * @version 1.0
+ * @since 2017-06-13
  */
-public class DecryptPanel {
-
-  private RsaEncryptorController controller;
+class DecryptPanel {
 
   private JPanel rootPanel;
+  private RsaEncryptorController controller;
+  private JFileChooser fileChooser;
+
+  private JLabel encryptedTextPathLabel;
   private JButton encryptedTextBrowseButton;
+
+  private JLabel manifestPathLabel;
   private JButton manifestBrowseButton;
+
   private JTextArea encryptedTextArea;
   private JTextArea plainTextArea;
+
   private JButton decryptButton;
   private JButton saveDecryptedButton;
-  private JLabel encryptedTextPathLabel;
-  private JLabel manifestPathLabel;
-
-  private JFileChooser fileChooser;
 
   private String manifest;
 
-
-  public DecryptPanel() {
+  DecryptPanel() {
     setUpOpenTextButtonListener();
     setUpOpenManifestButtonListener();
     setUpSaveButtonListener();
     setUpDecryptButtonListener();
   }
 
-  public JPanel getRootPanel() {
+  JPanel getRootPanel() {
     return rootPanel;
   }
 
-  public void setController(RsaEncryptorController controller) {
+  void setController(RsaEncryptorController controller) {
     this.controller = controller;
   }
 
-  public void setFileChooser(JFileChooser fileChooser) {
+  void setFileChooser(JFileChooser fileChooser) {
     this.fileChooser = fileChooser;
   }
 
   private void setUpOpenTextButtonListener() {
-    encryptedTextBrowseButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        fileChooser.setDialogTitle("Open encrypted file");
-        int returnVal = fileChooser.showOpenDialog(rootPanel);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          String path = fileChooser.getSelectedFile().getPath();
-          encryptedTextPathLabel.setText(path);
-          encryptedTextArea.setText(loadFileToString(path));
-        }
+    encryptedTextBrowseButton.addActionListener(e -> {
+      fileChooser.setDialogTitle("Open encrypted file");
+      int returnVal = fileChooser.showOpenDialog(rootPanel);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        String path = fileChooser.getSelectedFile().getPath();
+        encryptedTextPathLabel.setText(path);
+        encryptedTextArea.setText(loadFileToString(path));
       }
     });
   }
 
   private void setUpOpenManifestButtonListener() {
-    manifestBrowseButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        fileChooser.setDialogTitle("Open manifest");
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(
-            "XML files", "xml")
-        );
-        fileChooser.setAcceptAllFileFilterUsed(true);
-        int returnVal = fileChooser.showOpenDialog(rootPanel);
+    manifestBrowseButton.addActionListener(e -> {
+      fileChooser.setDialogTitle("Open manifest");
+      fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(
+          "XML files", "xml")
+      );
+      fileChooser.setAcceptAllFileFilterUsed(true);
+      int returnVal = fileChooser.showOpenDialog(rootPanel);
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          String path = fileChooser.getSelectedFile().getPath();
-          manifestPathLabel.setText(path);
-          manifest = loadFileToString(path);
-        }
-        fileChooser.resetChoosableFileFilters();
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        String path = fileChooser.getSelectedFile().getPath();
+        manifestPathLabel.setText(path);
+        manifest = loadFileToString(path);
       }
+      fileChooser.resetChoosableFileFilters();
     });
   }
 
   private void setUpDecryptButtonListener() {
-    decryptButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if (encryptedTextArea.getText().equals("")) {
-          JOptionPane.showMessageDialog(rootPanel,
-              "Encrypted text area is empty. Load text or type it in the text area first.",
-              "Error",
-              JOptionPane.ERROR_MESSAGE);
-          return;
-        }
-        if (manifest == null) {
-          JOptionPane.showMessageDialog(rootPanel,
-              "Manifest not found. Open manifest file to decrypt text.",
-              "Error",
-              JOptionPane.ERROR_MESSAGE);
-          return;
-        }
+    decryptButton.addActionListener(e -> {
+      if (encryptedTextArea.getText().equals("")) {
+        JOptionPane.showMessageDialog(rootPanel,
+            "Encrypted text area is empty. Load text or type it in the text area first.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      if (manifest == null) {
+        JOptionPane.showMessageDialog(rootPanel,
+            "Manifest not found. Open manifest file to decrypt text.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        return;
+      }
 
-        try {
-          String decrypted = controller.decryptText(manifest, encryptedTextArea.getText());
-          plainTextArea.setText(decrypted);
-        } catch (NullPointerException npe) {
-          JOptionPane.showMessageDialog(rootPanel,
-              "Public key is not set. Generate or load public key first.",
-              "Error",
-              JOptionPane.ERROR_MESSAGE);
-          npe.printStackTrace();
-        } catch (Exception ex) {
-          JOptionPane.showMessageDialog(rootPanel,
-              "Manifest XML cannot be parsed.",
-              "Error",
-              JOptionPane.ERROR_MESSAGE);
-          ex.printStackTrace();
-        }
+      try {
+        String[] decrypted = new String[1];
+        long elapsedTime =
+            controller.decryptText(manifest, encryptedTextArea.getText(), decrypted);
+
+        plainTextArea.setText(decrypted[0]);
+        JOptionPane.showMessageDialog(rootPanel,
+            "Text decrypted in " + elapsedTime / 1000000 + " ms.");
+      } catch (NullPointerException npe) {
+        JOptionPane.showMessageDialog(rootPanel,
+            "Public key is not set. Generate or load public key first.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        npe.printStackTrace();
+      } catch (Exception ex) {
+        JOptionPane.showMessageDialog(rootPanel,
+            "Manifest XML cannot be parsed.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
       }
     });
   }
 
   private void setUpSaveButtonListener() {
-    saveDecryptedButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if (encryptedTextArea.getText().equals("")) {
-          JOptionPane.showMessageDialog(rootPanel,
-              "Plain area is empty. Decrypt text first.",
-              "Error",
-              JOptionPane.ERROR_MESSAGE);
-          return;
-        }
+    saveDecryptedButton.addActionListener(e -> {
+      if (encryptedTextArea.getText().equals("")) {
+        JOptionPane.showMessageDialog(rootPanel,
+            "Plain area is empty. Decrypt text first.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        return;
+      }
 
-        fileChooser.setDialogTitle("Save decrypted file");
-        int returnVal = fileChooser.showSaveDialog(rootPanel);
+      fileChooser.setDialogTitle("Save decrypted file");
+      int returnVal = fileChooser.showSaveDialog(rootPanel);
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          String path = fileChooser.getSelectedFile().getPath();
-          saveStringToFile(path, plainTextArea.getText());
-        }
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        String path = fileChooser.getSelectedFile().getPath();
+        saveStringToFile(path, plainTextArea.getText());
       }
     });
   }

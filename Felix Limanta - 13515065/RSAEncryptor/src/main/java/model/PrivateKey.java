@@ -5,16 +5,19 @@ import java.security.SecureRandom;
 import org.xml.sax.SAXException;
 
 /**
- * Created by ASUS on 13/06/17.
+ * Represents an RSA CRT private key.
+ *
+ * @author Felix Limanta
+ * @version 1.0
+ * @since 2017-06-13
  */
 public class PrivateKey {
   private static final int BIT_LENGTH = 1024;
   private static final BigInt DEFAULT_E_VALUE = new BigInt("65537");
-  private static SecureRandom random = new SecureRandom();
-
   private static final String[] tagNames = new String[] {
       "Modulus", "Exponent", "P", "Q", "DP", "DQ", "InverseQ", "D"
   };
+  private static final SecureRandom random = new SecureRandom();
 
   private BigInt n;
   private BigInt e;
@@ -29,45 +32,123 @@ public class PrivateKey {
   //region Construction
   //------------------------------------------------------------------------------------------------
 
+  /**
+   * Generates and constructs a new CRT PrivateKey
+   */
   public PrivateKey() {
     generateKey();
   }
 
+  /**
+   * Constructs a CRT private key given a plain RSA private key
+   *
+   * @param n Modulus
+   * @param e Encryption exponent
+   * @param d Decryption exponent
+   */
   public PrivateKey(BigInt n, BigInt e, BigInt d) {
-    this.n = n;
-    this.e = e;
-    this.d = d;
+    this.n = new BigInt(n);
+    this.e = new BigInt(e);
+    this.d = new BigInt(d);
     getPQFromNED();
     generateCrtKey();
   }
 
+  /**
+   * Constructs a CRT private key given the two base prime numbers P and Q
+   *
+   * @param p First prime number
+   * @param q Second prime number
+   */
   public PrivateKey(BigInt p, BigInt q) {
-    this.p = p;
-    this.q = q;
+    this.p = new BigInt(p);
+    this.q = new BigInt(q);
     getNEDFromPQ();
     generateCrtKey();
   }
 
+  /**
+   * Constructs a CRT private key given P, Q, dP, dQ, and qInv
+   *
+   * @param p First prime number
+   * @param q Second prime number
+   * @param dP Modular multiplicative inverse of D to P - 1
+   * @param dQ Modular multiplicative inverse of D to Q - 1
+   * @param qInv Modular multiplicative inverse of Q to P
+   */
   public PrivateKey(BigInt p, BigInt q, BigInt dP, BigInt dQ,
       BigInt qInv) {
-    this.p = p;
-    this.q = q;
-    this.dP = dP;
-    this.dQ = dQ;
-    this.qInv = qInv;
+    this.p = new BigInt(p);
+    this.q = new BigInt(q);
+    this.dP = new BigInt(dP);
+    this.dQ = new BigInt(dQ);
+    this.qInv = new BigInt(qInv);
     getNEDFromPQ();
   }
 
-  public PrivateKey(BigInt n, BigInt e, BigInt d, BigInt p,
+  /**
+   * Constructs a CRT private key given all its components
+   *
+   * @param n Modulus
+   * @param e Encryption exponent
+   * @param d Decryption exponent
+   * @param p First prime number
+   * @param q Second prime number
+   * @param dP Modular multiplicative inverse of D to P - 1
+   * @param dQ Modular multiplicative inverse of D to Q - 1
+   * @param qInv Modular multiplicative inverse of Q to P
+   */
+  private PrivateKey(BigInt n, BigInt e, BigInt d, BigInt p,
       BigInt q, BigInt dP, BigInt dQ, BigInt qInv) {
-    this.n = n;
-    this.e = e;
-    this.d = d;
-    this.p = p;
-    this.q = q;
-    this.dP = dP;
-    this.dQ = dQ;
-    this.qInv = qInv;
+    this.n = new BigInt(n);
+    this.e = new BigInt(e);
+    this.d = new BigInt(d);
+    this.p = new BigInt(p);
+    this.q = new BigInt(q);
+    this.dP = new BigInt(dP);
+    this.dQ = new BigInt(dQ);
+    this.qInv = new BigInt(qInv);
+  }
+
+  /**
+   * Copy constructor
+   *
+   * @param privateKey Original {@code PrivateKey} object
+   */
+  public PrivateKey(PrivateKey privateKey) {
+    this.n = new BigInt(privateKey.n);
+    this.e = new BigInt(privateKey.e);
+    this.d = new BigInt(privateKey.d);
+    this.p = new BigInt(privateKey.p);
+    this.q = new BigInt(privateKey.q);
+    this.dP = new BigInt(privateKey.dP);
+    this.dQ = new BigInt(privateKey.dQ);
+    this.qInv = new BigInt(privateKey.qInv);
+  }
+
+  //------------------------------------------------------------------------------------------------
+  //endregion
+
+  //region Comparison
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Checks equality between {@code this} and {@code o}
+   *
+   * @param o Object to be compared to
+   * @return true if this == o
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == this)
+      return true;
+    if (!(o instanceof PrivateKey))
+      return false;
+
+    PrivateKey privateKey = (PrivateKey) o;
+    return (n.equals(privateKey.n) && e.equals(privateKey.e) && d.equals(privateKey.d) &&
+        p.equals(privateKey.q) && q.equals(privateKey.q) && dP.equals(privateKey.dP) &&
+        dQ.equals(privateKey.dQ) && qInv.equals(privateKey.qInv));
   }
 
   //------------------------------------------------------------------------------------------------
@@ -76,42 +157,74 @@ public class PrivateKey {
   //region Getters
   //------------------------------------------------------------------------------------------------
 
+  /**
+   * @return RSA modulus
+   */
   public BigInt getN() {
     return n;
   }
 
+  /**
+   * @return Encryption exponent
+   */
   public BigInt getE() {
     return e;
   }
 
+  /**
+   * @return Decryption exponent
+   */
   public BigInt getD() {
     return d;
   }
 
+  /**
+   * @return First prime number
+   */
   public BigInt getP() {
     return p;
   }
 
+  /**
+   * @return Second prime number
+   */
   public BigInt getQ() {
     return q;
   }
 
+  /**
+   * @return Modular multiplicative inverse of D to P - 1
+   */
   public BigInt getdP() {
     return dP;
   }
 
+  /**
+   * @return Modular multiplicative inverse of D to Q - 1
+   */
   public BigInt getdQ() {
     return dQ;
   }
 
+  /**
+   * @return Modular multiplicative inverse of Q to P
+   */
   public BigInt getqInv() {
     return qInv;
   }
 
+  /**
+   * @return Lowest common multiple of λ(p) and λ(q)
+   */
   public BigInt getLambda() {
     return lambda;
   }
 
+  /**
+   * Constructs and returns a public key from this private key to be used in encryption
+   *
+   * @return Public key
+   */
   public PublicKey getPublicKey() {
     return new PublicKey(n, e);
   }
@@ -275,20 +388,33 @@ public class PrivateKey {
   //------------------------------------------------------------------------------------------------
   //endregion
 
-  //region To and From XML
+  //region XML conversion
   //------------------------------------------------------------------------------------------------
 
+  /**
+   * Parses a {@code PrivateKey} object from an XML string representation
+   *
+   * @param xml XML string to be converted to a {@code PrivateKey}
+   * @return A {@code PrivateKey} object from the XML string
+   * @throws SAXException Error in parsing XML
+   * @throws IOException Error in parsing XML
+   */
   public static PrivateKey fromXmlString(String xml) throws SAXException, IOException {
-    BigInt[] values = XmlHelper.fromXmlString(xml, tagNames);
+    BigInt[] values = XmlHelper.rsaKeyFromXmlString(xml, tagNames);
     if (values != null)
       return new PrivateKey(values[0], values[1], values[7], values[2],
           values[3], values[4], values[5], values[6]);
     return null;
   }
 
+  /**
+   * Converts this {@code PrivateKey} object to an XML string representation
+   *
+   * @return An XML string representation of this {@code PrivateKey} object
+   */
   public String toXmlString() {
     BigInt[] values = new BigInt[] { n, e, p, q, dP, dQ, qInv, d };
-    return XmlHelper.toXmlString(tagNames, values);
+    return XmlHelper.rsaKeyToXmlString(tagNames, values);
   }
 
   //------------------------------------------------------------------------------------------------

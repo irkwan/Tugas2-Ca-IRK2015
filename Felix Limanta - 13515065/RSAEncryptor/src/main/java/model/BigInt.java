@@ -67,7 +67,7 @@ public class BigInt implements Comparable<BigInt> {
   /**
    * Random object for random number generation
    */
-  private static SecureRandom random;
+  private final static SecureRandom random;
 
   private byte sign;
   private int[] mag;
@@ -76,16 +76,16 @@ public class BigInt implements Comparable<BigInt> {
   private int bitLength;
   private int firstNonzeroIntNum;
 
-  public static BigInt ZERO = new BigInt(new int[0], (byte) 0);
-  public static BigInt ONE = new BigInt(valueOf(1));
-  public static BigInt TWO = new BigInt(valueOf(2));
-  public static BigInt NEGATIVE_ONE = new BigInt(valueOf(-1));
+  public static final BigInt ZERO = new BigInt(new int[0], (byte) 0);
+  public static final BigInt ONE = new BigInt(valueOf(1));
+  public static final BigInt TWO = new BigInt(valueOf(2));
+  public static final BigInt NEGATIVE_ONE = new BigInt(valueOf(-1));
 
   static {
     random = new SecureRandom();
   }
 
-  //region Constructor
+  //region Construction
   //------------------------------------------------------------------------------------------------
 
   /**
@@ -118,7 +118,7 @@ public class BigInt implements Comparable<BigInt> {
    * @param mag Array of integers
    * @param sign Sign value
    */
-  BigInt(int[] mag, byte sign) {
+  private BigInt(int[] mag, byte sign) {
     this.sign = (mag.length == 0 ? 0 : sign);
     this.mag = mag;
     if (mag.length >= MAX_MAG_LENGTH)
@@ -271,7 +271,7 @@ public class BigInt implements Comparable<BigInt> {
 
     // Process remaining digit groups
     int superRadix = intRadix[radix];
-    int groupVal = 0;
+    int groupVal;
     while (cursor < len) {
       group = val.substring(cursor, cursor += digitsPerInt[radix]);
       groupVal = Integer.parseInt(group, radix);
@@ -531,12 +531,19 @@ public class BigInt implements Comparable<BigInt> {
   }
 
   /**
-   * Checks equality between this integer and val
+   * Checks equality between {@code this} and {@code o}
    *
-   * @param val BigInt to be compared to
-   * @return true if this == val
+   * @param o Object to be compared to
+   * @return true if this == o
    */
-  public boolean equals(BigInt val) {
+  @Override
+  public boolean equals(Object o) {
+    if (o == this)
+      return true;
+    if (!(o instanceof BigInt))
+      return false;
+
+    BigInt val = (BigInt) o;
     return this.compareTo(val) == 0;
   }
 
