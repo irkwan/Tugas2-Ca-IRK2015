@@ -7,12 +7,17 @@
 #include <string>
 using namespace std;
 
+/* Commonly Used Constants */
 const biginteger biginteger::ZERO = biginteger();
 const biginteger biginteger::ONE = biginteger(1);
 const biginteger biginteger::TWO = biginteger(2);
 const biginteger biginteger::THREE = biginteger(3);
 const biginteger biginteger::FOUR = biginteger(4);
 const biginteger biginteger::FIVE = biginteger(5);
+const biginteger biginteger::SIX = biginteger(6);
+const biginteger biginteger::SEVEN = biginteger(7);
+const biginteger biginteger::EIGHT = biginteger(8);
+const biginteger biginteger::NINE = biginteger(9);
 const biginteger biginteger::TEN = biginteger(10);
 
 /* Constructors */
@@ -94,7 +99,8 @@ biginteger biginteger::operator+(const biginteger& rhs) const{
 
 biginteger biginteger::operator-() const{
 	biginteger res = *this;
-	res.pos = !res.pos;
+	if (res != biginteger::ZERO)
+		res.pos = !res.pos;
 	return res;
 }
 
@@ -104,12 +110,15 @@ biginteger biginteger::operator-(const biginteger& rhs) const{
 			biginteger res = *this;
 			int carry = 0;
 
-			for(int i=0; i<digits.size(); i++){
-				res.digits[i] -= carry + rhs.digits[i];
+			for(int i=0; i<rhs.digits.size() || carry; i++){
+				res.digits[i] -= carry;
+				if (i < rhs.digits.size())
+					res.digits[i] -= rhs.digits[i];
 				carry = (res.digits[i] < 0)? 1 : 0;
 				if (carry)
 					res.digits[i] += BASE;
 			}
+
 			res.delTrail0();
 
 			return res;
@@ -210,9 +219,12 @@ biginteger biginteger::abs() const{
 /* Relational Operators */
 bool biginteger::operator==(const biginteger& rhs) const{
 	bool same = (digits.size() == rhs.digits.size()) && (pos == rhs.pos);
+	//cout << digits.size() << " " << rhs.digits.size() << endl;
+	//cout << same << endl;
 	int i=0;
 	while (same && (i < digits.size())){
-		same = digits[i] == rhs.digits[i];
+		same = (digits[i] == rhs.digits[i]);
+		i++;
 	}
 	return same;
 }
@@ -249,8 +261,13 @@ bool biginteger::operator<=(const biginteger& rhs) const{
 
 
 /* I/O */
-istream& operator>>(istream &is, const biginteger& v){
+istream& operator>>(istream &is, biginteger& v){
+	string input;
+	is >> input;
 
+	v = biginteger(input);
+
+	return is;
 }
 
 ostream& operator<<(ostream &os, const biginteger& v){

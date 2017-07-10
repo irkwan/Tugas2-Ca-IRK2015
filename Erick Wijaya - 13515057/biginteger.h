@@ -13,7 +13,7 @@ public:
 	/* Static Constants */
 	static const biginteger ZERO;
 	static const biginteger ONE, TWO, THREE, FOUR, FIVE;
-	static const biginteger TEN;
+	static const biginteger SIX, SEVEN, EIGHT, NINE, TEN;
 
 	/* Constructors */
 	biginteger();
@@ -54,7 +54,7 @@ public:
 	bool operator<=(const biginteger& rhs) const;
 
 	/* I/O */
-	friend istream& operator>>(istream &is, const biginteger& v);
+	friend istream& operator>>(istream &is, biginteger& v);
 	friend ostream& operator<<(ostream &os, const biginteger& v);
 
 private:

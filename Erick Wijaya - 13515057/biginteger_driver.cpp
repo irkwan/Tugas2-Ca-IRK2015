@@ -8,7 +8,7 @@
 using namespace std;
 
 int main() {
-	biginteger b1(54321);
+	/*biginteger b1(54321);
 	biginteger b2(987);
 	biginteger b3(77777);
 	biginteger b4(123456);
@@ -37,7 +37,25 @@ int main() {
 
 	cout << b1 % b2 << " " << 54321%987 << endl;
 	cout << b3 % b1 << endl;
-	cout << b4 % b8 << endl;
+	cout << b4 % b8 << endl;*/
+	biginteger b1, b2;
+
+	cin >> b1 >> b2;
+	cout << "b1 + b2 = " << b1 + b2 << endl;
+	cout << "b1 - b2 = " << b1 - b2 << endl;
+	cout << endl;
+	cout << "b1 > b2 = " << (b1 > b2) << endl;
+	cout << "b1 >= b2 = " << (b1 >= b2) << endl;
+	cout << "b1 < b2 = " << (b1 < b2) << endl;
+	cout << "b1 <= b2 = " << (b1 <= b2) << endl;
+	cout << "b1 == b2 = " << (b1 == b2) << endl;
+	cout << "b1 != b2 = " << (b1 != b2) << endl;
+	cout << endl;
+	cout << "abs(b1) abs(b2) = " << b1.abs() << " " << b2.abs() << endl;
+	cout << "-b1 -b2 = " << -b1 << " " << -b2 << endl;
+	cout << endl;
+	//cout << b1 + b2 << endl;
+	//cout << b1 + b2 << endl;
 
 	return 0;
 }
