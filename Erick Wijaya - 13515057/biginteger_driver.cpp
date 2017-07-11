@@ -38,13 +38,16 @@ int main() {
 	cout << b1 % b2 << " " << 54321%987 << endl;
 	cout << b3 % b1 << endl;
 	cout << b4 % b8 << endl;*/
-	biginteger b1, b2;
+	string a, b;
+	cin >> a >> b;
+	biginteger b1(a), b2(b);
 
-	cin >> b1 >> b2;
+	//cin >> b1 >> b2;
 	cout << "b1 + b2 = " << b1 + b2 << endl;
 	cout << "b1 - b2 = " << b1 - b2 << endl;
+	cout << "b1 * b2 = " << b1 * b2 << endl;
 	cout << "b1 / b2 = " << b1 / b2 << endl;
-	cout << "b1 %% b2 = " << b1 % b2 << endl;
+	cout << "b1 % b2 = " << b1 % b2 << endl;
 	cout << endl;
 	cout << "b1 > b2 = " << (b1 > b2) << endl;
 	cout << "b1 >= b2 = " << (b1 >= b2) << endl;
@@ -56,8 +59,6 @@ int main() {
 	cout << "abs(b1) abs(b2) = " << b1.abs() << " " << b2.abs() << endl;
 	cout << "-b1 -b2 = " << -b1 << " " << -b2 << endl;
 	cout << endl;
-	//cout << b1 + b2 << endl;
-	//cout << b1 + b2 << endl;
 
 	return 0;
 }

@@ -132,24 +132,10 @@ biginteger biginteger::operator-(const biginteger& rhs) const{
 }
 
 biginteger biginteger::operator*(const biginteger& rhs) const{
-	// Make sure both value have same size
-	int diffsize = digits.size() - rhs.digits.size();
-	if (diffsize < 0) diffsize *= -1;
-
-	biginteger v1 = *this;
-	biginteger v2 = rhs;
-
-	if (v1.digits.size() < v2.digits.size()){
-		for(int i=0; i<diffsize; i++)
-			v1.digits.push_back(0);
-	}
-	else{
-		for(int i=0; i<diffsize; i++)
-			v2.digits.push_back(0);
-	}
-
-	// Calculate with Karatsuba Algorithm
-
+	biginteger res = karatsubaMultiply(*this, rhs);
+	res.pos = pos == rhs.pos;
+	res.normalize();
+	return res;
 }
 
 biginteger biginteger::operator/(const biginteger& rhs) const{
@@ -186,26 +172,6 @@ biginteger& biginteger::operator%=(const biginteger& rhs){
 	*this = *this % rhs;
 	return *this;
 }
-/*
-biginteger biginteger::add(const biginteger& rhs) const{
-	return *this + rhs;
-}
-
-biginteger biginteger::min(const biginteger& rhs) const{
-	return *this - rhs;
-}
-
-biginteger biginteger::mul(const biginteger& rhs) const{
-
-}
-
-biginteger biginteger::div(const biginteger& rhs) const{
-
-}
-
-biginteger biginteger::mod(const biginteger& rhs) const{
-
-}*/
 
 biginteger biginteger::abs() const{
 	biginteger res = *this;
@@ -287,7 +253,18 @@ biginteger biginteger::subDigit(int pos, int n) const{
 	return res;
 }
 
-int biginteger::max(int a, int b) const{
+biginteger biginteger::subDigit(int pos) const{
+	biginteger res;
+	int index = digits.size() - pos - 1;
+	
+	res.digits[0] += digits[index];
+	for(int i=index-1; i>=0; i--){
+		res.digits.push_front(digits[i]);
+	}
+	return res;
+}
+
+int biginteger::max(int a, int b){
 	return (a > b) ? a : b;
 }
 
@@ -300,17 +277,55 @@ void biginteger::normalize(){
 	}
 }
 
-long long biginteger::toLLInt() const{
-	long long res = 0;
-	for(int i=digits.size()-1; i>=0; i--){
-		res = (res * BASE) + digits[i];
-	}
-	if (!pos)
-		res = -res;
+biginteger biginteger::multiply10(int n){
+	biginteger res = *this;
+	for(int i=0; i<n; i++)
+		res.digits.push_front(0);
 	return res;
 }
 
-pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const biginteger& rhs){ // TODO: benerin kasus negatif
+biginteger biginteger::multiplySingleDigit(const biginteger& lhs, const biginteger& rhs){
+	int num = lhs.digits[0] * rhs.digits[0];
+	return biginteger(num);
+}
+
+biginteger biginteger::karatsubaMultiply(const biginteger& lhs, const biginteger& rhs){
+	if ((lhs.digits.size() < 2) && (rhs.digits.size() < 2)){
+		return multiplySingleDigit(lhs, rhs);
+	}
+	else{
+		int m1 = max(lhs.digits.size(), rhs.digits.size());
+		if (m1 % 2 == 1)
+			m1++;
+		int m2 = m1 / 2;
+
+		biginteger left = lhs;
+		biginteger right = rhs;
+
+		while (left.digits.size() < m1)
+			left.digits.push_back(0);
+		while (right.digits.size() < m1)
+			right.digits.push_back(0);
+
+		biginteger h1 = left.subDigit(0,m2);
+		biginteger l1 = left.subDigit(m2);
+		biginteger h2 = right.subDigit(0,m2);
+		biginteger l2 = right.subDigit(m2);
+
+//		cout << l1 << "," << h1 << "  " << l2 << "," << h2 << endl;
+		
+		biginteger x0 = karatsubaMultiply(l1, l2);
+		biginteger x1 = karatsubaMultiply(l1+h1, l2+h2);
+//		cout << "tes1" << endl;
+		biginteger x2 = karatsubaMultiply(h1, h2);
+//		cout << "tes2" << endl;
+
+		x0.normalize(); x1.normalize(); x2.normalize();
+		return x2.multiply10(2*m2) + (x1-x2-x0).multiply10(m2) + x0;
+	}
+}
+
+pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const biginteger& rhs){ // TODO: benerin kasus mod negatif (klo sempet aja krn ga ngaruh rsa)
 	biginteger den(rhs); // denominator
 	biginteger res;
 	biginteger remainder;
@@ -330,7 +345,7 @@ pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const big
 			if (i > 0){
 				res.digits.push_front(0);
 				remainder.digits.push_front(lhs.digits[i-1]);
-				remainder.normalize();
+				remainder.normalize(); // needed to avoid bug
 			}
 			i--;
 		}
@@ -346,6 +361,8 @@ pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const big
 
 	res.normalize();
 	remainder.normalize();
+
+	res.pos = lhs.pos == rhs.pos;
 
 	return make_pair(res, remainder);
 }

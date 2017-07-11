@@ -38,11 +38,6 @@ public:
 	biginteger& operator/=(const biginteger& rhs);
 	biginteger& operator%=(const biginteger& rhs);
 
-	/*biginteger add(const biginteger& rhs) const;
-	biginteger min(const biginteger& rhs) const;
-	biginteger mul(const biginteger& rhs) const;
-	biginteger div(const biginteger& rhs) const;
-	biginteger mod(const biginteger& rhs) const;*/
 	biginteger abs() const;
 	biginteger pow() const;
 	biginteger modpow() const;
@@ -61,17 +56,19 @@ public:
 
 	/* Other */
 	biginteger subDigit(int pos, int n) const; // always yield positive biginteger
+	biginteger subDigit(int pos) const; // always yield positive biginteger
 
 private:
-	deque<int> digits; // reverse order
+	deque<int> digits; // reverse-ordered digits
 	bool pos; // positive
 
 	static const int BASE = 10;
 
-	int max(int a, int b) const;
+	static int max(int a, int b);
 	void normalize();
-	long long toLLInt() const;
 
+	biginteger multiply10(int n);
+	static biginteger multiplySingleDigit(const biginteger& lhs, const biginteger& rhs);
 	static biginteger karatsubaMultiply(const biginteger& lhs, const biginteger& rhs);
 	static pair<biginteger, biginteger> divmod(const biginteger& lhs, const biginteger& rhs);
 };
