@@ -84,7 +84,7 @@ public class RsaEncryptorController {
 
   /**
    * Bridges encryption on {@code RSA} class with user interface
-   * encryptedText must be an array of String with length >= 2
+   * encryptedText must be an array of String with length ≥ 2
    *
    * @param plainText Text to be encrypted
    * @param encryptedText Array to store encrypted text

@@ -472,7 +472,7 @@ public class BigInt implements Comparable<BigInt> {
 
   /**
    * Compares this BigInt with the specified BigInt.
-   * Returns -1 if this < val, 0 if this == val, 1 if this > val.
+   * Returns -1 if this &lt; val, 0 if this == val, 1 if this &gt; val.
    *
    * @param val BigInt to be compared to
    * @return -1, 0, 1
@@ -747,7 +747,7 @@ public class BigInt implements Comparable<BigInt> {
    * Left shifts current BigInt object
    *
    * @param n Number of digits to shift
-   * @return this << n
+   * @return this &lt;&lt; n
    */
   public BigInt shiftLeft(int n) {
     if (sign == 0)
@@ -766,7 +766,7 @@ public class BigInt implements Comparable<BigInt> {
    *
    * @param mag Array of integers to shift
    * @param n Number of digits to shift
-   * @return mag << n
+   * @return mag &lt;&lt; n
    */
   // Adapted from the java.lang BigInteger library
   private static int[] shiftLeft(int[] mag, int n) {
@@ -803,7 +803,7 @@ public class BigInt implements Comparable<BigInt> {
    * Arithmetic right shifts current BigInt object
    *
    * @param n Number of digits to shift
-   * @return this >> n
+   * @return this &gt;&gt; n
    */
   public BigInt shiftRight(int n) {
     if (sign == 0)
@@ -821,7 +821,7 @@ public class BigInt implements Comparable<BigInt> {
    * Right shift implementation.
    *
    * @param n Number of digits to shift
-   * @return this >> n
+   * @return this &gt;&gt; n
    */
   // Adapted from the java.lang BigInteger library
   private BigInt shiftRightImpl(int n) {

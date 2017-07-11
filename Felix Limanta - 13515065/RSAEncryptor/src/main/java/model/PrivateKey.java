@@ -351,7 +351,7 @@ public class PrivateKey {
       }
     }
 
-    // 4: Output “prime factors not found” and stop
+    // 4: Output "prime factors not found" and stop
     throw new RuntimeException("Prime factors not found");
   }
 
