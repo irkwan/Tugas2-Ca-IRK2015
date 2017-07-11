@@ -122,7 +122,6 @@ class BigNumber{
 		ull size;
 		bool isNegate;
 };
-#endif
 
 /** ADT **/
 /*** FUNGSI GCD ***/
@@ -140,3 +139,12 @@ BigNumber gcdExtended(BigNumber a, BigNumber b, BigNumber &x, BigNumber &y);
 /*** MOD INVERSE ***/
 /* Akan dicari sebuah nilai b sehingga (a*b)%m == 1 */
 BigNumber modInverse(BigNumber a, BigNumber m);
+
+/*** FUNGSI PANGKAT ***/
+/* Mengembalikan nilai dari a^b */
+BigNumber pow(BigNumber a, BigNumber b);
+
+/*** FUNGSI PANGKAT+MODULO ***/
+/* Mengembalikan nilai dari a^b % m */
+BigNumber modPow(BigNumber a, BigNumber b, BigNumber m);
+#endif

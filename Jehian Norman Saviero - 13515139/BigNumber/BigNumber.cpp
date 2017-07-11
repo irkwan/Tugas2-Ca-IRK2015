@@ -660,3 +660,33 @@ BigNumber modInverse(BigNumber a, BigNumber m){
 	else
 		return (x%m + m) % m;
 }
+
+BigNumber pow(BigNumber a, BigNumber b){
+	if (b <= 2){
+		if (b == 2){
+			return a*a;
+		} else if (b == 1){
+			return a;
+		} else {
+			return 1;
+		}
+	} else {
+		if (b % 2 == 0) return pow(pow(a,b/2),2);
+		else return a*pow(pow(a,(b-1)/2),2);
+	}
+}
+
+BigNumber modPow(BigNumber a, BigNumber b, BigNumber m){
+	if (b <= 2){
+		if (b == 2){
+			return (a*a)%m;
+		} else if (b == 1){
+			return a%m;
+		} else {
+			return 1;
+		}
+	} else {
+		if (b % 2 == 0) return modPow(modPow(a,b/2,m)%m,2,m)%m;
+		else return (a*(modPow(modPow(a,(b-1)/2,m)%m,2,m)%m))%m;
+	}
+}
