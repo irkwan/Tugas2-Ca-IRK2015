@@ -35,8 +35,9 @@ int main() {
 	cout << endl;
 	//cout << "pow(b1,b2) = " << biginteger::pow(b1, b2) << endl;
 	cout << "modpow(b1,b2,b3) = " << biginteger::modpow(b1, b2, b3) << endl;
-	cout << "random prime = " << biginteger::generateRandomPrime() << endl;
-
+	//cout << "random prime = " << biginteger::generateRandomPrime() << endl;
+	biginteger myint(126);
+	cout << myint.toInt() << " " << myint.toString() << endl;
 
 
 	return 0;

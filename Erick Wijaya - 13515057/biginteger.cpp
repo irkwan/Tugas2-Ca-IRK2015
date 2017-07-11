@@ -361,6 +361,28 @@ ostream& operator<<(ostream &os, const biginteger& v){
 	return os;
 }
 
+/* Type Conversion */
+string biginteger::toString(){
+	string res;
+	if (!pos)
+		res += '-';
+	for(int i=digits.size()-1; i>=0; i--){
+		res += digits[i] + '0';
+	}
+	return res;
+}
+
+int biginteger::toInt(){
+	int res = 0;
+	for(int i=digits.size()-1; i>=0; i--){
+		res = res * 10 + digits[i];
+	}
+	if (!pos)
+		res = -res;
+	return res;
+}
+
+/* Other Methods */
 bool biginteger::isOdd() const{
 	return digits[0] % 2 == 1;
 }
@@ -419,14 +441,39 @@ biginteger biginteger::generateRandomPrime(int digits){
 	biginteger res = generateRandomNearlyPrime(digits);
 
 	while (!res.isProbablePrime()){
-		cout << res << endl;
 		res += biginteger::TWO;
+		if (res.digits[0] == 5)
+			res += biginteger::TWO;
 	}
 
 	return res;
 }
 
-bool biginteger::isProbablePrime(){
+bool biginteger::isProbablePrime(int certainty){
+	if (*this < biginteger::TWO)
+		return false;
+	if ((*this != biginteger::TWO) && (*this % biginteger::TWO == biginteger::ZERO))
+		return false;
+
+	biginteger val = *this - biginteger::ONE;
+	while (val % biginteger::TWO == biginteger::ZERO)
+		val /= biginteger::TWO;
+
+	for(int i=0; i<certainty; i++){
+		biginteger a = biginteger(rand()) % biginteger(*this - biginteger::ONE) + biginteger::ONE;
+		biginteger temp = val;
+		biginteger mod = modpow(a, temp, *this);
+
+		while (temp != *this - biginteger::ONE && mod != biginteger::ONE && mod != *this - biginteger::ONE){
+			mod = (mod * mod) % (*this);
+			temp *= biginteger::TWO;
+		}
+
+		if (mod != *this - biginteger::ONE && temp % biginteger::TWO == biginteger::ZERO){
+			return false;
+		}
+	}
+
 	return true;
 }
 

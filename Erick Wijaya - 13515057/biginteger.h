@@ -75,6 +75,10 @@ public:
 	friend istream& operator>>(istream &is, biginteger& v);
 	friend ostream& operator<<(ostream &os, const biginteger& v);
 
+	/* Type Conversion */
+	string toString();
+	int toInt();
+
 	/* Other Methods */
 	bool isOdd() const;
 	bool isEven() const;
@@ -83,7 +87,7 @@ public:
 	static biginteger gcd(biginteger a, biginteger b);
 	static biginteger gcdExtended(biginteger a, biginteger b, biginteger& x, biginteger& y);
 	static biginteger generateRandomPrime(int digits = 20);
-	bool isProbablePrime();
+	bool isProbablePrime(int certainty = 10);
 
 private:
 	deque<int> digits; // reverse-ordered digits

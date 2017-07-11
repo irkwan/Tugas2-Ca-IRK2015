@@ -8,6 +8,8 @@
 #include <string>
 #include <ctime>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include "biginteger.h"
 using namespace std;
 
@@ -22,19 +24,18 @@ private:
 	biginteger n;
 	biginteger eulerPhi;
 	biginteger e, d;
-	vector<char> plainText;
 	vector<biginteger> cipherText;
 	char* filename;
 	double elapsedTime;
 
-	void readFile();
+	vector<char> readFile();
 	void initPrimeNumbers();
 	void initSecurityParam();
 	void initEulerPhi();
 	void initPublicKey();
 	void initPrivateKey();
 
-	void encrypt();
+	void encrypt(vector<char> plainText);
 	vector<char> decrypt();
 
 	long long generateRandomPrimeNumber();
@@ -42,45 +43,42 @@ private:
 };
 
 RSA::RSA(char* filename) : filename(filename){
-	srand(time(NULL));
-	readFile();
+	vector<char> plainText = readFile();cout << "0";
+
+	// start counting time..
+	clock_t t = clock();
 
 	initPrimeNumbers();cout << "1";
 	initSecurityParam();cout << "2";
 	initEulerPhi();cout << "3";
 
-	// start counting time..
-	clock_t t = clock();
-
 	initPublicKey();cout << "4";
 	initPrivateKey();cout << "5";
-	encrypt();cout << "6";
+	encrypt(plainText);cout << "6";
 
 	t = clock() - t;
 	elapsedTime = (double)t/CLOCKS_PER_SEC;
 	// end of counting time.
 }
 
-void RSA::readFile(){
+vector<char> RSA::readFile(){
 	ifstream inputFile(filename);
-	char c;
+	vector<char> plainText;
+
 	while(inputFile.good()){
 		plainText.push_back(inputFile.get());
 	}
 	plainText.pop_back(); // delete EOF
 	inputFile.close();
 
-//	for(int i=0; i<plainText.size(); i++){
-//		cout << plainText[i] << " " << (int)plainText[i] << endl;
-//	}
-	
+	return plainText;
 }
 
 void RSA::initPrimeNumbers(){
-	p = biginteger(generateRandomPrimeNumber());
-	q = biginteger(generateRandomPrimeNumber());
+	p = biginteger::generateRandomPrime();
+	q = biginteger::generateRandomPrime();
 	while (p == q){
-		q = biginteger(generateRandomPrimeNumber());
+		q = biginteger::generateRandomPrime();
 	}
 //	cout << p << " " << q << endl;
 }
@@ -90,28 +88,42 @@ void RSA::initSecurityParam(){
 }
 
 void RSA::initEulerPhi(){
-	eulerPhi = (p - biginteger::ONE) * (q - biginteger::ONE);
+	eulerPhi = (p - 1) * (q - 1);
 }
 
 void RSA::initPublicKey(){
-	e = biginteger::THREE;
-	while (gcd(e, eulerPhi) != biginteger::ONE){
-		e += biginteger::TWO;
+	e = 3;
+	while (biginteger::gcd(e, eulerPhi) != 1){
+		e += 2;
 	}
+//	cout << "e = " << e << endl;
 }
 
 void RSA::initPrivateKey(){
 	// e * d + phi * a = gcd(e,phi) = 1
 	biginteger a;
-	biginteger one = biginteger::gcdExtended(e, eulerPhi, d, a);
+	biginteger gcd = biginteger::gcdExtended(e, eulerPhi, d, a);
+	if (d < 0)
+		d += eulerPhi;
 }
 
-void RSA::encrypt(){
-
+void RSA::encrypt(vector<char> plainText){
+	// C = P^e % n
+	for(int i=0; i<plainText.size(); i++){
+		biginteger p(plainText[i]);
+		cipherText.push_back(biginteger::modpow(p, e, n));
+	}
 }
 
 vector<char> RSA::decrypt(){
-
+	// P = C^d % n
+	vector<char> plainText;
+	for(int i=0; i<cipherText.size(); i++){
+		biginteger result = biginteger::modpow(cipherText[i], d, n);
+		cout << cipherText[i] << " " << d << " " << " " << n << " = " << result << " " << endl;;
+		plainText.push_back((char)result.toInt());
+	}
+	return plainText;
 }
 
 void RSA::createEncryptionFile(){
@@ -127,7 +139,12 @@ void RSA::createEncryptionFile(){
 	}
 
 	ofstream outputFile(efile);
-	// insert ciphertext in file
+	
+	for(int i=0; i<cipherText.size(); i++){
+		outputFile << cipherText[i] << " ";
+	}
+
+	outputFile.close();
 }
 
 void RSA::createDecryptionFile(){
@@ -143,7 +160,13 @@ void RSA::createDecryptionFile(){
 	}
 
 	ofstream outputFile(dfile);
-	// decrypt
+	
+	vector<char> plainText = decrypt();
+	for(int i=0; i<plainText.size(); i++){
+		outputFile << plainText[i];
+	}
+
+	outputFile.close();
 }
 
 void RSA::createTimeFile(){
@@ -160,54 +183,7 @@ void RSA::createTimeFile(){
 
 	ofstream outputFile(tfile);
 	outputFile << "Time Elapsed: " << setprecision(4) << fixed << elapsedTime << endl;
-}
-
-long long RSA::generateRandomPrimeNumber(){
-	const int BITS = sizeof(long long) * 4 - 1; // bit size for prime number
-	int bin[BITS];
-	bool isPrime = false;
-	long long num;
-
-	
-	while (!isPrime){
-		bin[0] = 1; // make sure num is big
-		bin[BITS-1] = 1; // make sure num is odd
-		for(int i=1; i<BITS-1; i++){
-			bin[i] = (rand()%2 == 1);
-		}
-
-		// convert bin to LL
-		num = 0;
-		for(int i=BITS-1; i>=0; i--){
-			num += bin[i] * pow2(i);
-		}
-
-		// check prime
-		int i = 3;
-		isPrime = true;
-		while (isPrime && (i<=(int)sqrt(num))){
-			if (num % i == 0)
-				isPrime = false;
-			else
-				i += 2;
-		}
-	}
-
-	return num;
-}
-
-long long RSA::pow2(int n){
-	if (n == 0)
-		return 1;
-	else if (n == 1)
-		return 2;
-	else{
-		int newn = pow2(n/2);
-		if (n % 2 == 0)
-			return newn * newn;
-		else
-			return newn * newn * 2;
-	}
+	outputFile.close();
 }
 
 /* ---------------------------------------------------------------------- */
