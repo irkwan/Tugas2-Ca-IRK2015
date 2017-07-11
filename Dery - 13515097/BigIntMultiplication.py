@@ -158,30 +158,46 @@ class BigInt:
 			result = self.mul10(z2,ten_pow[2*m]) + self.mul10(z1-(z2+z0),ten_pow[m]) + z0 # z2*(B**(2*m))+(z1-z2-z0)*(B**m)+z0
 			return result
 
-	# """
-	# 	Comparation
-	# 	equal 0
-	# 	greater than 1
-	# 	less than 2
-	# """
-	# def cmp(x,y):
-	# 	x = str(x)
-	# 	y = str(y)
+	"""
+		Comparation
+		equal 0
+		greater than 1
+		less than 2
+	"""
+	def cmp(self,y):
+		x = self.num
+		y = y.num
 
-	# 	if(len(x)>len(y)):
-	# 		return 1
-	# 	if(len(x)<len(y)):
-	# 		return 2
+		x = str(x)
+		y = str(y)
 
-	# 	for i in range(len(x)):
-	# 		if(x[i]>y[i]):
-	# 			return 1
-	# 		if(x[i]<y[i]):
-	# 			return 2
-	# 	return 0
+		if(len(x)>len(y)):
+			return 1
+		if(len(x)<len(y)):
+			return 2
 
-x = BigInt("2307564365986459467596759372658362763298647268352")
-y = BigInt("2098420583720458973204587230857203984570398457923850")
-print x-y
-y = BigInt("17")
-print x**y
+		for i in range(len(x)):
+			if(x[i]>y[i]):
+				return 1
+			if(x[i]<y[i]):
+				return 2
+		return 0
+
+	def __eq__(self,num2):
+		return self.cmp(num2)==0
+	def __gt__(self,num2):
+		return self.cmp(num2)==1
+	def __ge__(self,num2):
+		return self.cmp(num2)==1 or self.cmp(num2)==0
+	def __lt__(self,num2):
+		return self.cmp(num2)==2
+	def __le__(self,num2):
+		return self.cmp(num2)==2 or self.cmp(num2)==0
+
+# x = BigInt("2307564365986459467596759372658362763298647268352")
+# y = BigInt("2098420583720458973204587230857203984570398457923850")
+# print x-y
+# x = BigInt("2763593267598673295673296752649537615081360593190857102985")
+# y = BigInt("2763593267598673295673296752649537615081360593190857102985")
+# print x>y
+# print x**y
