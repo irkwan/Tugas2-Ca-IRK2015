@@ -10,6 +10,11 @@
 
 using namespace std;
 
+const BigInteger BigInteger::ZERO = BigInteger(0);
+const BigInteger BigInteger::ONE = BigInteger(1);
+const BigInteger BigInteger::TWO = BigInteger(2);
+const BigInteger BigInteger::TEN = BigInteger(10);
+
 BigInteger::BigInteger() {
   sign = true;
 }
@@ -167,7 +172,7 @@ BigInteger operator-=(BigInteger& num1, const BigInteger& num2) {
     num1.trimZero();
     return num1;
   } else {
-    if (num1 > BigInteger::BigInteger(0)) {
+    if (num1 > BigInteger::ZERO) {
       return num1 += (-num2);
     } else {
       return num1 = -(num2 + (-num1));
@@ -177,8 +182,8 @@ BigInteger operator-=(BigInteger& num1, const BigInteger& num2) {
 
 BigInteger operator*=(BigInteger& num1, const BigInteger& num2) {
   BigInteger res(0);
-  if (num1 == BigInteger::BigInteger(0) || num2 == BigInteger::BigInteger(0)) {
-    res = BigInteger::BigInteger(0);
+  if (num1 == BigInteger::ZERO || num2 == BigInteger::ZERO) {
+    res = BigInteger::ZERO;
   } else {
     vector<char>::const_iterator idx2;
     idx2 = num2.number.begin();
@@ -219,7 +224,7 @@ BigInteger operator/=(BigInteger& num1, const BigInteger& num2) {
   BigInteger snoob1 = num1.absolute();
   BigInteger snoob2 = num2.absolute();
   if (snoob1 < snoob2) {
-    num1 = BigInteger::BigInteger(0);
+    num1 = BigInteger::ZERO;
     return num1;
   }
   deque<char> temp;
@@ -227,7 +232,7 @@ BigInteger operator/=(BigInteger& num1, const BigInteger& num2) {
   idx = snoob1.number.rbegin();
   BigInteger temp2(0);
   while (idx != snoob1.number.rend()) {
-    temp2 = temp2 * BigInteger::BigInteger(10) + BigInteger((int)(*idx));
+    temp2 = temp2 * BigInteger::TEN + BigInteger((int)(*idx));
     char divide = 0;
     while (temp2 >= snoob2) {
       temp2 -= snoob2;
@@ -254,7 +259,7 @@ BigInteger operator+(const BigInteger& num1, const BigInteger& num2) {
 }
 
 BigInteger operator++(BigInteger& num) {
-  num += BigInteger::BigInteger(1);
+  num += BigInteger::ONE;
   return num;
 }
 
@@ -277,7 +282,7 @@ BigInteger operator-(const BigInteger& num) {
 }
 
 BigInteger operator--(BigInteger& num) {
-  num -= BigInteger::BigInteger(1);
+  num -= BigInteger::ONE;
   return num;
 }
 
@@ -399,4 +404,16 @@ BigInteger gcd(BigInteger a, BigInteger b) {
 
 BigInteger lcm(BigInteger a, BigInteger b) {
   return a * b / gcd(a,b);
+}
+
+BigInteger modPow(BigInteger base, BigInteger expo, BigInteger mod) {
+  BigInteger res = BigInteger(1);
+  while (expo > BigInteger::ZERO) {
+    if (expo % BigInteger::TWO == BigInteger::ONE) {
+      res = (res * base) % mod;
+    }
+    expo = expo/BigInteger::TWO;
+    base = (base * base) % mod;
+  }
+  return res;
 }

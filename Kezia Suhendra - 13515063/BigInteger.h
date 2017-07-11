@@ -44,6 +44,12 @@ public:
   friend istream& operator>>(istream&, BigInteger&);
   friend BigInteger gcd(BigInteger, BigInteger);
   friend BigInteger lcm(BigInteger, BigInteger);
+  friend BigInteger modPow(BigInteger, BigInteger, BigInteger);
+
+  static const BigInteger ZERO;
+  static const BigInteger ONE;
+  static const BigInteger TWO;
+  static const BigInteger TEN;
 
 private:
   vector<char> number;
