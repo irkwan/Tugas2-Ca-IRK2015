@@ -184,6 +184,30 @@ bool operator==(const string& A, const BigNumber& B){
 	return (a.number == B.number);
 }
 
+bool operator!=(const BigNumber& A, const BigNumber& B){
+	return !(A.number == B.number);
+}
+
+bool operator!=(const BigNumber& A, const ll& B){
+	BigNumber b(B);
+	return !(A.number == b.number);
+}
+
+bool operator!=(const ll& A, const BigNumber& B){
+	BigNumber a(A);
+	return !(a.number == B.number);
+}
+
+bool operator!=(const BigNumber& A, const string& B){
+	BigNumber b(B);
+	return !(A.number == b.number);
+}
+
+bool operator!=(const string& A, const BigNumber& B){
+	BigNumber a(A);
+	return !(a.number == B.number);
+}
+
 bool operator<(const BigNumber& A, const BigNumber& B){
 	vll numberA = A.number, numberB = B.number;
 	reverse(numberA.begin(),numberA.end());
@@ -593,4 +617,46 @@ BigNumber operator%(BigNumber B, BigNumber A){
 BigNumber& BigNumber::operator%=(const BigNumber& A){
 	*this = *this % A;
 	return *this;
+}
+
+BigNumber gcd(BigNumber A, BigNumber B){
+	if (A < 0) A *= -1;
+	if (B < 0) B *= -1;
+	BigNumber zero = 0;
+	while (A % B > zero){
+		A %= B;
+		swap(A,B);
+	}
+	return B;
+}
+
+void swap(BigNumber &A, BigNumber &B){
+	BigNumber C = A;
+	A = B;
+	B = C;
+}
+
+BigNumber gcdExtended(BigNumber a, BigNumber b, BigNumber &x, BigNumber &y){
+	// Kasus dasar
+	if (a == 0){
+		x = 0, y = 1;
+		return b;
+	}
+
+	BigNumber x1, y1;
+	BigNumber gcd = gcdExtended(b%a, a, x1, y1);
+
+	// Update x dan y dengan menggunakan hasil rekursif
+	x = y1 - (b/a) * x1;
+	y = x1;
+	return gcd;
+}
+
+BigNumber modInverse(BigNumber a, BigNumber m){
+	BigNumber x, y;
+	BigNumber g = gcdExtended(a, m, x, y);
+	if (g != 1)
+		throw runtime_error("Tolong lah, GCD(a,m) != 1 please");
+	else
+		return (x%m + m) % m;
 }

@@ -61,6 +61,13 @@ class BigNumber{
 		friend bool operator==(const BigNumber& A, const string& B);
 		friend bool operator==(const string& A, const BigNumber& B);
 
+		/** Operator != **/
+		friend bool operator!=(const BigNumber& A, const BigNumber& B);
+		friend bool operator!=(const BigNumber& A, const ll& B);
+		friend bool operator!=(const ll& A, const BigNumber& B);
+		friend bool operator!=(const BigNumber& A, const string& B);
+		friend bool operator!=(const string& A, const BigNumber& B);
+
 		/** Operator < **/
 		friend bool operator<(const BigNumber& A, const BigNumber& B);
 		friend bool operator<(const BigNumber& A, const ll& B);
@@ -89,21 +96,47 @@ class BigNumber{
 		friend bool operator>=(const BigNumber& A, const string& B);
 		friend bool operator>=(const string& A, const BigNumber& B);
 
-
+		/** Operator + **/
 		friend BigNumber operator+(const BigNumber& A, const BigNumber& B);
 		BigNumber& operator+=(const BigNumber& A);
+
+		/** Operator - **/
 		friend BigNumber operator-(const BigNumber& X, const BigNumber& Y);
 		BigNumber& operator-=(const BigNumber& A);
+
+		/** Operator * **/
 		friend BigNumber operator*(const BigNumber& A, const BigNumber& B);
 		BigNumber& operator*=(const BigNumber& A);
+
+		/** Operator / **/
 		friend BigNumber operator/(BigNumber B, BigNumber A);
 		BigNumber& operator/=(const BigNumber& A);
+
+		/** Operator % **/
 		friend BigNumber operator%(BigNumber B, BigNumber A);
 		BigNumber& operator%=(const BigNumber& A);
 
+		
 	private:
 		vll number;
 		ull size;
 		bool isNegate;
 };
 #endif
+
+/** ADT **/
+/*** FUNGSI GCD ***/
+/* Mencari FPB dari dua buah bilangan A dan B */
+BigNumber gcd(BigNumber A, BigNumber B);
+
+/*** FUNGSI SWAP ***/
+/* Menukar dua buah bilangan A dan B */
+void swap(BigNumber &A, BigNumber &B);
+
+/*** EXTENDED ECULDIAN ALGORITHM ***/
+/* Mencari solusi yang mungkin sehingga ax + by = 1 */
+BigNumber gcdExtended(BigNumber a, BigNumber b, BigNumber &x, BigNumber &y);
+
+/*** MOD INVERSE ***/
+/* Akan dicari sebuah nilai b sehingga (a*b)%m == 1 */
+BigNumber modInverse(BigNumber a, BigNumber m);
