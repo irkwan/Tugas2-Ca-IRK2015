@@ -5,6 +5,9 @@
 #include <iostream>
 #include <deque>
 #include <string>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 /* Commonly Used Constants */
@@ -26,7 +29,7 @@ biginteger::biginteger(){
 	digits.push_back(0);
 }
 
-biginteger::biginteger(long long v){
+biginteger::biginteger(int v){
 	pos = v >= 0;
 	if (!pos)
 		v = -v;
@@ -319,16 +322,23 @@ biginteger biginteger::gcdExtended(biginteger a, biginteger b, biginteger& x, bi
  	
     biginteger x1, y1; // To store results of recursive call
     biginteger gcd = biginteger::gcdExtended(b%a, a, x1, y1);
+
     // Update x and y using results of recursive call
-    /*out << y1 << endl;
-    cout << (b/a) << endl;
-    cout << x1 << endl;
-    cout << (b/a) * x1 << endl;
-    cout << y1 - (b/a) * x1 << endl;*/
     x = y1 - (b/a) * x1;
     y = x1;
 
     return gcd;
+}
+
+biginteger biginteger::generateRandomPrime(int digits){
+	biginteger res = generateRandomNearlyPrime(digits);
+
+	while (!res.isProbablePrime()){
+		cout << res << endl;
+		res += biginteger::TWO;
+	}
+
+	return res;
 }
 
 int biginteger::max(int a, int b){
@@ -434,3 +444,26 @@ pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const big
 	return make_pair(res, remainder);
 }
 
+biginteger biginteger::generateRandomNearlyPrime(int digits){
+	srand(time(NULL));
+
+	if (digits == 1){
+		int n = rand()%9 + 1;
+		if ((n != 2) && (n % 2 == 0))
+			n--;
+		return biginteger(n);
+	}
+	
+	biginteger res;
+	int odds[4] = {1, 3, 7, 9};
+	int least = odds[rand()%4];
+	res.digits[0] = least; // smallest digit must be odd and not 5
+
+	for(int i=0; i<digits-2; i++)
+		res.digits.push_back(rand()%10);
+
+	int most = rand()%9 + 1; // biggest digit must not be zero
+	res.digits.push_back(most);
+	
+	return res;
+}

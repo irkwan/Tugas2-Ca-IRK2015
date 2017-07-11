@@ -17,7 +17,7 @@ public:
 
 	/* Constructors */
 	biginteger(); // zero
-	biginteger(long long v);
+	biginteger(int v);
 	biginteger(const string& v);
 	biginteger(const biginteger& v);
 
@@ -54,13 +54,15 @@ public:
 	friend istream& operator>>(istream &is, biginteger& v);
 	friend ostream& operator<<(ostream &os, const biginteger& v);
 
-	/* Other */
+	/* Other Methods */
 	bool isOdd() const;
 	bool isEven() const;
 	biginteger subDigit(int pos, int n) const; // always yield positive biginteger
 	biginteger subDigit(int pos) const; // always yield positive biginteger
 	static biginteger gcd(biginteger a, biginteger b);
 	static biginteger gcdExtended(biginteger a, biginteger b, biginteger& x, biginteger& y);
+	static biginteger generateRandomPrime(int digits = 20);
+	bool isProbablePrime();
 
 private:
 	deque<int> digits; // reverse-ordered digits
@@ -75,4 +77,5 @@ private:
 	static biginteger multiplySingleDigit(const biginteger& lhs, const biginteger& rhs);
 	static biginteger karatsubaMultiply(const biginteger& lhs, const biginteger& rhs);
 	static pair<biginteger, biginteger> divmod(const biginteger& lhs, const biginteger& rhs);
+	static biginteger generateRandomNearlyPrime(int digits);
 };

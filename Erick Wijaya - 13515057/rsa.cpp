@@ -6,9 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <cstdio>      /* NULL */
-#include <cstdlib>     /* srand, rand */
-#include <ctime>       /* time */
+#include <ctime>
 #include <cmath>
 #include "biginteger.h"
 using namespace std;
@@ -41,8 +39,6 @@ private:
 
 	long long generateRandomPrimeNumber();
 	long long pow2(int n);
-	biginteger gcd(biginteger a, biginteger b);
-	biginteger gcdExtended(biginteger a, biginteger b, biginteger& x, biginteger& y);
 };
 
 RSA::RSA(char* filename) : filename(filename){
@@ -90,19 +86,18 @@ void RSA::initPrimeNumbers(){
 }
 
 void RSA::initSecurityParam(){
-//	n = p * q;
+	n = p * q;
 }
 
 void RSA::initEulerPhi(){
-//	eulerPhi = (p-1)*(q-1);
+	eulerPhi = (p - biginteger::ONE) * (q - biginteger::ONE);
 }
 
 void RSA::initPublicKey(){
 	e = biginteger::THREE;
-//	while (gcd(e, biginteger(265766508)) != 1){
-//		e += biginteger::TWO;
-//	}
-//	cout << e << endl;
+	while (gcd(e, eulerPhi) != biginteger::ONE){
+		e += biginteger::TWO;
+	}
 }
 
 void RSA::initPrivateKey(){
