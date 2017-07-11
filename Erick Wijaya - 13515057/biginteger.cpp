@@ -58,7 +58,6 @@ biginteger::biginteger(const string& v){
 }
 
 biginteger::biginteger(const biginteger& v) : pos(v.pos), digits(v.digits){
-
 }
 
 
@@ -71,6 +70,9 @@ biginteger& biginteger::operator=(const biginteger& rhs){
 	return *this;
 }
 
+biginteger& biginteger::operator=(int rhs){
+	return operator=(biginteger(rhs));
+}
 
 /* Arithmetic Operators */
 biginteger biginteger::operator+(const biginteger& rhs) const{
@@ -98,6 +100,10 @@ biginteger biginteger::operator+(const biginteger& rhs) const{
 			return *this;
 		return *this - (-rhs);
 	}
+}
+
+biginteger biginteger::operator+(int rhs) const{
+	return operator+(biginteger(rhs));
 }
 
 biginteger biginteger::operator-() const{
@@ -138,6 +144,10 @@ biginteger biginteger::operator-(const biginteger& rhs) const{
 	}
 }
 
+biginteger biginteger::operator-(int rhs) const{
+	return operator-(biginteger(rhs));
+}
+
 biginteger biginteger::operator*(const biginteger& rhs) const{
 	biginteger res = karatsubaMultiply(*this, rhs);
 	res.pos = pos == rhs.pos;
@@ -145,9 +155,17 @@ biginteger biginteger::operator*(const biginteger& rhs) const{
 	return res;
 }
 
+biginteger biginteger::operator*(int rhs) const{
+	return operator*(biginteger(rhs));
+}
+
 biginteger biginteger::operator/(const biginteger& rhs) const{
 	biginteger res = divmod(*this, rhs).first;
 	return res;
+}
+
+biginteger biginteger::operator/(int rhs) const{
+	return operator/(biginteger(rhs));
 }
 
 biginteger biginteger::operator%(const biginteger& rhs) const{
@@ -155,9 +173,17 @@ biginteger biginteger::operator%(const biginteger& rhs) const{
 	return res;
 }
 
+biginteger biginteger::operator%(int rhs) const{
+	return operator%(biginteger(rhs));
+}
+
 biginteger& biginteger::operator+=(const biginteger& rhs){
 	*this = *this + rhs;
 	return *this;
+}
+
+biginteger& biginteger::operator+=(int rhs){
+	return operator+=(biginteger(rhs));
 }
 
 biginteger& biginteger::operator-=(const biginteger& rhs){
@@ -165,9 +191,17 @@ biginteger& biginteger::operator-=(const biginteger& rhs){
 	return *this;
 }
 
+biginteger& biginteger::operator-=(int rhs){
+	return operator-=(biginteger(rhs));
+}
+
 biginteger& biginteger::operator*=(const biginteger& rhs){
 	*this = *this * rhs;
 	return *this;
+}
+
+biginteger& biginteger::operator*=(int rhs){
+	return operator*=(biginteger(rhs));
 }
 
 biginteger& biginteger::operator/=(const biginteger& rhs){
@@ -175,9 +209,39 @@ biginteger& biginteger::operator/=(const biginteger& rhs){
 	return *this;
 }
 
+biginteger& biginteger::operator/=(int rhs){
+	return operator/=(biginteger(rhs));
+}
+
 biginteger& biginteger::operator%=(const biginteger& rhs){
 	*this = *this % rhs;
 	return *this;
+}
+
+biginteger& biginteger::operator%=(int rhs){
+	return operator%=(biginteger(rhs));
+}
+
+biginteger& biginteger::operator++(){
+	*this += 1;
+	return *this;
+}
+
+biginteger biginteger::operator++(int d){
+	biginteger before = *this;
+	*this += 1;
+	return before;
+}
+
+biginteger& biginteger::operator--(){
+	*this -= 1;
+	return *this;
+}
+
+biginteger biginteger::operator--(int d){
+	biginteger before = *this;
+	*this -= 1;
+	return before;
 }
 
 biginteger biginteger::abs() const{
@@ -217,8 +281,6 @@ biginteger biginteger::modpow(const biginteger& a, const biginteger& n, const bi
 /* Relational Operators */
 bool biginteger::operator==(const biginteger& rhs) const{
 	bool same = (digits.size() == rhs.digits.size()) && (pos == rhs.pos);
-	//cout << digits.size() << " " << rhs.digits.size() << endl;
-	//cout << same << endl;
 	int i=0;
 	while (same && (i < digits.size())){
 		same = (digits[i] == rhs.digits[i]);
@@ -227,8 +289,16 @@ bool biginteger::operator==(const biginteger& rhs) const{
 	return same;
 }
 
+bool biginteger::operator==(int rhs) const{
+	return operator==(biginteger(rhs));
+}
+
 bool biginteger::operator!=(const biginteger& rhs) const{
 	return !(*this == rhs);
+}
+
+bool biginteger::operator!=(int rhs) const{
+	return operator!=(biginteger(rhs));
 }
 
 bool biginteger::operator>(const biginteger& rhs) const{
@@ -245,18 +315,33 @@ bool biginteger::operator>(const biginteger& rhs) const{
 	}
 }
 
+bool biginteger::operator>(int rhs) const{
+	return operator>(biginteger(rhs));
+}
+
 bool biginteger::operator>=(const biginteger& rhs) const{
 	return !(*this < rhs);
+}
+
+bool biginteger::operator>=(int rhs) const{
+	return operator>=(biginteger(rhs));
 }
 
 bool biginteger::operator<(const biginteger& rhs) const{
 	return (*this != rhs) && !(*this > rhs);
 }
 
+bool biginteger::operator<(int rhs) const{
+	return operator<(biginteger(rhs));
+}
+
 bool biginteger::operator<=(const biginteger& rhs) const{
 	return !(*this > rhs);
 }
 
+bool biginteger::operator<=(int rhs) const{
+	return operator<=(biginteger(rhs));
+}
 
 /* I/O */
 istream& operator>>(istream &is, biginteger& v){
@@ -339,6 +424,10 @@ biginteger biginteger::generateRandomPrime(int digits){
 	}
 
 	return res;
+}
+
+bool biginteger::isProbablePrime(){
+	return true;
 }
 
 int biginteger::max(int a, int b){

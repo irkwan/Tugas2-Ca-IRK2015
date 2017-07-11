@@ -23,20 +23,35 @@ public:
 
 	/* Operator= */
 	biginteger& operator=(const biginteger& rhs);
+	biginteger& operator=(int rhs);
 
 	/* Arithmetic Operators */
 	biginteger operator+(const biginteger& rhs) const;
+	biginteger operator+(int rhs) const;
 	biginteger operator-() const; // unary operator
 	biginteger operator-(const biginteger& rhs) const;
+	biginteger operator-(int rhs) const;
 	biginteger operator*(const biginteger& rhs) const;
+	biginteger operator*(int rhs) const;
 	biginteger operator/(const biginteger& rhs) const;
+	biginteger operator/(int rhs) const;
 	biginteger operator%(const biginteger& rhs) const;
+	biginteger operator%(int rhs) const;
 
 	biginteger& operator+=(const biginteger& rhs);
+	biginteger& operator+=(int rhs);
 	biginteger& operator-=(const biginteger& rhs);
+	biginteger& operator-=(int rhs);
 	biginteger& operator*=(const biginteger& rhs);
+	biginteger& operator*=(int rhs);
 	biginteger& operator/=(const biginteger& rhs);
+	biginteger& operator/=(int rhs);
 	biginteger& operator%=(const biginteger& rhs);
+	biginteger& operator%=(int rhs);
+	biginteger& operator++(); // prefix
+	biginteger operator++(int d); // postfix
+	biginteger& operator--(); // prefix
+	biginteger operator--(int d); // postfix
 
 	biginteger abs() const;
 	static biginteger pow(const biginteger& a, const biginteger& n);
@@ -44,11 +59,17 @@ public:
 
 	/* Relational Operators */
 	bool operator==(const biginteger& rhs) const;
+	bool operator==(int rhs) const;
 	bool operator!=(const biginteger& rhs) const;
+	bool operator!=(int rhs) const;
 	bool operator>(const biginteger& rhs) const;
+	bool operator>(int rhs) const;
 	bool operator>=(const biginteger& rhs) const;
+	bool operator>=(int rhs) const;
 	bool operator<(const biginteger& rhs) const;
+	bool operator<(int rhs) const;
 	bool operator<=(const biginteger& rhs) const;
+	bool operator<=(int rhs) const;
 
 	/* I/O */
 	friend istream& operator>>(istream &is, biginteger& v);
