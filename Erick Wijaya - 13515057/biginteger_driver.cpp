@@ -38,11 +38,9 @@ int main() {
 	cout << b1 % b2 << " " << 54321%987 << endl;
 	cout << b3 % b1 << endl;
 	cout << b4 % b8 << endl;*/
-	string a, b;
-	cin >> a >> b;
-	biginteger b1(a), b2(b);
+	biginteger b1, b2, b3;
+	cin >> b1 >> b2 >> b3;
 
-	//cin >> b1 >> b2;
 	cout << "b1 + b2 = " << b1 + b2 << endl;
 	cout << "b1 - b2 = " << b1 - b2 << endl;
 	cout << "b1 * b2 = " << b1 * b2 << endl;
@@ -59,6 +57,17 @@ int main() {
 	cout << "abs(b1) abs(b2) = " << b1.abs() << " " << b2.abs() << endl;
 	cout << "-b1 -b2 = " << -b1 << " " << -b2 << endl;
 	cout << endl;
+	cout << "gcd(b1,b2) = " << biginteger::gcd(b1, b2) << endl;
+	biginteger x, y;
+	cout << "b1*x + b2*y = (the result) " << biginteger::gcdExtended(b1, b2, x, y) << endl;
+	cout << "x = " << x << " and y = " << y << endl;
+	cout << "b1*x + b2*y = (expected)   " << b1*x + b2*y << endl; 
+	cout << endl;
+	cout << "pow(b1,b2) = " << biginteger::pow(b1, b2) << endl;
+	cout << "modpow(b1,b2,b3) = " << biginteger::modpow(b1, b2, b3) << endl;
+
+
+
 
 	return 0;
 }

@@ -91,6 +91,8 @@ biginteger biginteger::operator+(const biginteger& rhs) const{
 		return res;
 	}
 	else{
+		if (rhs == biginteger::ZERO)
+			return *this;
 		return *this - (-rhs);
 	}
 }
@@ -127,6 +129,8 @@ biginteger biginteger::operator-(const biginteger& rhs) const{
 		}
 	}
 	else{
+		if (rhs == biginteger::ZERO)
+			return *this;
 		return *this + (-rhs);
 	}
 }
@@ -179,6 +183,33 @@ biginteger biginteger::abs() const{
 	return res;
 }
 
+biginteger biginteger::pow(const biginteger& a, const biginteger& n){
+	if (n == biginteger::ZERO)
+		return biginteger::ONE;
+	else if (n == biginteger::ONE)
+		return a;
+	else{
+		biginteger a2 = pow(a, n / biginteger::TWO);
+		if (n.isOdd())
+			return a2 * a2 * a;
+		else
+			return a2 * a2;
+	}
+}
+
+biginteger biginteger::modpow(const biginteger& a, const biginteger& n, const biginteger& m){
+    biginteger base = a;
+    biginteger exp = n;
+    biginteger res = biginteger::ONE;
+    while (exp > biginteger::ZERO)
+    {
+        if (exp.isOdd())
+            res = (res * base) % m;
+        exp /= biginteger::TWO;
+        base = (base * base) % m;
+    }
+    return res;
+}
 
 /* Relational Operators */
 bool biginteger::operator==(const biginteger& rhs) const{
@@ -242,6 +273,14 @@ ostream& operator<<(ostream &os, const biginteger& v){
 	return os;
 }
 
+bool biginteger::isOdd() const{
+	return digits[0] % 2 == 1;
+}
+
+bool biginteger::isEven() const{
+	return !isOdd();
+}
+
 biginteger biginteger::subDigit(int pos, int n) const{
 	biginteger res;
 	int index = digits.size() - pos - 1;
@@ -262,6 +301,34 @@ biginteger biginteger::subDigit(int pos) const{
 		res.digits.push_front(digits[i]);
 	}
 	return res;
+}
+
+biginteger biginteger::gcd(biginteger a, biginteger b){
+	if (a == biginteger::ZERO)
+		return b;
+	else
+		return biginteger::gcd(b%a, a);
+}
+
+biginteger biginteger::gcdExtended(biginteger a, biginteger b, biginteger& x, biginteger& y){
+    if (a == biginteger::ZERO){
+        x = biginteger::ZERO;
+        y = biginteger::ONE;
+        return b;
+    }
+ 	
+    biginteger x1, y1; // To store results of recursive call
+    biginteger gcd = biginteger::gcdExtended(b%a, a, x1, y1);
+    // Update x and y using results of recursive call
+    /*out << y1 << endl;
+    cout << (b/a) << endl;
+    cout << x1 << endl;
+    cout << (b/a) * x1 << endl;
+    cout << y1 - (b/a) * x1 << endl;*/
+    x = y1 - (b/a) * x1;
+    y = x1;
+
+    return gcd;
 }
 
 int biginteger::max(int a, int b){
@@ -366,3 +433,4 @@ pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const big
 
 	return make_pair(res, remainder);
 }
+

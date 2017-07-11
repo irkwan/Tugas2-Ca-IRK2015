@@ -42,7 +42,7 @@ private:
 	long long generateRandomPrimeNumber();
 	long long pow2(int n);
 	biginteger gcd(biginteger a, biginteger b);
-	biginteger gcdExtended(biginteger a, biginteger b, biginteger* x, biginteger* y);
+	biginteger gcdExtended(biginteger a, biginteger b, biginteger& x, biginteger& y);
 };
 
 RSA::RSA(char* filename) : filename(filename){
@@ -106,7 +106,9 @@ void RSA::initPublicKey(){
 }
 
 void RSA::initPrivateKey(){
-
+	// e * d + phi * a = gcd(e,phi) = 1
+	biginteger a;
+	biginteger one = biginteger::gcdExtended(e, eulerPhi, d, a);
 }
 
 void RSA::encrypt(){
@@ -211,30 +213,6 @@ long long RSA::pow2(int n){
 		else
 			return newn * newn * 2;
 	}
-}
-
-biginteger RSA::gcd(biginteger a, biginteger b){
-	if (a == biginteger::ZERO)
-		return b;
-	else
-		return gcd(b%a, a);
-}
-
-biginteger RSA::gcdExtended(biginteger a, biginteger b, biginteger* x, biginteger* y){
-    if (a == biginteger::ZERO){
-        *x = biginteger::ZERO;
-        *y = biginteger::ONE;
-        return b;
-    }
- 
-    biginteger x1, y1; // To store results of recursive call
-    biginteger gcd = gcdExtended(b%a, a, &x1, &y1);
- 
-    // Update x and y using results of recursive call
-    *x = y1 - (b/a) * x1;
-    *y = x1;
- 
-    return gcd;
 }
 
 /* ---------------------------------------------------------------------- */

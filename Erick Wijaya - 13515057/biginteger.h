@@ -39,8 +39,8 @@ public:
 	biginteger& operator%=(const biginteger& rhs);
 
 	biginteger abs() const;
-	biginteger pow() const;
-	biginteger modpow() const;
+	static biginteger pow(const biginteger& a, const biginteger& n);
+	static biginteger modpow(const biginteger& a, const biginteger& n, const biginteger& m);
 
 	/* Relational Operators */
 	bool operator==(const biginteger& rhs) const;
@@ -55,8 +55,12 @@ public:
 	friend ostream& operator<<(ostream &os, const biginteger& v);
 
 	/* Other */
+	bool isOdd() const;
+	bool isEven() const;
 	biginteger subDigit(int pos, int n) const; // always yield positive biginteger
 	biginteger subDigit(int pos) const; // always yield positive biginteger
+	static biginteger gcd(biginteger a, biginteger b);
+	static biginteger gcdExtended(biginteger a, biginteger b, biginteger& x, biginteger& y);
 
 private:
 	deque<int> digits; // reverse-ordered digits
