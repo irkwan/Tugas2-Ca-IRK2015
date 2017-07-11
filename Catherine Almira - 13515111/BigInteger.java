@@ -5,23 +5,11 @@
  * dengan jumlah digit yang besar.
  */
 
-import java.io.File;
-
-import java.io.FileInputStream;
-
-import java.io.FileNotFoundException;
-
-import java.io.IOException;
-
-import java.nio.file.Files;
-
 import java.util.ArrayList;
 
 import java.util.List;
 
 import java.util.Random;
-
-
 
 public class BigInteger {
   private ArrayList<Integer> value;
@@ -726,33 +714,6 @@ public class BigInteger {
     } while ((temp.subtract(hasil)).compareTo(zero) > 0);
     return hasil;
   }
-  
-  /*
-   * Mengembalikan nilai b1 ^ b2.
-   */
-
-  public static BigInteger pow(BigInteger b1, BigInteger b2) throws ArithmeticException {
-    if (b2.sign == -1) {
-      throw new ArithmeticException("negative exponent");
-    }
-    if (b1.sign == 0 && b2.sign == 0) {
-      throw new ArithmeticException("undefine");
-    }
-    if (b1.sign == 0) {
-      return new BigInteger();
-    }
-    if (b2.sign == 0) {
-      return new BigInteger(one);
-    }
-    if (b2.compareTo(one) == 0) {
-      return new BigInteger(b1);
-    }
-    if (mod(b2, two).compareTo(zero) == 0) {
-      return (pow(multiply(b1, b1), divide(b2, two)));
-    } else {
-      return multiply(b1, pow(multiply(b1, b1), divide(b2, two)));
-    }
-  }
 
   /*
    * Mengembalikan nilai b1 ^ b2 mod b3.
@@ -882,36 +843,6 @@ public class BigInteger {
       }
     return hasil;
   }
-  
-  /*
-   * Mengembalikan array of BigInteger yang berisi pecahan this sebesar n digit.
-   */
-
-  public ArrayList<BigInteger> convertToSmallBlock(int n) {
-    BigInteger temp = new BigInteger(this);
-    BigInteger temp2 = new BigInteger();
-    temp2.sign = 1;
-    ArrayList<BigInteger> hasil = new ArrayList<BigInteger>();
-    int i = temp.value.size() - 1;
-    while (temp.value.size() >= n && i >= 0) {
-      for (int j = 0; j < n; j++) {
-        temp2.value.add(0, temp.value.get(i));
-        i--;
-      }
-      temp = temp.removeNDigitForward(n);
-      hasil.add(temp2);
-      temp2 = new BigInteger();
-      temp2.sign = 1;
-    }
-    if (temp.value.size() > 0) {
-      normalize(temp);
-      System.out.println(temp);
-      hasil.add(temp);
-    } else if (this.value.size() % n != 0) {
-      hasil.add(zero);
-    }
-    return hasil;
-  }
 
   /*
    * Mengembalikan BigInteger prima secara acak dengan jumlah digit n.
@@ -923,23 +854,6 @@ public class BigInteger {
       hasil = hasil.add(two);
     }
     return hasil;
-  }
-
-  /*
-   * Mengembalikan BigInteger prima secara acak yang diperoleh dari
-   * file BigPrimeNumber.txt
-   * PrekondisiL: File BigPrimeNymber.txt berisi bilangan prima.
-   */
-
-  public static BigInteger getPrimeNumber() {
-    List<String> lines = null;
-    try {
-        lines = Files.readAllLines(new File("BigPrimeNumber.txt").toPath());
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    Random rand = new Random();
-    return new BigInteger(lines.get(rand.nextInt(lines.size())));
   }
 
   /*
@@ -960,24 +874,5 @@ public class BigInteger {
   	}
   	return output;
   }
-
-  /*public static void main(String args[]) {
-    BigInteger bi = new BigInteger("2712323415435123412341231");
-    BigInteger b2 = new BigInteger("12");
-    BigInteger an = new BigInteger("2");
-    BigInteger b3 = new BigInteger("322");
-    //BigInteger b = generateRandomPrime(2);
-    //BigInteger as = generateRandomPrime(10);
-    //System.out.println(as);
-    boolean a = isProbablePrime(bi);
-    System.out.println(a);
-    BigInteger b = new BigInteger("1234567890");
-    ArrayList<BigInteger> alb = b.convertToSmallBlock(3);
-    System.out.println(alb.get(0));
-    System.out.println(alb.get(1));
-    System.out.println(alb.get(2));
-    System.out.println(alb.size());
-    System.out.println(alb.get(3));
-  }*/
 }
 

@@ -1,6 +1,9 @@
 /*
  * Nama : Catherine Almira
  * NIM  : 13515111
+ * Kelas RSA Generator adalah kelas yang merepresentasikan kunci-kunci yang
+ * diperlukan dalam enkripsi dan dekripsi suatu pesan dengan algoritma kriptografi
+ * RSA.
  */
 
 import java.io.File;
@@ -32,10 +35,10 @@ public class RSAGenerator {
    */
 
   public RSAGenerator() {
-    primeP = BigInteger.getPrimeNumber();
-    primeQ = BigInteger.getPrimeNumber();
+    primeP = BigInteger.generateRandomPrime(20);
+    primeQ = BigInteger.generateRandomPrime(20);
     while (primeP.compareTo(primeQ) == 0) {
-      primeQ = BigInteger.getPrimeNumber();
+      primeQ = BigInteger.generateRandomPrime(20);
     }
     modulus = primeP.multiply(primeQ);
     System.out.println("Prime number 1 : " + primeP);
@@ -72,8 +75,6 @@ public class RSAGenerator {
       fin = new FileInputStream(file);
       fileContent = new byte[(int)file.length()];
       fin.read(fileContent);
-      //String s = new String(fileContent);
-      //System.out.println("File content: " + fileContent);
       fin.close();
     } catch (IOException e) {
       System.out.println("File not found!");
@@ -96,6 +97,10 @@ public class RSAGenerator {
   	return temp;
   }
 
+  /*
+   * Mengembalikan array of biginteger yang dikonversi dari ascii.
+   */
+
   public static BigInteger[] convertASCIIToBigInt2(byte[] fileContent) {
     BigInteger[] hasil = new BigInteger[fileContent.length];
     for (int i = 0; i < fileContent.length; i++) {
@@ -103,6 +108,10 @@ public class RSAGenerator {
     }
     return hasil;
   }
+
+  /*
+   * Mengembalikan array of byte yang dikonversi dari BigInteger.
+   */
 
   public static byte[] convertBigIntToASCII(BigInteger[] fileContent) {
   	byte[] hasil = new byte[fileContent.length];
@@ -112,6 +121,10 @@ public class RSAGenerator {
   	return hasil;
   }
 
+  /*
+   * Mengembalikan string hasil konversi dari ascii.
+   */
+
   public static String convertASCIIToText(byte[] message) {
   	String hasil = new String(message);
   	return hasil;
@@ -119,6 +132,8 @@ public class RSAGenerator {
 
   /*
    * Mengembalikan BigInteger hasil enkripsi message.
+   * message diubah menjadi suatu BigInteger baru yang BigInteger sebelumnya ditambah
+   * dengan bilangan random yang dikali dengan 256.
    */
 
   public BigInteger encrypt(BigInteger message) {
@@ -133,32 +148,16 @@ public class RSAGenerator {
 
   /*
    * Mengembalikan BigInteger hasil dekripsi encrypted message.
+   * BigInteger hasil dekripsi dimod dengan 256 agar menghasilkan nilai yang sama dengan
+   * saat sebelum dienkripsi.
    */
 
   public BigInteger decrypt(BigInteger encrypted) {
   	return BigInteger.mod(BigInteger.modPow(encrypted, deKey, modulus), mul);
   }
 
-  /*
-   * Mengembalikan String hasil enkripsi message.
-   */
-
-  public String encrypt(String message){
-	return this.encrypt(new BigInteger(message)).toString();
-  }
-
-  /*
-   * Mengembalikan String hasil dekripsi encrypted message.
-   */
-
-  public String decrypt(String message){
-    return this.decrypt(new BigInteger(message)).toString();
-  }
-
   public static void main(String args[]) {
   	try {
-
-
   	  byte[] fileContent = readFile("sample.txt");
   	  BigInteger[] content2 = convertASCIIToBigInt2(fileContent); //dalam bentuk array BigInteger
       //start timer
@@ -187,19 +186,5 @@ public class RSAGenerator {
   	} catch (IOException e) {
       System.out.println("File not found!");
     }
-    /*BigInteger b1 = new BigInteger("10007");
-    BigInteger b2 = new BigInteger("10009");
-    BigInteger b3 = new BigInteger("3");
-    BigInteger nMin = (b1.subtract(one)).multiply(b2.subtract(one));
-    System.out.println(nMin);
-    System.out.println(BigInteger.divide(nMin, b3));
-    BigInteger b = BigInteger.gcd(nMin, b3);
-    System.out.println(b);*/
-    //BigInteger b1 = new BigInteger("263718416706237632659782657716364816346912645179953791341");
-    //BigInteger b2 = new BigInteger("1012312412");
-    //BigInteger b3 = new BigInteger("123215123");
-    //BigInteger b = BigInteger.generateRandomPrime(15);
-  	//System.out.println(b);
-
   }
 }
