@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="RSAEncryptor:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/RSAEncryptor_jar</output-path>
+    <root id="archive" name="RSAEncryptor.jar">
+      <element id="module-output" name="RSAEncryptor" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.5/commons-io-2.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.9/commons-codec-1.9.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
