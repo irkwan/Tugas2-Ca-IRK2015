@@ -1,3 +1,57 @@
+"""
+	Addition Operator
+"""
+def add(x,y):
+	x = str(x)
+	y = str(y)
+
+	if len(x)<len(y):
+		temp = x
+		x = y
+		y = temp
+	min = len(y)
+	reminder = 0
+	result = " "
+	for i in range(min):
+		curr = int(x[len(x)-1-i])+int(y[len(y)-1-i])+reminder
+		reminder = curr/10
+		curr = curr%10
+		result = str(curr)+result
+
+	x = list(x)
+	x[len(x)-len(y)-1] = str(int(x[len(x)-len(y)-1])+reminder)
+	x="".join(x)
+	result = x[:len(x)-len(y)] + result
+	return result
+
+"""
+	Minus Operator
+"""
+def min(x,y):
+	x = str(x)
+	y = str(y)
+	if len(x)<len(y):
+		temp = x
+		x = y
+		y = temp
+	min = len(y)
+	reminder = 0
+	result = " "
+	for i in range(min):
+		curr = int(x[len(x)-1-i])+int(y[len(y)-1-i])-reminder
+		if curr<0:
+			reminder = 1
+			curr = 10+curr
+		else:
+			reminder = 0
+		result = str(curr)+result
+
+	x = list(x)
+	x[len(x)-len(y)-1] = str(int(x[len(x)-len(y)-1])-reminder)
+	x="".join(x)
+	result = x[:len(x)-len(y)] + result
+	return result
+
 def divmod(x,y):
 	q=0
 	while x>=y:
@@ -14,11 +68,11 @@ def pow(x,y):
 	while y>0:
 		# If power is odd
 		if y%2==1:
-			result=(mul(result,x))%MOD
+			dummy,result=divmod((mul(result,x)),MOD)
 			# Divide the power by 2
-			y = y/2
+			y,dummy = divmod(y,2)
 			# Multiply base to itself
-			x = (mul(x,x))%MOD
+			dummy,x = divmod((mul(x,x)),MOD)
 	return result
 
 """
@@ -42,11 +96,11 @@ def mul(x,y):
 
 		# Compute three multiplications, with recursive
 		z0 = mul(x0,y0)
-		z1 = mul(x1+x0,y1+y0)
+		z1 = mul(add(x1,x0),add(y1,y0))
 		z2 = mul(x1,y1)
 
 		# Result
-		result = mul(z2,pow(B,mul(2,m))) + mul((z1-z2-z0),pow(B,m)) + z0
+		result = add(mul(z2,pow(B,mul(2,m))),(add(mul((min(z1,min(z2,z0))),pow(B,m)),z0)))
 		return result
 
 x = 102131243242432
