@@ -5,9 +5,23 @@
  * dengan jumlah digit yang besar.
  */
 
+import java.io.File;
+
+import java.io.FileInputStream;
+
+import java.io.FileNotFoundException;
+
+import java.io.IOException;
+
+import java.nio.file.Files;
+
 import java.util.ArrayList;
 
+import java.util.List;
+
 import java.util.Random;
+
+
 
 public class BigInteger {
   private ArrayList<Integer> value;
@@ -499,43 +513,60 @@ public class BigInteger {
   }
 
   /*
+   * Mengembalikan hasil pembagian dan modulus pada array of BigInteger.
+   * indeks 0 untuk hasil bagi dan indeks 1 untuk sisa hasil bagi (mod).
+   */
+
+  public static BigInteger[] divideModAbs(BigInteger b1, BigInteger b2) throws ArithmeticException {
+    if (b2.sign == 0) {
+      throw new ArithmeticException("divide by zero");
+    }
+    BigInteger[] hasil = new BigInteger[2];
+    for (int i = 0; i < 2; i++) {
+      hasil[i] = new BigInteger();
+    }
+    if (b1.sign == 0) {
+      return hasil;
+    }
+    if (b1.abs().compareTo(b2.abs()) == -1) { //b1 < b2
+      hasil[1] = new BigInteger(b1);
+    }
+    BigInteger tempDiv = new BigInteger();
+    BigInteger tempMod = new BigInteger();
+    int count = 0;
+    tempDiv.sign = 1;
+    tempMod.sign = 1;
+    for (int i = b1.value.size() - b2.value.size(); i < b1.value.size(); i++) {
+      tempMod.value.add(b1.value.get(i));
+    }
+    for (int i = b1.value.size() - b2.value.size(); i >= 0; i--) {
+      normalize(tempMod);
+      while (tempMod.subtract(b2).compareTo(zero) >= 0) {
+        count++;
+        tempMod = tempMod.subtract(b2);
+      }
+      if (i > 0) {
+        if (tempMod.sign == 0) {
+          tempMod.sign = 1;
+        }
+        tempMod.value.add(0, b1.value.get(i - 1));
+      }
+      tempDiv.value.add(0, count);
+      count = 0;
+    }
+    normalize(tempDiv);
+    normalize(tempMod);
+    hasil[0] = tempDiv;
+    hasil[1] = tempMod;
+    return hasil;
+  }
+
+  /*
    * Mengembalikan hasil pembagian b1 / b2 tanpa memerhatikan sign.
    */
 
   public static BigInteger divideAbs(BigInteger b1, BigInteger b2) throws ArithmeticException {
-  	if (b2.sign == 0) {
-  	  throw new ArithmeticException("divide by zero");
-  	}
-  	if (b1.sign == 0) {
-  	  return new BigInteger();
-  	}
-  	if (b1.abs().compareTo(b2.abs()) == -1) { //b1 < b2
-  	  return new BigInteger();
-  	}
-  	BigInteger hasil = new BigInteger();
-    BigInteger temp = new BigInteger();
-    int count = 0;
-    hasil.sign = 1;
-    temp.sign = 1;
-    for (int i = b1.value.size() - b2.value.size(); i < b1.value.size(); i++) {
-      temp.value.add(b1.value.get(i));
-    }
-    for (int i = b1.value.size() - b2.value.size(); i >= 0; i--) {
-      while (temp.subtract(b2).compareTo(zero) >= 0) {
-        count++;
-        temp = temp.subtract(b2);
-      }
-      if (i > 0) {
-        if (temp.sign == 0) {
-          temp.sign = 1;
-        }
-      	temp.value.add(0, b1.value.get(i - 1));
-      }
-      hasil.value.add(0, count);
-      count = 0;
-    }
-    normalize(hasil);
-  	return hasil;
+  	return new BigInteger(divideModAbs(b1, b2)[0]);
   }
 
   /*
@@ -570,39 +601,7 @@ public class BigInteger {
    */
 
   public static BigInteger modAbs(BigInteger b1, BigInteger b2) throws ArithmeticException {
-    if (b2.sign == 0) {
-      throw new ArithmeticException("divide by zero");
-    }
-    if (b1.sign == 0) {
-      return new BigInteger();
-    }
-    if (b1.abs().compareTo(b2.abs()) == -1) { //b1 < b2
-      return new BigInteger();
-    }
-    BigInteger hasil = new BigInteger();
-    BigInteger temp = new BigInteger();
-    int count = 0;
-    hasil.sign = 1;
-    temp.sign = 1;
-    for (int i = b1.value.size() - b2.value.size(); i < b1.value.size(); i++) {
-      temp.value.add(b1.value.get(i));
-    }
-    for (int i = b1.value.size() - b2.value.size(); i >= 0; i--) {
-      while (temp.subtract(b2).compareTo(zero) >= 0) {
-        count++;
-        temp = temp.subtract(b2);
-      }
-      if (i > 0) {
-        if (temp.sign == 0) {
-          temp.sign = 1;
-        }
-        temp.value.add(0, b1.value.get(i - 1));
-      }
-      hasil.value.add(0, count);
-      count = 0;
-    }
-    normalize(temp);
-    return temp;
+    return new BigInteger(divideModAbs(b1, b2)[1]);
   }
 
   /*
@@ -760,7 +759,6 @@ public class BigInteger {
    */
 
   public static BigInteger modPow(BigInteger b1, BigInteger b2, BigInteger b3) throws ArithmeticException {
-    BigInteger hasil;
     if (b2.sign == -1) {
       throw new ArithmeticException("negative exponent");
     }
@@ -774,17 +772,30 @@ public class BigInteger {
       return new BigInteger();
     }
     if (b2.sign == 0) {
-      hasil = mod(one, b3);
+      if (b3.compareTo(one) > 0) {
+        return new BigInteger(one);
+      } else {
+        return new BigInteger();
+      }
+      //hasil = mod(one, b3);
     }
     if (b2.compareTo(one) == 0) {
-      hasil = mod(b1, b3);
+      return new BigInteger(mod(b1, b3));
     }
-    if (mod(b2, two).compareTo(zero) == 0) {
+    BigInteger[] halfpow = divideModAbs(b2, two);
+    BigInteger hasil = modPow(b1, halfpow[0], b3);
+    hasil = multiply(hasil, hasil);
+    if (halfpow[1].compareTo(zero) != 0) {
+      hasil = multiply(hasil, b1);
+    }
+    return mod(hasil, b3);
+    /*if (mod(b2, two).compareTo(zero) == 0) {
       hasil =  pow(mod(multiply(b1, b1), b3), divide(b2, two));
     } else {
       hasil = mod(multiply(b1, pow(mod(multiply(b1, b1), b3), divide(b2, two))), b3);
-    }
-    return hasil;
+    }*/
+
+    //return hasil;
   }
 
   /*
@@ -854,6 +865,9 @@ public class BigInteger {
    */
 
   public static BigInteger generateRandom(int n) {
+    if (n == 0) {
+      return new BigInteger();
+    }
     BigInteger hasil = new BigInteger();
     Random rand = new Random();
     int temp;
@@ -909,7 +923,24 @@ public class BigInteger {
       hasil = hasil.add(two);
     }
     return hasil;
-  }  
+  }
+
+  /*
+   * Mengembalikan BigInteger prima secara acak yang diperoleh dari
+   * file BigPrimeNumber.txt
+   * PrekondisiL: File BigPrimeNymber.txt berisi bilangan prima.
+   */
+
+  public static BigInteger getPrimeNumber() {
+    List<String> lines = null;
+    try {
+        lines = Files.readAllLines(new File("BigPrimeNumber.txt").toPath());
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    Random rand = new Random();
+    return new BigInteger(lines.get(rand.nextInt(lines.size())));
+  }
 
   /*
    * Mengembalikan String yang merepresentasikan nilai BigInteger.

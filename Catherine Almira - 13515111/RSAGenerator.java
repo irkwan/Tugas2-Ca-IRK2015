@@ -11,40 +11,35 @@ import java.io.FileNotFoundException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
+import java.util.Random;
 
+import java.util.Scanner;
 
 public class RSAGenerator {
   private BigInteger primeP;
   private BigInteger primeQ;
+  private BigInteger modulus;
   private BigInteger enKey; //kunci enkripsi
   private BigInteger deKey; //kunci dekripsi
 
   private static BigInteger one = new BigInteger("1");
-
+  private static BigInteger mul = new BigInteger("256");
+  
   /*
    * Konstruktor tanpa parameter.
-   * Tidak digenerate secara random.
+   * Memilih 2 bilangan prima secara acak (primeP, primeQ), mengenerate kunci enkripsi
+   * (enKey) dan kunci dekripsi (deKey). 
    */
 
   public RSAGenerator() {
-    
-    primeP = new BigInteger("47");
-    primeQ = new BigInteger("71");
-    enKey = new BigInteger("79");
-    deKey = enKey.modInverse((primeP.subtract(one).multiply(primeQ.subtract(one))));
-  }
-
-  /*
-   * Konstruktor dengan parameter n sebagai jumlah digit dari primeP dan primeQ yang diharapkan. 
-   */
-
-  public RSAGenerator(int n) {
-    primeP = BigInteger.generateRandomPrime(n);
-    primeQ = BigInteger.generateRandomPrime(n);
+    primeP = BigInteger.getPrimeNumber();
+    primeQ = BigInteger.getPrimeNumber();
     while (primeP.compareTo(primeQ) == 0) {
-      primeQ = BigInteger.generateRandomPrime(n);
+      primeQ = BigInteger.getPrimeNumber();
     }
+    modulus = primeP.multiply(primeQ);
+    System.out.println("Prime number 1 : " + primeP);
+    System.out.println("Prime number 2 : " + primeQ);
     BigInteger nMin = (primeP.subtract(one)).multiply(primeQ.subtract(one));
     BigInteger temp = new BigInteger("3");
     BigInteger two = new BigInteger("2");
@@ -60,7 +55,9 @@ public class RSAGenerator {
         enKey = enKey.add(two);
       }
     }
+    System.out.println("Public key : " + enKey);
     deKey = enKey.modInverse(nMin);
+    System.out.println("Private key : " + deKey);
   }
 
   /*
@@ -99,15 +96,39 @@ public class RSAGenerator {
   	return temp;
   }
 
-  
+  public static BigInteger[] convertASCIIToBigInt2(byte[] fileContent) {
+    BigInteger[] hasil = new BigInteger[fileContent.length];
+    for (int i = 0; i < fileContent.length; i++) {
+      hasil[i] = new BigInteger(Byte.toString((byte)fileContent[i]));
+    }
+    return hasil;
+  }
+
+  public static byte[] convertBigIntToASCII(BigInteger[] fileContent) {
+  	byte[] hasil = new byte[fileContent.length];
+  	for (int i = 0; i < fileContent.length; i++) {
+  	  hasil[i] = Byte.valueOf(fileContent[i].toString());
+  	}
+  	return hasil;
+  }
+
+  public static String convertASCIIToText(byte[] message) {
+  	String hasil = new String(message);
+  	return hasil;
+  }
 
   /*
    * Mengembalikan BigInteger hasil enkripsi message.
    */
 
   public BigInteger encrypt(BigInteger message) {
-    BigInteger modulus = primeP.multiply(primeQ);
-    return BigInteger.modPow(message, enKey, modulus);
+  	BigInteger sub = new BigInteger("255");
+  	BigInteger temp = BigInteger.divide(modulus.subtract(sub), sub);
+  	int len = temp.toString().length();
+  	if (len > 0) {
+  	  len--;
+  	}
+    return BigInteger.modPow(message.add(BigInteger.generateRandom(len).multiply(mul)), enKey, modulus);
   }
 
   /*
@@ -115,8 +136,7 @@ public class RSAGenerator {
    */
 
   public BigInteger decrypt(BigInteger encrypted) {
-  	BigInteger modulus = primeP.multiply(primeQ);
-  	return BigInteger.modPow(encrypted, deKey, modulus);
+  	return BigInteger.mod(BigInteger.modPow(encrypted, deKey, modulus), mul);
   }
 
   /*
@@ -137,29 +157,49 @@ public class RSAGenerator {
 
   public static void main(String args[]) {
   	try {
+
+
   	  byte[] fileContent = readFile("sample.txt");
-  	  BigInteger content = convertASCIIToBigInt(fileContent);
-  	  ArrayList<BigInteger> contentBlock = content.convertToSmallBlock(3);
-  	  RSAGenerator rsa = new RSAGenerator();
-  	  ArrayList<BigInteger> encrypted = new ArrayList<BigInteger>();
-  	  ArrayList<BigInteger> decrypted = new ArrayList<BigInteger>();
-  	  //Proses enkripsi
-  	  for (int i = 0; i < contentBlock.size(); i++) {
-        encrypted.add(rsa.encrypt(contentBlock.get(i)));
-  	  }
-  	  //Preses dekripsi
-  	  for (int i = 0; i < encrypted.size(); i++) {
-  	  	//System.out.println(encrypted.get(i));
-  	  	decrypted.add(rsa.decrypt(encrypted.get(i)));
-  	  }
-  	  
-  	  //String decrypted = rsa.decrypt(encrypted);
-  	  System.out.println(decrypted);
+  	  BigInteger[] content2 = convertASCIIToBigInt2(fileContent); //dalam bentuk array BigInteger
+      //start timer
+  	  long startTime = System.currentTimeMillis();
+  	  //generate public key dan private key
+      RSAGenerator rsa = new RSAGenerator();
+      //enkripsi
+      System.out.println("Encrypting...");
+      BigInteger[] encrypted = new BigInteger[content2.length];
+      for (int i = 0; i < content2.length; i++) {
+        encrypted[i] = rsa.encrypt(content2[i]);
+        System.out.println(encrypted[i]);
+      }
+      //stop timer (enkripsi selesai)
+      long endTime = System.currentTimeMillis();
+      System.out.println("Decrypting...");
+      //dekripsi
+      BigInteger[] decrypted = new BigInteger[encrypted.length];
+      for (int i = 0; i < encrypted.length; i++) {
+        decrypted[i] = rsa.decrypt(encrypted[i]);
+        System.out.println(decrypted[i]);
+      }
+      System.out.println("Finish");
+      System.out.println(convertASCIIToText(convertBigIntToASCII(decrypted)));
+      System.out.println("Execution time " + (endTime - startTime) + " ms");
   	} catch (IOException e) {
       System.out.println("File not found!");
     }
-
-  	
+    /*BigInteger b1 = new BigInteger("10007");
+    BigInteger b2 = new BigInteger("10009");
+    BigInteger b3 = new BigInteger("3");
+    BigInteger nMin = (b1.subtract(one)).multiply(b2.subtract(one));
+    System.out.println(nMin);
+    System.out.println(BigInteger.divide(nMin, b3));
+    BigInteger b = BigInteger.gcd(nMin, b3);
+    System.out.println(b);*/
+    //BigInteger b1 = new BigInteger("263718416706237632659782657716364816346912645179953791341");
+    //BigInteger b2 = new BigInteger("1012312412");
+    //BigInteger b3 = new BigInteger("123215123");
+    //BigInteger b = BigInteger.generateRandomPrime(15);
+  	//System.out.println(b);
 
   }
 }
