@@ -1,11 +1,12 @@
 package rsa;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -20,20 +21,24 @@ public class Message {
     this.content = content;
   }
 
-  public static Message fromString (String string, Charset charset) {
-    return new Message(string.getBytes(charset));
+  public static Message fromString (String string, String charsetName) throws UnsupportedEncodingException {
+    return new Message(string.getBytes(charsetName));
   }
 
-  public String toString (Charset charset) {
-    return new String(content, charset);
+  public String toString (String charsetName) throws UnsupportedEncodingException {
+    return new String(content, charsetName);
+  }
+
+  public static Message fromHexString (String string) {
+    return new Message(DatatypeConverter.parseHexBinary(string));
   }
 
   public String toHexString () {
-    return toBigNumber().toHexString();
+    return DatatypeConverter.printHexBinary(content);
   }
 
-  public static Message fromFile (Path path) throws IOException {
-    return new Message(Files.readAllBytes(path));
+  public static Message fromFile (File file) throws IOException {
+    return new Message(Files.readAllBytes(file.toPath()));
   }
 
   public BigNumber toBigNumber () {
@@ -44,13 +49,17 @@ public class Message {
     return new Message(bigNumber.toByteArray());
   }
 
-  public void toFile (Path path) throws IOException {
-    Files.write(path, content);
+  public void toFile (File file) throws IOException {
+    Files.write(file.toPath(), content);
   }
 
-  public Message encode (String label, Charset labelCharset, String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, IOException, RSAException {
-    byte[] labelHash = hash(label.getBytes(labelCharset), hashAlgorithm);
-    int hashLength = labelHash.length;
+  public static int getLengthLimit (String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException {
+    return modulusByteCount - 2 * hashLength(hashAlgorithm) - 2;
+  }
+
+  public Message encode (String label, String labelCharsetName, String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, IOException, RSAException {
+    byte[] labelHash = hash(label.getBytes(labelCharsetName), hashAlgorithm);
+    int hashLength = hashLength(hashAlgorithm);
 
     if (content.length > modulusByteCount - 2 * hashLength - 2) {
       throw new RSAException("Message length too long");
@@ -88,9 +97,9 @@ public class Message {
     return new Message(outputStream.toByteArray());
   }
 
-  public Message decode (String label, Charset labelCharset, String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, IOException, RSAException {
-    byte[] labelHash = hash(label.getBytes(labelCharset), hashAlgorithm);
-    int hashLength = labelHash.length;
+  public Message decode (String label, String labelCharsetName, String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, IOException, RSAException {
+    byte[] labelHash = hash(label.getBytes(labelCharsetName), hashAlgorithm);
+    int hashLength = hashLength(hashAlgorithm);
 
     if (content.length != modulusByteCount || modulusByteCount < 2 * hashLength + 2) {
       throw new RSAException("Decryption error");
@@ -125,6 +134,10 @@ public class Message {
 
   private static byte[] hash (byte[] message, String hashAlgorithm) throws NoSuchAlgorithmException, IOException {
     return MessageDigest.getInstance(hashAlgorithm).digest(message);
+  }
+
+  private static int hashLength (String hashAlgorithm) throws NoSuchAlgorithmException {
+    return MessageDigest.getInstance(hashAlgorithm).getDigestLength();
   }
 
   private static byte[] maskGenerationFunction (byte[] seed, int length, String hashAlgorithm) throws NoSuchAlgorithmException, IOException {

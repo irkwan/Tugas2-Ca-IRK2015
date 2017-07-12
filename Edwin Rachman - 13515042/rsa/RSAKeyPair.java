@@ -16,20 +16,16 @@ public class RSAKeyPair {
     this.privateKey = privateKey;
   }
 
-  public static RSAKeyPair generateKeyPair (int bits) {
-    BigNumber lowerBound = BigNumber.ZERO;
-    BigNumber upperBound = BigNumber.getMaxValue(bits / 64);
-    BigNumber prime1, prime2, phi;
-    BigNumber publicExponent = BigNumber.fromInt(65537);
+  public static RSAKeyPair generateKeyPair (BigNumber prime1, BigNumber prime2, BigNumber publicExponent) throws RSAException {
+    BigNumber phi;
 
-    do {
-      prime1 = BigNumber.generatePrime(lowerBound, upperBound);
-      prime2 = BigNumber.generatePrime(lowerBound, upperBound);
-      prime1 = prime1.resize(prime1.getSize() * 2);
-      prime2 = prime2.resize(prime2.getSize() * 2);
-      phi = prime1.subtract(BigNumber.ONE).multiply(prime2.subtract(BigNumber.ONE));
+    prime1 = prime1.resize(prime1.getSize() * 2);
+    prime2 = prime2.resize(prime2.getSize() * 2);
+    phi = prime1.subtract(BigNumber.ONE).multiply(prime2.subtract(BigNumber.ONE));
+
+    if (!publicExponent.greatestCommonDivisor(phi).equalTo(BigNumber.ONE)) {
+      throw new RSAException("Public exponent and phi are not coprimes");
     }
-    while (!publicExponent.greatestCommonDivisor(phi).equalTo(BigNumber.ONE));
 
     BigNumber modulus = prime1.multiply(prime2);
     BigNumber privateExponent = publicExponent.modularInverse(phi);
@@ -39,18 +35,28 @@ public class RSAKeyPair {
             null, null, null));
   }
 
-  public Message encrypt (Message message, String label, Charset labelCharset, String hashAlgorithm) throws NoSuchAlgorithmException, IOException, RSAException {
+  public Message encrypt (Message message, String label, String labelCharsetName, String hashAlgorithm)
+      throws NoSuchAlgorithmException, IOException, RSAException {
     return Message.fromBigNumber(publicKey.encryptionPrimitive(
-        message.encode(label, labelCharset, hashAlgorithm, publicKey.getModulusByteCount())
+        message.encode(label, labelCharsetName, hashAlgorithm, publicKey.getModulusByteCount())
             .toBigNumber()));
   }
 
-  public Message decrypt (Message message, String label, Charset labelCharset, String hashAlgorithm) throws NoSuchAlgorithmException, IOException, RSAException {
+  public Message decrypt (Message message, String label, String labelCharsetName, String hashAlgorithm)
+      throws NoSuchAlgorithmException, IOException, RSAException {
     return Message.fromBigNumber(privateKey.decryptionPrimitive(message.toBigNumber()))
-        .decode(label, labelCharset, hashAlgorithm, privateKey.getModulusByteCount());
+        .decode(label, labelCharsetName, hashAlgorithm, privateKey.getModulusByteCount());
   }
 
-  public static void main (String[] args) throws Exception {
+  public RSAPublicKey getPublicKey () {
+    return publicKey;
+  }
+
+  public RSAPrivateKey getPrivateKey () {
+    return privateKey;
+  }
+
+  public static void main (String[] args) throws Exception {/*
     Charset charset = Charset.forName("UTF-8");
     String algorithm = "SHA-1";
     RSAKeyPair rsaKeyPair = RSAKeyPair.generateKeyPair(512);
@@ -68,7 +74,7 @@ public class RSAKeyPair {
     System.out.println(output1.toString(charset));
 
     Message output2 = rsaKeyPair.decrypt(cipherText2, "", charset, algorithm);
-    System.out.println(output2.toString(charset));
+    System.out.println(output2.toString(charset));*/
   }
 
 }

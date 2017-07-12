@@ -19,6 +19,14 @@ public class RSAPublicKey implements Serializable {
     return modulus.getSize() * 4;
   }
 
+  public String getModulusText () {
+    return modulus.toHexString();
+  }
+
+  public String getPublicExponentText () {
+    return publicExponent.toHexString();
+  }
+
   public void toFile () {
 
   }
