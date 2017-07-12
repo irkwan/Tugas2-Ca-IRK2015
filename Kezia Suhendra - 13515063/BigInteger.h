@@ -1,60 +1,75 @@
-//NIM     : 13515063
-//Nama    : Kezia Suhendra
+//NIM      : 13515063
+//Nama     : Kezia Suhendra
 
 #ifndef BIGINT_H_
 #define BIGINT_H_
-
+#include <iostream>
 #include <string>
-#include <vector>
-#include<iostream>
+#include <stdlib.h>
+#include "PrimeData.h"
 
 using namespace std;
 
-class BigInteger {
+class BigInt {
 public:
-  BigInteger();
-  BigInteger(int);
-  BigInteger(string&);
-  BigInteger(const BigInteger&);
-  BigInteger operator=(const BigInteger& opr);
-  BigInteger absolute() const;
-  BigInteger pow(int p);
-  friend BigInteger operator+=(BigInteger&, const BigInteger&);
-  friend BigInteger operator-=(BigInteger&, const BigInteger&);
-  friend BigInteger operator*=(BigInteger&, const BigInteger&);
-  friend BigInteger operator/=(BigInteger&, const BigInteger&);
-  friend BigInteger operator%=(BigInteger&, const BigInteger&);
-  friend BigInteger operator+(const BigInteger&, const BigInteger&);
-  friend BigInteger operator++(BigInteger&);
-  friend BigInteger operator++(BigInteger&, int);
-  friend BigInteger operator-(const BigInteger&, const BigInteger&);
-  friend BigInteger operator-(const BigInteger&);
-  friend BigInteger operator--(BigInteger&);
-  friend BigInteger operator--(BigInteger&, int);
-  friend BigInteger operator*(const BigInteger&, const BigInteger&);
-  friend BigInteger operator/(const BigInteger&, const BigInteger&);
-  friend BigInteger operator%(const BigInteger&, const BigInteger&);
-  friend bool operator>(const BigInteger&, const BigInteger&);
-  friend bool operator<(const BigInteger&, const BigInteger&);
-  friend bool operator>=(const BigInteger&, const BigInteger&);
-  friend bool operator<=(const BigInteger&, const BigInteger&);
-  friend bool operator!=(const BigInteger&, const BigInteger&);
-  friend bool operator==(const BigInteger&, const BigInteger&);
-  friend ostream& operator<<(ostream&, const BigInteger&);
-  friend istream& operator>>(istream&, BigInteger&);
-  friend BigInteger gcd(BigInteger, BigInteger);
-  friend BigInteger lcm(BigInteger, BigInteger);
-  friend BigInteger modPow(BigInteger, BigInteger, BigInteger);
-
-  static const BigInteger ZERO;
-  static const BigInteger ONE;
-  static const BigInteger TWO;
-  static const BigInteger TEN;
-
+  BigInt();
+  BigInt(const int&);
+  BigInt(const BigInt&);
+  BigInt(string, int);
+  void GenFromHexString(string str);
+  void GenFromBinString(string str);
+  void GenFromByteString(const string& buf);
+  string ToString() const;
+  string ToHexString() const;
+  BigInt& operator= (const BigInt&);
+  BigInt& operator= (int& a) {
+    Clear();
+    num[0] = a;
+    return *this;
+  }
+  BigInt& operator>> (const int&);
+  BigInt& operator<< (const int&);
+  int GetBitLength() const;
+  int GetLength() const;
+  bool TestSign() const {return sign;}
+  void Clear();
+  void Random(int digit);
+  void Randomsmall(int digit);
+  bool IsOdd() const {return (num[0] & 1);}
+  BigInt operator+ (const BigInt&) const;
+  BigInt operator- (const BigInt&) const;
+  BigInt operator- (const int&) const;
+  BigInt operator* (const BigInt&) const;
+  BigInt operator* (const unsigned int&) const;
+  BigInt operator% (const BigInt&) const;
+  int operator% (const int&) const;
+  BigInt operator/ (const BigInt&) const;
+  BigInt operator& (const BigInt&) const;
+  BigInt operator^ (const BigInt&) const;
+  BigInt operator| (const BigInt&) const;
+  bool operator< (const BigInt&) const;
+  bool operator> (const BigInt&) const;
+  bool operator<= (const int&) const;
+  bool operator== (const BigInt&) const;
+  bool operator== (const int&) const;
+  friend ostream& operator<< (ostream&, const BigInt&);
+  static BigInt ModPow(const BigInt& n, const BigInt& p, const BigInt& m);
+  static BigInt Gcd(const BigInt& m, const BigInt& n);
+  static BigInt Euc(BigInt& E, BigInt& A);
+  static BigInt GcdExtended(const BigInt& a, const BigInt& b, BigInt& x, BigInt& y);
 private:
-  vector<char> number;
+  static const size_t _capacity = 128 + 1;
+  unsigned int num[_capacity];
   bool sign;
-  void trimZero();
+  void output(ostream& out) const;
+  int HexCharToInt(char c);
+  char IntToHexChar(int n);
+};
+
+enum STRING_TYPE {
+  BIN_STRING = 2,
+  HEX_STRING = 16,
+  BYTE_STRING = 10
 };
 
 #endif
