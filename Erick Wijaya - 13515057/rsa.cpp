@@ -25,13 +25,17 @@ private:
 	biginteger e; // public key
 	biginteger d; // private key
 
+	biginteger p, q;
+	biginteger dp, dq;
+	biginteger qInv;
+
 	static const int DEFAULT_DIGITS = 20;
 };
 
 RSA::RSA(int digits){
 	// Initialize Prime Numbers
-	biginteger p = biginteger::generateRandomProbablePrime(digits);
-	biginteger q = biginteger::generateRandomProbablePrime(digits);
+	p = biginteger::generateRandomProbablePrime(digits);
+	q = biginteger::generateRandomProbablePrime(digits);
 	while (p == q){
 		q = biginteger::generateRandomProbablePrime(digits);
 	}
@@ -55,34 +59,46 @@ RSA::RSA(int digits){
 		d += eulerPhi;
 
 	// Initialize for RSA-CRT Decryption
+	dp = d % (p - 1);
+	dq = d % (q - 1);
+	gcd = biginteger::gcdExtended(q, p, qInv, a);
+	if (qInv < 0)
+		qInv += p;
 }
 
 string RSA::encrypt(string plainText){
-	string cipherText;
+	stringstream sscipher;
 
 	// C = P^e % n
 	for(int i=0; i<plainText.length(); i++){
 		biginteger p(plainText[i]);
-		cipherText += biginteger::modpow(p, e, n).toString();
+		sscipher << biginteger::modpow(p, e, n).toString();
 		if (i < plainText.length()-1)
-			cipherText += " ";
+			sscipher << " ";
 	}
 
-	return cipherText;
+	return sscipher.str();
 }
 
 string RSA::decrypt(string cipherText){
-	string plainText;
+	stringstream ssplain;
 	stringstream sscipher(cipherText);
 
 	// P = C^d % n
 	biginteger in;
 	while (sscipher >> in){
-		biginteger result = biginteger::modpow(in, d, n);
-		plainText += (char)result.toInt();
+		biginteger m1 = biginteger::modpow(in, dp, p);
+		biginteger m2 = biginteger::modpow(in, dq, q);
+		biginteger h = (qInv * (m1 - m2)) % p;
+		if (h < 0)
+			h += p;
+		biginteger result = m2 + h * q;
+		ssplain << (char)result.toInt();
+		/*biginteger result = biginteger::modpow(in, d, n);
+		plainText += (char)result.toInt();*/
 	}
 
-	return plainText;
+	return ssplain.str();
 }
 
 /*
@@ -187,6 +203,8 @@ int main(int argc, char* argv[]){
 	cout << "Generate Key Time: " << keyTime << endl;
 	cout << "Encrypt Time     : " << encryptTime << endl;
 	cout << "Decrypt Time     : " << decryptTime << endl;
+	cout << "CipherText: " << cipher << endl;
+	cout << "Decrypt Result: " << plain << endl;
 	
 
 
