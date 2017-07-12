@@ -1,39 +1,56 @@
 //NIM      : 13515063
 //Nama     : Kezia Suhendra
 
-#include <iostream>
+#include "RSA.h"
 #include "BigInteger.h"
+#include "Key.h"
+#include "UtilsMsg.h"
+#include <cstdio>
 
-using namespace std;
-
-BigInteger gcdExtended(BigInteger, BigInteger, BigInteger*, BigInteger*);
-BigInteger modInverse(BigInteger, BigInteger);
-
-int main() {
-
-  return 0;
+BigInt RSA::encrypt(const BigInt& src, const BigInt& N, const BigInt& E) {
+  if (!(src < N)) {
+    fprintf(stderr, "Encrypt source is bigger than N\n");
+    exit(EXIT_FAILURE);
+  }
+  return BigInt::ModPow(src, E, N);
 }
 
-BigInteger gcdExtended(BigInteger a, BigInteger b, BigInteger* c, BigInteger* d) {
-  if (a == BigInteger(0)) {
-    *c = 0;
-    *d = 1;
-    return b;
-  }
-  BigInteger x, y;
-  BigInteger res = gcdExtended(b%a, a, &x, &y);
-  *c = y - (b/a) * x;
-  *d = x;
-  return res;
+BigInt RSA::encrypt(const BigInt& src) const {
+  BigInt N, E;
+  key.getPublicKey(N, E);
+  return RSA::encrypt(src, N, E);
 }
 
-BigInteger modInverse(BigInteger a, BigInteger m) {
-  BigInteger x, y;
-  BigInteger n = gcdExtended(a, m, &x, &y);
-  if (n != BigInteger(1)) {
-    return -1; //inverse doesn't exist
-  } else {
-    BigInteger res = (x%m + m) % m;
-    return res;
+void RSA::encrypt(StringTrans& st, const BigInt& N, const BigInt& E) {
+  for (StringTrans::iterator itr = st.begin(); itr != st.end(); itr++) {
+    *itr = RSA::encrypt(*itr, N, E);
   }
+}
+
+BigInt RSA::decrypt(const BigInt& src, const BigInt& N, const BigInt& D) {
+  if (!(src < N)) {
+    fprintf(stderr, "Encrypt source is bigger than N\n");
+    exit(EXIT_FAILURE);
+  }
+  return BigInt::ModPow(src, D, N);
+}
+
+BigInt RSA::decrypt(const BigInt& src) const {
+  BigInt N, D;
+  key.getPrivateKey(N, D);
+  return RSA::decrypt(src, N, D);
+}
+
+void RSA::decrypt(StringTrans& st) {
+  for (StringTrans::iterator itr = st.begin(); itr != st.end(); itr++) {
+    *itr = RSA::decrypt(*itr);
+  }
+}
+
+void RSA::getPublicKey(BigInt& N, BigInt& E) const {
+  key.getPublicKey(N, E);
+}
+
+void RSA::getPrivateKey(BigInt& N, BigInt& D) const {
+  key.getPrivateKey(N, D);
 }
