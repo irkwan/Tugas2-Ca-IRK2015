@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <ctime>
 #include <cmath>
 #include <cstdlib>
@@ -15,114 +16,76 @@ using namespace std;
 
 class RSA {
 public:
-	RSA(char* filename);
-	void createEncryptionFile();
-	void createDecryptionFile();
-	void createTimeFile();
+	RSA(int digits = DEFAULT_DIGITS);
+	string encrypt(string plainText);
+	string decrypt(string cipherText);
+
 private:
-	biginteger p, q;
-	biginteger n;
-	biginteger eulerPhi;
-	biginteger e, d;
-	vector<biginteger> cipherText;
-	char* filename;
-	double elapsedTime;
+	biginteger n; // security parameter
+	biginteger e; // public key
+	biginteger d; // private key
 
-	vector<char> readFile();
-	void initPrimeNumbers();
-	void initSecurityParam();
-	void initEulerPhi();
-	void initPublicKey();
-	void initPrivateKey();
-
-	void encrypt(vector<char> plainText);
-	vector<char> decrypt();
+	static const int DEFAULT_DIGITS = 20;
 };
 
-RSA::RSA(char* filename) : filename(filename){
-	vector<char> plainText = readFile();cout << "0";
-
-	// start counting time..
-	clock_t t = clock();
-
-	initPrimeNumbers();cout << "1";
-	initSecurityParam();cout << "2";
-	initEulerPhi();cout << "3";
-
-	initPublicKey();cout << "4";
-	initPrivateKey();cout << "5";
-	encrypt(plainText);cout << "6";
-
-	t = clock() - t;
-	elapsedTime = (double)t/CLOCKS_PER_SEC;
-	// end of counting time.
-}
-
-vector<char> RSA::readFile(){
-	ifstream inputFile(filename);
-	vector<char> plainText;
-
-	while(inputFile.good()){
-		plainText.push_back(inputFile.get());
-	}
-	plainText.pop_back(); // delete EOF
-	inputFile.close();
-
-	return plainText;
-}
-
-void RSA::initPrimeNumbers(){
-	p = biginteger::generateRandomProbablePrime();
-	q = biginteger::generateRandomProbablePrime();
+RSA::RSA(int digits){
+	// Initialize Prime Numbers
+	biginteger p = biginteger::generateRandomProbablePrime(digits);
+	biginteger q = biginteger::generateRandomProbablePrime(digits);
 	while (p == q){
-		q = biginteger::generateRandomProbablePrime();
+		q = biginteger::generateRandomProbablePrime(digits);
 	}
-//	cout << p << " " << q << endl;
-}
 
-void RSA::initSecurityParam(){
+	// Calculate Security Parameter
 	n = p * q;
-}
 
-void RSA::initEulerPhi(){
-	eulerPhi = (p - 1) * (q - 1);
-}
+	// Calculate EulerPhi
+	biginteger eulerPhi = (p - 1) * (q - 1);
 
-void RSA::initPublicKey(){
+	// Calculate Public Key
 	e = 3;
 	while (biginteger::gcd(e, eulerPhi) != 1){
 		e += 2;
 	}
-//	cout << "e = " << e << endl;
-}
 
-void RSA::initPrivateKey(){
-	// e * d + phi * a = gcd(e,phi) = 1
+	// Calculate Private Key
 	biginteger a;
 	biginteger gcd = biginteger::gcdExtended(e, eulerPhi, d, a);
 	if (d < 0)
 		d += eulerPhi;
+
+	// Initialize for RSA-CRT Decryption
 }
 
-void RSA::encrypt(vector<char> plainText){
+string RSA::encrypt(string plainText){
+	string cipherText;
+
 	// C = P^e % n
-	for(int i=0; i<plainText.size(); i++){
+	for(int i=0; i<plainText.length(); i++){
 		biginteger p(plainText[i]);
-		cipherText.push_back(biginteger::modpow(p, e, n));
+		cipherText += biginteger::modpow(p, e, n).toString();
+		if (i < plainText.length()-1)
+			cipherText += " ";
 	}
+
+	return cipherText;
 }
 
-vector<char> RSA::decrypt(){
+string RSA::decrypt(string cipherText){
+	string plainText;
+	stringstream sscipher(cipherText);
+
 	// P = C^d % n
-	vector<char> plainText;
-	for(int i=0; i<cipherText.size(); i++){
-		biginteger result = biginteger::modpow(cipherText[i], d, n);
-		cout << cipherText[i] << " " << d << " " << " " << n << " = " << result << " " << endl;;
-		plainText.push_back((char)result.toInt());
+	biginteger in;
+	while (sscipher >> in){
+		biginteger result = biginteger::modpow(in, d, n);
+		plainText += (char)result.toInt();
 	}
+
 	return plainText;
 }
 
+/*
 void RSA::createEncryptionFile(){
 	const int prefix = 2;
 	int len = sizeof(filename)/sizeof(char);
@@ -182,15 +145,50 @@ void RSA::createTimeFile(){
 	outputFile << "Time Elapsed: " << setprecision(4) << fixed << elapsedTime << endl;
 	outputFile.close();
 }
+*/
 
 /* ---------------------------------------------------------------------- */
 /* Main Program Start Here */
 
+string readFile(char* filename){
+	ifstream inputFile(filename);
+	string plainText;
+
+	while(inputFile.good()){
+		plainText += inputFile.get();
+	}
+	inputFile.close();
+
+	return plainText;
+}
+
 int main(int argc, char* argv[]){
-	RSA myfile(argv[1]);
-	myfile.createEncryptionFile();
-	myfile.createDecryptionFile();
-	myfile.createTimeFile();
+	clock_t t;
+	double keyTime, encryptTime, decryptTime;
+
+	t = clock(); // Generate Public and Private Key
+	RSA security;
+	t = clock() - t;
+	keyTime = (double)t/CLOCKS_PER_SEC;
+
+	string input = readFile(argv[1]); // Read From File
+	
+	t = clock(); // Encrypt Message
+	string cipher = security.encrypt(input);
+	t = clock() - t;
+	encryptTime = (double)t/CLOCKS_PER_SEC;
+	
+	t = clock(); // Decrypt Message
+	string plain = security.decrypt(cipher);
+	t = clock() - t;
+	decryptTime = (double)t/CLOCKS_PER_SEC;
+
+	cout << setprecision(4) << fixed;
+	cout << "Generate Key Time: " << keyTime << endl;
+	cout << "Encrypt Time     : " << encryptTime << endl;
+	cout << "Decrypt Time     : " << decryptTime << endl;
+	
+
 
 	return 0;
 }
