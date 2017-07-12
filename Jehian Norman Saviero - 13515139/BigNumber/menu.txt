@@ -8,4 +8,5 @@
 5. A%B
 6. Change value A and or B
 7. GCD(A,B)
+8. Menampilkan hasil konversi A dan B ke long long
 0. Exit

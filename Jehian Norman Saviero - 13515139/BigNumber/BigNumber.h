@@ -117,6 +117,9 @@ class BigNumber{
 		BigNumber& operator%=(const BigNumber& A);
 
 		
+		/*** REVERT BACK TO INTEGER ***/
+		/* Mengubah tipe BigNumber menjadi long long */
+		ll toInt();
 	private:
 		vll number;
 		ull size;
@@ -147,4 +150,5 @@ BigNumber pow(BigNumber a, BigNumber b);
 /*** FUNGSI PANGKAT+MODULO ***/
 /* Mengembalikan nilai dari a^b % m */
 BigNumber modPow(BigNumber a, BigNumber b, BigNumber m);
+
 #endif

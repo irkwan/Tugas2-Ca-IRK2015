@@ -690,3 +690,9 @@ BigNumber modPow(BigNumber a, BigNumber b, BigNumber m){
 		else return (a*(modPow(modPow(a,(b-1)/2,m)%m,2,m)%m))%m;
 	}
 }
+
+ll BigNumber::toInt(){
+	ll sum = 0;
+	for (ll i = number.size()-1; i >= 0; --i) sum *= 10, sum += number[i];
+	return sum;	
+}

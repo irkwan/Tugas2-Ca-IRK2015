@@ -75,6 +75,7 @@ int main(){
 			if (ganti == "Y" || ganti == "y") cout << "Masukkan nilai B: ", cin >> B;
 			ganti.clear();
 		} else if (menu == 7) cout << "GCD(A,B) adalah: " << gcd(A,B) << endl; 
+		else if (menu == 8) cout << "Hasil konversi nilai A dan B ke long long adalah: " << A.toInt() << " " << B.toInt() << endl;
 		else if (menu) {
 			cout << "Menu tidak tersedia" << endl;
 		}

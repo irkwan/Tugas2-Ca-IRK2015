@@ -1,5 +1,7 @@
 /* Author	: Jehian Norman Saviero (@Reiva5) */
 #include <bits/stdc++.h>
+#include "../BigNumber/BigNumber.h"
+#include "RSA.h"
 
 /* MACROS SAMPAH */
 #define jehian using
@@ -31,37 +33,10 @@ typedef pair<ld,ld> pld;
 #define mp make_pair
 #define eb emplace_back
 
-#ifndef RSA_H
-#define RSA_H
-#include "../BigNumber/BigNumber.h"
-
-class RSA {
-	public:
-		/* CTOR */
-		RSA();
-
-		/* GETTER */
-		BigNumber get_n();
-		BigNumber get_e();
-		BigNumber get_d();
-
-		/* SETTE */
-		void set_e(BigNumber E); //Public key (Part II)
-
-		/* METHOD */
-		void generate();
-		void process();
-		BigNumber encrypt(BigNumber message);
-		BigNumber decrypt(BigNumber encoded);
-
-		BigNumber p;
-		BigNumber q;
-	private:
-		BigNumber encrypt(BigNumber m, BigNumber n, BigNumber e);
-		BigNumber decrypt(BigNumber c, BigNumber d, BigNumber n);
-		BigNumber n; //Public key (Part I)
-		BigNumber e; //Public key (Part II)
-		BigNumber d; //Private key d = e^-1 mod λ(n)
-		vector<BigNumber> data;
-};
-#endif
+int main(){
+	RSA yes;
+	yes.process();
+	cout << yes.p << " " << yes.q << endl;
+	cout << "=========FINISH=========";
+	return 0;
+}

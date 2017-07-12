@@ -33,17 +33,67 @@ typedef pair<ld,ld> pld;
 #define eb emplace_back
 
 RSA::RSA(){
-
+	n = q = 0;
+	e = d = 19;
 }
 
-void RSA::generate(){
+BigNumber RSA::get_n(){
+	return n;
+}
 
+BigNumber RSA::get_e(){
+	return e;
+}
+
+BigNumber RSA::get_d(){
+	return d;
+}
+		
+void RSA::generate(){
+	if (data.empty()){
+		ifstream in("prime_numbers.txt");
+		BigNumber X;
+		while (in >> X) data.pb(X);
+	}
+	BigNumber A, B;
+	ll count = 1000;
+	do {
+		srand(time(NULL));
+		A = modPow(rand()%data.size(),rand(),data.size());
+		B = modPow(modPow(A,rand(),data.size()),A,data.size());
+		--count;
+	} while (A == B || count > 0);
+	ll a = A.toInt();
+	ll b = B.toInt();
+	p = data[a];
+	q = data[b];
+}
+
+void RSA::set_e(BigNumber E){
+	e = E;
+}
+
+void RSA::process(){
+	if (p == 0 || q == 0){
+		generate();
+	}
+	n = p*q;
+	BigNumber lambda_n = (p-1)*(q-1)/gcd(p-1,q-1);
+	d = modInverse(e,n);
 }
 
 BigNumber RSA::encrypt(BigNumber m, BigNumber n, BigNumber e){
-
+	return modPow(m,n,e);
 }
 
 BigNumber RSA::decrypt(BigNumber c, BigNumber d, BigNumber n){
+	return modPow(c,d,n);
+}
 
+BigNumber RSA::encrypt(BigNumber message){
+	return encrypt(message,n,e);
+}
+
+BigNumber RSA::decrypt(BigNumber encoded){
+	return decrypt(encoded,d,n);
 }
