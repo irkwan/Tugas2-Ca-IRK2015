@@ -629,9 +629,7 @@ BigNumber gcd(BigNumber A, BigNumber B){
 		C = A;
 		A = B;
 		B = C;
-//		cerr << A << " " << B << endl;
 	}
-//	cerr << "out" << endl;
 	return B;
 }
 

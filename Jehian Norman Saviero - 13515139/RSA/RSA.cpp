@@ -78,6 +78,7 @@ void RSA::set_e(BigNumber E){
 	e = E;
 }
 
+bool prime[10000];
 void RSA::process(){
 	if (p == 0 || q == 0){
 		generate_prime();
@@ -85,15 +86,14 @@ void RSA::process(){
 	n = p*q;
 	BigNumber lambda_n = (p-1)*(q-1)/gcd(p-1,q-1);
 	if (small.empty()){
-		bool prime[10000];
 		memset(prime, true, sizeof prime);
 		for (ll i = 2; i <= 10000; ++i){
 			if (prime[i]){
-				small.pb(i);
+				BigNumber A = i;
+				small.pb(A);
 				for (ll j = 2; j*i <= 10000; ++j) prime[(j*i)] = false;
 			}
 		}
-		cerr << "~~";
 	}
 	ll count = 1000;
 	srand(time(NULL));
@@ -101,7 +101,6 @@ void RSA::process(){
 	cerr << "--";
 	while (gcd(e, lambda_n) != 1 || count > 0 || e >= lambda_n){
 		e = small[idx];
-		cerr << e << endl;
 		idx *= rand();
 		idx %= small.size();
 		++idx;
@@ -143,12 +142,24 @@ void RSA::encrypt_to_code(const string& from, const string& to){
 	ifstream in(from.c_str());
 	ofstream out(to.c_str());
 	string temp;
-	ll tmp;
-	while (in >> temp){
-		for (auto a : temp){
-			out << encrypt(select_random_prime()*256 + (ll) a) << " ";
+	ll count = 0;
+	BigNumber tmp;
+	while (getline(in,temp)){
+		srand(time(NULL));
+		tmp = (select_random_prime()-1)*rand()*256;
+		for (ll i = 0; i < temp.size(); ++i){
+			do {
+				if ((count*small[small.size()/4]) % small[small.size()/2] <= small[small.size()/8]){
+					tmp += select_random_prime()*256;
+				} else {
+					tmp -= small.back()*256;
+				}
+				++count;
+			} while (gcd(tmp + temp[i], n) != 1);
+			out << encrypt(tmp + (ll)((unsigned char) temp[i])) << " ";
+			count = 0;
 		}
-		out << encrypt(select_random_prime()*256 + (ll) '\n');
+		out << encrypt((select_random_prime()-1)*rand()*256 + (ll) '\n');
 	}
 }
 
