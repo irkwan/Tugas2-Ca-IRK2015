@@ -37,9 +37,6 @@ private:
 
 	void encrypt(vector<char> plainText);
 	vector<char> decrypt();
-
-	long long generateRandomPrimeNumber();
-	long long pow2(int n);
 };
 
 RSA::RSA(char* filename) : filename(filename){
@@ -75,10 +72,10 @@ vector<char> RSA::readFile(){
 }
 
 void RSA::initPrimeNumbers(){
-	p = biginteger::generateRandomPrime();
-	q = biginteger::generateRandomPrime();
+	p = biginteger::generateRandomProbablePrime();
+	q = biginteger::generateRandomProbablePrime();
 	while (p == q){
-		q = biginteger::generateRandomPrime();
+		q = biginteger::generateRandomProbablePrime();
 	}
 //	cout << p << " " << q << endl;
 }

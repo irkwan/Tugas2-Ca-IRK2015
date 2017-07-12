@@ -1,5 +1,11 @@
-// NIM/Nama : 13515057 / Erick Wijaya
-// File     : biginteger.cpp
+/**
+ * Implementation of Big Integer Class.
+ * For more details, see biginteger.h.
+ *
+ * @author Erick Wijaya 
+ * @version 1.0
+ * @since 2017-13-07
+ */
 
 #include "biginteger.h"
 #include <iostream>
@@ -10,6 +16,7 @@
 #include <ctime>
 using namespace std;
 
+/****************************************************************************/
 /* Commonly Used Constants */
 const biginteger biginteger::ZERO = biginteger();
 const biginteger biginteger::ONE = biginteger(1);
@@ -23,6 +30,8 @@ const biginteger biginteger::EIGHT = biginteger(8);
 const biginteger biginteger::NINE = biginteger(9);
 const biginteger biginteger::TEN = biginteger(10);
 
+
+/****************************************************************************/
 /* Constructors */
 biginteger::biginteger(){
 	pos = true;
@@ -61,6 +70,7 @@ biginteger::biginteger(const biginteger& v) : pos(v.pos), digits(v.digits){
 }
 
 
+/****************************************************************************/
 /* Operator= */
 biginteger& biginteger::operator=(const biginteger& rhs){
 	if (this != &rhs){
@@ -74,6 +84,8 @@ biginteger& biginteger::operator=(int rhs){
 	return operator=(biginteger(rhs));
 }
 
+
+/****************************************************************************/
 /* Arithmetic Operators */
 biginteger biginteger::operator+(const biginteger& rhs) const{
 	if (pos == rhs.pos){
@@ -278,6 +290,8 @@ biginteger biginteger::modpow(const biginteger& a, const biginteger& n, const bi
     return res;
 }
 
+
+/****************************************************************************/
 /* Relational Operators */
 bool biginteger::operator==(const biginteger& rhs) const{
 	bool same = (digits.size() == rhs.digits.size()) && (pos == rhs.pos);
@@ -343,6 +357,8 @@ bool biginteger::operator<=(int rhs) const{
 	return operator<=(biginteger(rhs));
 }
 
+
+/****************************************************************************/
 /* I/O */
 istream& operator>>(istream &is, biginteger& v){
 	string input;
@@ -361,6 +377,8 @@ ostream& operator<<(ostream &os, const biginteger& v){
 	return os;
 }
 
+
+/****************************************************************************/
 /* Type Conversion */
 string biginteger::toString(){
 	string res;
@@ -382,7 +400,9 @@ int biginteger::toInt(){
 	return res;
 }
 
-/* Other Methods */
+
+/****************************************************************************/
+/* Other Public Methods */
 bool biginteger::isOdd() const{
 	return digits[0] % 2 == 1;
 }
@@ -427,17 +447,16 @@ biginteger biginteger::gcdExtended(biginteger a, biginteger b, biginteger& x, bi
         return b;
     }
  	
-    biginteger x1, y1; // To store results of recursive call
+    biginteger x1, y1; 
     biginteger gcd = biginteger::gcdExtended(b%a, a, x1, y1);
 
-    // Update x and y using results of recursive call
     x = y1 - (b/a) * x1;
     y = x1;
 
     return gcd;
 }
 
-biginteger biginteger::generateRandomPrime(int digits){
+biginteger biginteger::generateRandomProbablePrime(int digits){
 	biginteger res = generateRandomNearlyPrime(digits);
 
 	while (!res.isProbablePrime()){
@@ -477,6 +496,36 @@ bool biginteger::isProbablePrime(int certainty){
 	return true;
 }
 
+/*
+	if (*this < biginteger::TWO)
+		return false;
+	if ((*this != biginteger::TWO) && (*this % biginteger::TWO == biginteger::ZERO))
+		return false;
+	if (*this == biginteger::THREE)
+		return true;
+
+	biginteger val = *this - biginteger::ONE;
+	while (val % biginteger::TWO == biginteger::ZERO)
+		val /= biginteger::TWO;
+
+	biginteger mod = modpow(biginteger::TWO, val, *this);
+	if (mod == biginteger::ONE || mod == *this - biginteger::ONE)
+		return true;
+
+	for(int i=0; i<certainty; i++){
+		mod = modpow(mod, biginteger::TWO, *this);
+		if (mod == biginteger::ONE)
+			return false;
+		else if (mod == *this - biginteger::ONE)
+			return true;
+	}
+
+	return false;
+*/
+
+
+/****************************************************************************/
+/* Private Methods */
 int biginteger::max(int a, int b){
 	return (a > b) ? a : b;
 }
