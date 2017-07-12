@@ -1,5 +1,6 @@
 package rsa;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
@@ -23,7 +24,7 @@ public class RSAKeyPair {
     prime2 = prime2.resize(prime2.getSize() * 2);
     phi = prime1.subtract(BigNumber.ONE).multiply(prime2.subtract(BigNumber.ONE));
 
-    if (!publicExponent.greatestCommonDivisor(phi).equalTo(BigNumber.ONE)) {
+    if (publicExponent.greatestCommonDivisor(phi).notEqualTo(BigNumber.ONE)) {
       throw new RSAException("Public exponent and phi are not coprimes");
     }
 
@@ -33,6 +34,23 @@ public class RSAKeyPair {
     return new RSAKeyPair(new RSAPublicKey(modulus, publicExponent),
         new RSAPrivateKey(modulus, publicExponent, privateExponent, prime1, prime2,
             null, null, null));
+  }
+
+  public static RSAKeyPair fromPublicKeyFile (File file) throws IOException, ClassNotFoundException {
+    return new RSAKeyPair(RSAPublicKey.fromFile(file), null);
+  }
+
+  public static RSAKeyPair fromPrivateKeyFile (File file) throws IOException, ClassNotFoundException {
+    RSAPrivateKey privateKey = RSAPrivateKey.fromFile(file);
+    return new RSAKeyPair(privateKey.toPublicKey(), privateKey);
+  }
+
+  public void savePublicKeyFile (File file) throws IOException {
+    publicKey.toFile(file);
+  }
+
+  public void savePrivateKeyFile (File file) throws IOException {
+    privateKey.toFile(file);
   }
 
   public Message encrypt (Message message, String label, String labelCharsetName, String hashAlgorithm)
@@ -54,6 +72,10 @@ public class RSAKeyPair {
 
   public RSAPrivateKey getPrivateKey () {
     return privateKey;
+  }
+
+  public boolean hasPrivateKey () {
+    return privateKey != null;
   }
 
   public static void main (String[] args) throws Exception {/*

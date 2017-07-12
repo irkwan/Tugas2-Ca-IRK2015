@@ -22,19 +22,21 @@ public class Message {
   }
 
   public static Message fromString (String string, String charsetName) throws UnsupportedEncodingException {
-    return new Message(string.getBytes(charsetName));
+    if (charsetName.equals("Hex")) {
+      return new Message(DatatypeConverter.parseHexBinary(string));
+    }
+    else {
+      return new Message(string.getBytes(charsetName));
+    }
   }
 
   public String toString (String charsetName) throws UnsupportedEncodingException {
-    return new String(content, charsetName);
-  }
-
-  public static Message fromHexString (String string) {
-    return new Message(DatatypeConverter.parseHexBinary(string));
-  }
-
-  public String toHexString () {
-    return DatatypeConverter.printHexBinary(content);
+    if (charsetName.equals("Hex")) {
+      return DatatypeConverter.printHexBinary(content);
+    }
+    else {
+      return new String(content, charsetName);
+    }
   }
 
   public static Message fromFile (File file) throws IOException {

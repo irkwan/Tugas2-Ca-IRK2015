@@ -1,6 +1,6 @@
 package rsa;
 
-import java.io.Serializable;
+import java.io.*;
 
 public class RSAPublicKey implements Serializable {
   private BigNumber modulus;
@@ -27,7 +27,11 @@ public class RSAPublicKey implements Serializable {
     return publicExponent.toHexString();
   }
 
-  public void toFile () {
+  public static RSAPublicKey fromFile (File file) throws IOException, ClassNotFoundException {
+    return (RSAPublicKey) new ObjectInputStream(new FileInputStream(file)).readObject();
+  }
 
+  public void toFile (File file) throws IOException {
+    new ObjectOutputStream(new FileOutputStream(file)).writeObject(this);
   }
 }

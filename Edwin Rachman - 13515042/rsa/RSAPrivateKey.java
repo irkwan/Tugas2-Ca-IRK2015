@@ -1,6 +1,8 @@
 package rsa;
 
-public class RSAPrivateKey {
+import java.io.*;
+
+public class RSAPrivateKey implements Serializable {
   private int version;
   private BigNumber modulus;
   private BigNumber publicExponent;
@@ -32,7 +34,47 @@ public class RSAPrivateKey {
     return modulus.getSize() * 4;
   }
 
-  public void writeToFile () {
+  public static RSAPrivateKey fromFile (File file) throws IOException, ClassNotFoundException {
+    return (RSAPrivateKey) new ObjectInputStream(new FileInputStream(file)).readObject();
+  }
 
+  public RSAPublicKey toPublicKey () {
+    return new RSAPublicKey(modulus, publicExponent);
+  }
+
+  public void toFile (File file) throws IOException {
+    new ObjectOutputStream(new FileOutputStream(file)).writeObject(this);
+  }
+
+  public String getModulusText () {
+    return modulus.toHexString();
+  }
+
+  public String getPublicExponentText () {
+    return publicExponent.toHexString();
+  }
+
+  public String getPrivateExponentText () {
+    return privateExponent.toHexString();
+  }
+
+  public String getPrime1Text () {
+    return prime1.toHexString();
+  }
+
+  public String getPrime2Text () {
+    return prime2.toHexString();
+  }
+
+  public String getExponent1Text () {
+    return exponent1.toHexString();
+  }
+
+  public String getExponent2Text () {
+    return exponent2.toHexString();
+  }
+
+  public String getCoefficientText () {
+    return coefficient.toHexString();
   }
 }
