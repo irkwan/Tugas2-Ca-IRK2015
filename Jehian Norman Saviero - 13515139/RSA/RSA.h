@@ -49,10 +49,13 @@ class RSA {
 		void set_e(BigNumber E); //Public key (Part II)
 
 		/* METHOD */
-		void generate();
+		void generate_prime();
 		void process();
+		BigNumber select_random_prime();
 		BigNumber encrypt(BigNumber message);
 		BigNumber decrypt(BigNumber encoded);
+		void encrypt_to_code(const string& from, const string& to);
+		void decrypt_to_normal(const string& from, const string& to);
 
 		BigNumber p;
 		BigNumber q;
@@ -62,6 +65,7 @@ class RSA {
 		BigNumber n; //Public key (Part I)
 		BigNumber e; //Public key (Part II)
 		BigNumber d; //Private key d = e^-1 mod λ(n)
-		vector<BigNumber> data;
+		vector<BigNumber> data; //Store array of Big Prime
+		vector<BigNumber> small; //Store array of Small Prime
 };
 #endif

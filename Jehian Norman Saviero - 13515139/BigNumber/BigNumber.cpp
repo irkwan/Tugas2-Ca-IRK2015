@@ -623,10 +623,15 @@ BigNumber gcd(BigNumber A, BigNumber B){
 	if (A < 0) A *= -1;
 	if (B < 0) B *= -1;
 	BigNumber zero = 0;
+	BigNumber C;
 	while (A % B > zero){
 		A %= B;
-		swap(A,B);
+		C = A;
+		A = B;
+		B = C;
+//		cerr << A << " " << B << endl;
 	}
+//	cerr << "out" << endl;
 	return B;
 }
 
