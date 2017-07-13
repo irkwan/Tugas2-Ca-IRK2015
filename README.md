@@ -40,8 +40,10 @@ Konversi dilakukan untuk memudahkan proses enkripsi dan dekripsi.
 8. Tekan tombol **Decrypt** untuk mendekripsi teks agar kembali seperti semula.
 ![Decrypt](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/DecryptedText.PNG)
 9. Tombol **Generate Keys** dan **Browse** kemudian **Open** harus ditekan terlebih dahulu sebelum enkripsi. Jika tidak, akan muncul pesan berikut.
+
 ![Error message](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/EncryptionErrorMessage.PNG)
 10. Tombol **Encrypt** harus ditekan terlebih dahulu sebelum **Decrypt**. Jika tidak, akan muncul pesan berikut.
 ![Error message](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/DecryptionErrorMessage.PNG)
-11. Tekan menu **File - New** atau **Ctrl+N** apabila ingin melakukan enkripsi dan dekripsi kembali.
+11. Tekan menu **File - New** pada pojok kiri atas atau **Ctrl+N** apabila ingin melakukan enkripsi dan dekripsi kembali.
+
 ![New](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/NewRSA.PNG)
