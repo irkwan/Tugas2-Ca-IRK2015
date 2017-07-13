@@ -26,7 +26,7 @@ void Key::generate(int digit) {
   srand((unsigned)time(NULL));
   BigInt p(GeneratePrime(digit));
   BigInt q(GeneratePrime(digit));
-  LOGLN("Key: ");
+  LOGLN("\nKey: ");
   BigInt totient = (p - 1) * (q - 1);
   BigInt x, y, temp;
   while (1) {
@@ -44,5 +44,5 @@ void Key::generate(int digit) {
   n = p * q;
   LOGLN("n: " << n);
   d = x;
-  LOGLN("d: " << d);
+  LOGLN("d: " << d << endl);
 }

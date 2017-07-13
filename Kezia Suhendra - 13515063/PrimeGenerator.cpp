@@ -54,7 +54,7 @@ bool RabinMiller(const BigInt& n, int digit) {
 BigInt GeneratePrime(int digit) {
   BigInt n;
   int i = 0;
-  LOG("Generating Prime Number ");
+  LOG("\nGenerating Prime Number ");
   while (i < 5) {
     GenPrime(n, digit);
     i = 0;

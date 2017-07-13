@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Invalid Argument %s\n", argv[1]);
     exit(EXIT_FAILURE);
   }
-  cout << "Input your message here:\n";
+  cout << "\nInput your message here:\n";
   string msg;
   getline(cin, msg);
   RSA *rsa;
@@ -62,14 +62,14 @@ int main(int argc, char **argv) {
   cout << "\nEncoded Message:\n";
   cout << st.toHexString() << endl;
   RSA::encrypt(st, N, E);
-  cout << "Encrypted Message:\n";
+  cout << "\nEncrypted Message:\n";
   cout << st.toHexString() << endl;
   rsa->decrypt(st);
-  cout << "Decryped Message:\n";
+  cout << "\nDecryped Message:\n";
   cout << st.toHexString() << endl;
   oaep.decode(st);
-  cout << "Decoded Message:\n";
-  cout << st.toString() << endl;
+  cout << "\nDecoded Message:\n";
+  cout << st.toString() << endl << endl;
 
   return 0;
 }

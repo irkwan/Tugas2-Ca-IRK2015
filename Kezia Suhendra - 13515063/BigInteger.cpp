@@ -5,14 +5,14 @@
 #include "UtilsMsg.h"
 
 BigInt::BigInt() {
-  for (int i = 0; i < _capacity; ++i) {
+  for (int i = 0; i < _capacity; i++) {
     num[i] = 0;
   }
   sign = true;
 }
 
 BigInt::BigInt(const int& in) {
-  for (int i = 0; i < _capacity; ++i) {
+  for (int i = 0; i < _capacity; i++) {
     num[i] = 0;
   }
   num[0] = in;
@@ -24,7 +24,7 @@ BigInt::BigInt(const int& in) {
 }
 
 BigInt::BigInt(const BigInt& in) {
-  for (int i = 0; i < _capacity; ++i) {
+  for (int i = 0; i < _capacity; i++) {
     num[i] = in.num[i];
   }
   sign = in.sign;
@@ -55,16 +55,16 @@ void BigInt::GenFromHexString(string str) {
     string segment = str.substr(str.length() - 8, 8);
     str.erase(str.length() - 8, 8);
     unsigned int current = 0;
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 8; i++) {
       current = current * 16 + HexCharToInt(segment[i]);
     }
     num[idx++] = current;
   }
   unsigned int current = 0;
-  for (int i = 0; i < str.length(); ++i) {
+  for (int i = 0; i < str.length(); i++) {
     current = current * 16 + HexCharToInt(str[i]);
-    num[idx] = current;
   }
+  num[idx] = current;
 }
 
 void BigInt::GenFromBinString(string str) {
@@ -74,13 +74,13 @@ void BigInt::GenFromBinString(string str) {
     string segment = str.substr(str.length() - 32, 32);
     str.erase(str.length() - 32, 32);
     unsigned int current = 0;
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < 32; i++) {
       current = current * 2 + (segment[i] - '0');
     }
     num[idx++] = current;
   }
   unsigned int current = 0;
-  for (int i = 0; i < str.length(); ++i) {
+  for (int i = 0; i < str.length(); i++) {
     current = current * 2 + (str[i] - '0');
   }
   num[idx] = current;
@@ -264,7 +264,7 @@ void BigInt::Randomsmall(int digit) {
   for (int i = 0; i < digit / 128; i++) {
     num[i] = (rand() << 17) + (rand() << 2) + rand() % 4;
   }
-  num[digit/128-1] = num[digit/128-1] | 0x80000000;
+  num[digit/128-1] = num[digit/32-1] | 0x80000000;
 }
 
 BigInt BigInt::operator+ (const BigInt& in) const {
@@ -293,7 +293,7 @@ BigInt BigInt::operator+ (const BigInt& in) const {
     for (int i = 0; i < length; i++) {
       sub = temp2.num[i] + carry;
       if (temp1.num[i] >= sub) {
-        res.num[i] = temp1.num[1] - sub;
+        res.num[i] = temp1.num[i] - sub;
         carry = 0;
       } else {
         res.num[i] = (unsigned long long)temp1.num[i] + ((unsigned long long)1 << 32) - sub;
@@ -325,7 +325,7 @@ BigInt BigInt::operator- (const BigInt& in) const {
         res.num[i] = temp1.num[i] - sub;
         carry = 0;
       } else {
-        res.num[i] = (unsigned long long)temp1.num[1] + ((unsigned long long)1 << 32) - sub;
+        res.num[i] = (unsigned long long)temp1.num[i] + ((unsigned long long)1 << 32) - sub;
         carry = 1;
       }
     }
@@ -663,8 +663,7 @@ BigInt BigInt::Euc(BigInt& E, BigInt& A) {
   return X;
 }
 
-BigInt BigInt::GcdExtended(const BigInt& a, const BigInt& b, BigInt& x, BigInt&
-y) {
+BigInt BigInt::GcdExtended(const BigInt& a, const BigInt& b, BigInt& x, BigInt& y) {
   BigInt x0 = 1, y0 = 0, x1 = 0, y1 = 1, c = a, d = b;
   BigInt k, r, t;
   while (!(d == 0)) {
