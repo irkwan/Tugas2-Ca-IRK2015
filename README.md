@@ -17,7 +17,7 @@ Library dari BigInteger beserta RSA di implementasi menggunakan bahasa C++. Dipi
 ![hasilfile2] [3]
 ![hasilfile3] [4]
 
-[1]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(file%20input).png
-[2]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input1.txt).png
-[3]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input2.txt).png
-[4]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input3.txt).png
+[1]: Kezia\ Suhendra\ -\ 13515063/screenshot/Screen\ Shot\ (file\ input).png
+[2]: Kezia\ Suhendra\ -\ 13515063/screenshot/Screen\ Shot\ (input1.txt).png
+[3]: Kezia\ Suhendra\ -\ 13515063/screenshot/Screen\ Shot\ (input2.txt).png
+[4]: Kezia\ Suhendra\ -\ 13515063/screenshot/Screen\ Shot\ (input3.txt).png
