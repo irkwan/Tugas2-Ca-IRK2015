@@ -2,7 +2,6 @@ package rsa;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
 import java.awt.event.*;
 import java.security.NoSuchAlgorithmException;
@@ -30,7 +29,7 @@ public class GenerateNewKeyPairDialog extends JDialog {
     getRootPane().setDefaultButton(loadButton);
     setTitle("Generate new key pair");
     ((JTextField) publicExponentComboBox.getEditor().getEditorComponent()).setHorizontalAlignment(JTextField.RIGHT);
-    keyLengthSpinner.setModel(new SpinnerNumberModel(512, 384, null, 32));
+    keyLengthSpinner.setModel(new SpinnerNumberModel(512, 384, null, 64));
     keyLengthSpinner.setEditor(new JSpinner.NumberEditor(keyLengthSpinner, "#"));
     ((DefaultFormatter) ((JFormattedTextField) keyLengthSpinner.getEditor().getComponent(0)).getFormatter()).setCommitsOnValidEdit(true);
 
@@ -50,6 +49,8 @@ public class GenerateNewKeyPairDialog extends JDialog {
     });
 
     generateButton.addActionListener(e -> {
+      keyLengthSpinner.setValue((int) keyLengthSpinner.getValue() - (int) keyLengthSpinner.getValue() % 64);
+
       worker = new SwingWorker<Void, Void>() {
         private int count;
         private int state;

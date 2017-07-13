@@ -2,8 +2,8 @@ package rsa;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
+
 
 @SuppressWarnings("ALL")
 public class RSAKeyPair {
@@ -99,5 +99,4 @@ public class RSAKeyPair {
   public boolean hasPrivateKey () {
     return privateKey != null;
   }
-
 }

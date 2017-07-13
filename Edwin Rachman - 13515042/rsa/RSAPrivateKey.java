@@ -3,7 +3,6 @@ package rsa;
 import java.io.*;
 
 public class RSAPrivateKey implements Serializable {
-  private int version;
   private BigNumber modulus;
   private BigNumber publicExponent;
   private BigNumber privateExponent;
@@ -15,7 +14,6 @@ public class RSAPrivateKey implements Serializable {
 
   public RSAPrivateKey (BigNumber modulus, BigNumber publicExponent, BigNumber privateExponent, BigNumber prime1,
                         BigNumber prime2, BigNumber exponent1, BigNumber exponent2, BigNumber coefficient) {
-    version = 0;
     this.modulus = modulus;
     this.publicExponent = publicExponent;
     this.privateExponent = privateExponent;
@@ -29,6 +27,13 @@ public class RSAPrivateKey implements Serializable {
   public BigNumber decryptionPrimitive(BigNumber cipherText) {
     return cipherText.modularExponent(privateExponent, modulus);
   }
+
+  /*
+  public BigNumber decryptionChineseRemainderTheorem (BigNumber cipherText) {
+    BigNumber m1 = cipherText.modularExponent(exponent1.resize(exponent1.getSize() * 2), prime1);
+    BigNumber m2 = cipherText.modularExponent(exponent2.resize(exponent1.getSize() * 2), prime2);
+    return m2.add(coefficient.multiply(m1.subtract(m2)).modulo(prime1).multiply(prime2));
+  }*/
 
   public int getModulusByteCount () {
     return modulus.getSize() * 4;
