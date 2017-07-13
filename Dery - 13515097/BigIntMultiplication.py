@@ -13,9 +13,8 @@ for i in range(10000):
 class BigInt:
 	def __init__(self, x):
 		self.num = ""
-		done = False
 		for i in range(len(x)):
-			if(x[i]=='0' and not done): continue
+			if(x[i]=='0'): continue
 			self.num = x[i:]
 			break
 		if(len(self.num)==0):
@@ -27,6 +26,25 @@ class BigInt:
 	def ten(self,i):
 		return self.ten_pow[i]
 
+	def length(self):
+		return len(self.num)
+
+	def split_on(self,m):
+		return self.num[:m], self.num[m:]
+
+	def concate_front(self,num2):
+		s = num2.num
+		for i in range(len(s)):
+			if(s[i]=='0'): continue
+			self.num = s[i:]+self.num
+			break
+		# print self.num
+
+	def concate_back(self,num2):
+		self.num = self.num + num2.num
+
+	def is_zero(self):
+		return len(self.num)==0 or self.num=="0"
 	"""
 		Addition Operator
 	"""
@@ -80,6 +98,45 @@ class BigInt:
 			result = str(curr)+result
 		# print BigInt(result)
 		return BigInt(result)
+
+	def divmod_each(self,y):
+		x = self
+		q=BigInt("0")
+		while x>=y:
+			q+=BigInt("1")
+			x-=y
+		x = x.num
+		q = q.num
+		# if q=="0":
+		# 	q=""
+		if x=="0":
+			x = ""
+		return q,x
+
+	def divmod(self,y):
+		x = self.num
+		y = y.num
+		q = ""
+		j = len(x)
+		while BigInt(x)>=BigInt(y) or j>0:
+			j-=1
+			while True:
+				if j==0:
+					x_head, x_tail = x, ""
+				else:
+					x_head, x_tail = x[:-j], x[-j:]
+				# print j
+				# print x_head, x_tail
+				if(BigInt(x_head)>=BigInt(y)) or j<=0:
+					break
+				j-=1
+				q = q+"0"
+			# print x_head, y
+			q_temp,x_add = BigInt(x_head).divmod_each(BigInt(y))
+			x = x_add + x_tail
+			q = q + q_temp
+			# print "Q", q
+		return BigInt(q),BigInt(x)
 
 	"""
 		Division and Modulo with base10
@@ -194,10 +251,25 @@ class BigInt:
 	def __le__(self,num2):
 		return self.cmp(num2)==2 or self.cmp(num2)==0
 
-# x = BigInt("2307564365986459467596759372658362763298647268352")
-# y = BigInt("2098420583720458973204587230857203984570398457923850")
+	def __div__(self,y):
+		res, dummy = self.divmod(y)
+		return res
+	def __mod__(self,y):
+		dummy, res = self.divmod(y)
+		return res
+# x = BigInt("930756436598645946732525352353252353223532596759372658362763298647268352")
+# y = BigInt("33253253")
 # print x-y
-# x = BigInt("2763593267598673295673296752649537615081360593190857102985")
-# y = BigInt("2763593267598673295673296752649537615081360593190857102985")
-# print x>y
+# x = BigInt("3003")
+# y = BigInt("30")
+# x = BigInt("3000")
+# y = BigInt("3")
+# print x/y, x%y
+# x = BigInt("100001")
+# y = BigInt("3")
+# print x/y, x%y
+# print x.split_on(3)[1]
+
+# z = "12345"
+# print x.length()
 # print x**y
