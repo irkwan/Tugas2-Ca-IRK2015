@@ -27,7 +27,7 @@ public class RSAPublicKey implements Serializable {
     return publicExponent.toHexString();
   }
 
-  public static RSAPublicKey fromFile (File file) throws IOException, ClassNotFoundException {
+  public static RSAPublicKey fromFile (File file) throws IOException, ClassNotFoundException, ClassCastException {
     return (RSAPublicKey) new ObjectInputStream(new FileInputStream(file)).readObject();
   }
 

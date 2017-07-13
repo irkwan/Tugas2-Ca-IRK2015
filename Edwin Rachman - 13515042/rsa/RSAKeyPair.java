@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 
-
 @SuppressWarnings("ALL")
 public class RSAKeyPair {
 
@@ -20,9 +19,17 @@ public class RSAKeyPair {
   public static RSAKeyPair generateKeyPair (BigNumber prime1, BigNumber prime2, BigNumber publicExponent) throws RSAException {
     BigNumber phi;
 
-    prime1 = prime1.resize(prime1.getSize() * 2);
-    prime2 = prime2.resize(prime2.getSize() * 2);
-    phi = prime1.subtract(BigNumber.ONE).multiply(prime2.subtract(BigNumber.ONE));
+    int size = prime1.getSize();
+    prime1 = prime1.resize(size * 2);
+    prime2 = prime2.resize(size * 2);
+    if (prime1.lessThan(prime2)) {
+      BigNumber temp = prime1;
+      prime1 = prime2;
+      prime2 = temp;
+    }
+    BigNumber PRIME1_MINUS_ONE = prime1.subtract(BigNumber.ONE);
+    BigNumber PRIME2_MINUS_ONE = prime2.subtract(BigNumber.ONE);
+    phi = PRIME1_MINUS_ONE.multiply(PRIME2_MINUS_ONE);
 
     if (publicExponent.greatestCommonDivisor(phi).notEqualTo(BigNumber.ONE)) {
       throw new RSAException("Public exponent and phi are not coprimes");
@@ -32,17 +39,30 @@ public class RSAKeyPair {
     BigNumber privateExponent = publicExponent.modularInverse(phi);
 
     return new RSAKeyPair(new RSAPublicKey(modulus, publicExponent),
-        new RSAPrivateKey(modulus, publicExponent, privateExponent, prime1, prime2,
-            null, null, null));
+        new RSAPrivateKey(modulus, publicExponent, privateExponent,
+            prime1.resize(size), prime2.resize(size),
+            publicExponent.modularInverse(PRIME1_MINUS_ONE).resize(size),
+            publicExponent.modularInverse(PRIME2_MINUS_ONE).resize(size),
+            prime2.modularInverse(prime1).resize(size)));
   }
 
   public static RSAKeyPair fromPublicKeyFile (File file) throws IOException, ClassNotFoundException {
-    return new RSAKeyPair(RSAPublicKey.fromFile(file), null);
+    try {
+      return new RSAKeyPair(RSAPublicKey.fromFile(file), null);
+    }
+    catch (ClassCastException ex) {
+      throw ex;
+    }
   }
 
   public static RSAKeyPair fromPrivateKeyFile (File file) throws IOException, ClassNotFoundException {
-    RSAPrivateKey privateKey = RSAPrivateKey.fromFile(file);
-    return new RSAKeyPair(privateKey.toPublicKey(), privateKey);
+    try {
+      RSAPrivateKey privateKey = RSAPrivateKey.fromFile(file);
+      return new RSAKeyPair(privateKey.toPublicKey(), privateKey);
+    }
+    catch (ClassCastException ex) {
+      throw ex;
+    }
   }
 
   public void savePublicKeyFile (File file) throws IOException {
@@ -55,6 +75,7 @@ public class RSAKeyPair {
 
   public Message encrypt (Message message, String label, String labelCharsetName, String hashAlgorithm)
       throws NoSuchAlgorithmException, IOException, RSAException {
+    message.encodeLengthCheck(hashAlgorithm, publicKey.getModulusByteCount());
     return Message.fromBigNumber(publicKey.encryptionPrimitive(
         message.encode(label, labelCharsetName, hashAlgorithm, publicKey.getModulusByteCount())
             .toBigNumber()));
@@ -62,6 +83,7 @@ public class RSAKeyPair {
 
   public Message decrypt (Message message, String label, String labelCharsetName, String hashAlgorithm)
       throws NoSuchAlgorithmException, IOException, RSAException {
+    message.decodeLengthCheck(hashAlgorithm, privateKey.getModulusByteCount());
     return Message.fromBigNumber(privateKey.decryptionPrimitive(message.toBigNumber()))
         .decode(label, labelCharsetName, hashAlgorithm, privateKey.getModulusByteCount());
   }
@@ -76,27 +98,6 @@ public class RSAKeyPair {
 
   public boolean hasPrivateKey () {
     return privateKey != null;
-  }
-
-  public static void main (String[] args) throws Exception {/*
-    Charset charset = Charset.forName("UTF-8");
-    String algorithm = "SHA-1";
-    RSAKeyPair rsaKeyPair = RSAKeyPair.generateKeyPair(512);
-
-    Message plainText = Message.fromString("test", charset);
-    System.out.println(plainText.toString(charset));
-
-    Message cipherText1 = rsaKeyPair.encrypt(plainText, "", charset, algorithm);
-    System.out.println(cipherText1.toHexString());
-
-    Message cipherText2 = rsaKeyPair.encrypt(plainText, "", charset, algorithm);
-    System.out.println(cipherText2.toHexString());
-
-    Message output1 = rsaKeyPair.decrypt(cipherText1, "", charset, algorithm);
-    System.out.println(output1.toString(charset));
-
-    Message output2 = rsaKeyPair.decrypt(cipherText2, "", charset, algorithm);
-    System.out.println(output2.toString(charset));*/
   }
 
 }

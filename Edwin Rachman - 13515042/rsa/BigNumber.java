@@ -519,6 +519,10 @@ public class BigNumber implements Serializable {
   }
 
   public BigNumber[] divideAndModulo (BigNumber y) {
+    if (y.equalTo(ZERO)) {
+      throw new ArithmeticException("Divide by zero error");
+    }
+
     BigNumber quotient = ZERO.resize(getSize());
     BigNumber remainder = ZERO.resize(getSize());
     BigNumber divisor = y.resize(getSize());
@@ -584,7 +588,7 @@ public class BigNumber implements Serializable {
     }
 
     if (r0.moreThan(ONE)) {
-      return null;
+      throw new ArithmeticException("Number not invertible error");
     }
     if (t0.isNegative()) {
       t0 = t0.add(modulus);
@@ -687,11 +691,7 @@ public class BigNumber implements Serializable {
   }
 
   public static void main (String[] args) {
-    BigNumber prime1 = BigNumber.generateRandom(BigNumber.getMaxValue(256));//(int) keyLengthSpinner.getValue()));
-    while (!prime1.isPrimeSmallPrimesTest(128) || !prime1.isPrimeMillerRabinTest(5)) {
-      prime1.add(BigNumber.TWO);
-      System.out.println(prime1.toHexString());
-    }
+    System.out.println(fromInt(10).modularInverse(fromInt(17)).toHexString());
   }
 }
 

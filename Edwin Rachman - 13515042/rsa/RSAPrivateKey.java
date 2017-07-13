@@ -34,7 +34,7 @@ public class RSAPrivateKey implements Serializable {
     return modulus.getSize() * 4;
   }
 
-  public static RSAPrivateKey fromFile (File file) throws IOException, ClassNotFoundException {
+  public static RSAPrivateKey fromFile (File file) throws IOException, ClassNotFoundException, ClassCastException {
     return (RSAPrivateKey) new ObjectInputStream(new FileInputStream(file)).readObject();
   }
 

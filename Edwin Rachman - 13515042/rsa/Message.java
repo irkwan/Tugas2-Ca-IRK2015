@@ -6,6 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -30,12 +34,13 @@ public class Message {
     }
   }
 
-  public String toString (String charsetName) throws UnsupportedEncodingException {
+  public String toString (String charsetName) throws CharacterCodingException {
     if (charsetName.equals("Hex")) {
       return DatatypeConverter.printHexBinary(content);
     }
     else {
-      return new String(content, charsetName);
+      return Charset.forName(charsetName).newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+          .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(content)).toString();
     }
   }
 
@@ -59,13 +64,16 @@ public class Message {
     return modulusByteCount - 2 * hashLength(hashAlgorithm) - 2;
   }
 
+  public void encodeLengthCheck (String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, RSAException {
+    if (content.length > getLengthLimit(hashAlgorithm, modulusByteCount)) {
+      throw new RSAException(String.format("Message length too long\nCurrent: %d bytes\nLimit: %d bytes",
+          content.length, getLengthLimit(hashAlgorithm, modulusByteCount)));
+    }
+  }
+
   public Message encode (String label, String labelCharsetName, String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, IOException, RSAException {
     byte[] labelHash = hash(label.getBytes(labelCharsetName), hashAlgorithm);
     int hashLength = hashLength(hashAlgorithm);
-
-    if (content.length > modulusByteCount - 2 * hashLength - 2) {
-      throw new RSAException("Message length too long");
-    }
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     outputStream.write(labelHash);
@@ -99,13 +107,15 @@ public class Message {
     return new Message(outputStream.toByteArray());
   }
 
+  public void decodeLengthCheck (String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, RSAException {
+    if (content.length != modulusByteCount || modulusByteCount < 2 * hashLength(hashAlgorithm) + 2) {
+      throw new RSAException("Decryption error");
+    }
+  }
+
   public Message decode (String label, String labelCharsetName, String hashAlgorithm, int modulusByteCount) throws NoSuchAlgorithmException, IOException, RSAException {
     byte[] labelHash = hash(label.getBytes(labelCharsetName), hashAlgorithm);
     int hashLength = hashLength(hashAlgorithm);
-
-    if (content.length != modulusByteCount || modulusByteCount < 2 * hashLength + 2) {
-      throw new RSAException("Decryption error");
-    }
 
     byte headByte = content[0];
     byte[] seed = Arrays.copyOfRange(content, 1, hashLength + 1);
