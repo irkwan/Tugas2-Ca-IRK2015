@@ -27,7 +27,7 @@ public class RSAGenerator {
 
   private static BigInteger one = new BigInteger("1");
   private static BigInteger mul = new BigInteger("256");
-  
+
   /*
    * Konstruktor tanpa parameter.
    * Memilih 2 bilangan prima secara acak (primeP, primeQ), mengenerate kunci enkripsi
@@ -67,8 +67,8 @@ public class RSAGenerator {
    * Membaca file yang bernama filename dan menyimpan dalam array of byte.
    */
 
-  public static byte[] readFile(String filename) throws IOException {
-    File file = new File(filename);
+  public static byte[] readFile(File file) throws IOException {
+    //File file = new File(filename);
     FileInputStream fin = null;
     byte[] fileContent = new byte[1];
     try {
@@ -156,7 +156,23 @@ public class RSAGenerator {
   	return BigInteger.mod(BigInteger.modPow(encrypted, deKey, modulus), mul);
   }
 
-  public static void main(String args[]) {
+  public String getPrimeP() {
+  	return primeP.toString();
+  }
+
+  public String getPrimeQ() {
+  	return primeQ.toString();
+  }
+
+  public String getEnKey() {
+  	return enKey.toString();
+  }
+
+  public String getDeKey() {
+  	return deKey.toString();
+  }
+
+  /*public static void main(String args[]) {
   	try {
   	  byte[] fileContent = readFile("sample.txt");
   	  BigInteger[] content2 = convertASCIIToBigInt2(fileContent); //dalam bentuk array BigInteger
@@ -186,5 +202,5 @@ public class RSAGenerator {
   	} catch (IOException e) {
       System.out.println("File not found!");
     }
-  }
+  }*/
 }
