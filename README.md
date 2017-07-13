@@ -1,42 +1,32 @@
 # Tugas2-Ca-IRK2015 RSA and Big Number Implementation 
 
-Halo Ca-IRK 2015 !
+## Penjelasan Singkat
 
-Pada kesempatan kali ini anda mendapat tugas untuk mengimplementasikan algoritma dalam bidang kriptografi yang cukup terkenal.
+Pada tugas kali ini, Ca-IRK 2015 mendapat tugas untuk mengimplementasikan algoritma dalam bidang kriptografi yang cukup terkenal.
 Algoritma tersebut adalah algoritma RSA. RSA termasuk kedalam algoritma kriptografi non-simetris, RSA banyak dipakai karena tingkat 
 keamanannya yang cukup baik dengan memanfaatkan prinsip operasi pada big number.
+Selain itu, Ca-IRK 2015 juga harus mengimplementasikan library big number hasil buatan sendiri.
 
-Sebagai tantangan tambahan, anda juga harus mengimplementasikan library big number hasil buatan anda sendiri dengan memanfaatkan
-algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
+Implementasi library big number terdapat pada file [BigInteger.java][https://github.com/calmira/Tugas2-Ca-IRK2015/blob/master/Catherine%20Almira%20-%2013515111/BigInteger.java].
+Di dalam file tersebut, big number dibuat dengan memiliki atribut sign (penanda positif, negatif, atau 0) dan value (nilai dari big number itu sendiri).
+Operasi dasar (penjumlahan, pengurangan, perkalian, pembagian, dan mod), gcd (greatest common divisor/faktor pembagi bersama terbesar), invers dari mod, dan pembangkitan bilangan prima secara acak dengan menggunakan Miller Rabin Test diimplementasikan pada file ini.
 
-# Aturan Pengerjaan
-1. Lakukan fork pada repository ini.
-2. Buat folder berisi hasil pekerjaan anda, beri nama folder dengan format : **Nama anda - NIM**. 
+Implementasi algoritma RSA terdapat pada file [RSAGenerator.java][https://github.com/calmira/Tugas2-Ca-IRK2015/blob/master/Catherine%20Almira%20-%2013515111/RSAGenerator.java].
+Untuk menerapkan algoritma RSA, pertama-tama dipilih 2 buah bilangan prima secara acak, misal p dan q.
+Kemudian dihitung nilai dari n = p * q dan phi = (p - 1) * (q - 1).
+Pilih kunci publik, e, yang relatif prima dengan phi.
+Kunci privat, d, akan diperoleh dari invers e dalam modulus phi.
+Hasil enkripsi terhadap m diperoleh dengan c = m<sup>e</sup> mod n, sementara hasil dekripsi terhadap c diperoleh dengan m = c<sup>d</sup> mod n.
+Pada RSAGenerator ini, enkripsi dilakukan per karakter agar tidak mengubah makna dari karakter tersebut.
+Untuk meningkatkan keamanan, enkripsi per karakter ini dilakukan dengan menjumlahkan suatu bilangan acak dikali dengan 256 terhadap nilai dari karakter tersebut agar dari karakter yang sama diperoleh hasil enkripsi yang berbeda. Hasil enkripsi yang akan didekripsi kembali dimod dengan 256 agar menghasilkan karakter sesuai dengan asalnya.
+Selain mengimplementasikan enkripsi dan dekripsi dengan algoritma RSA, file tersebut pun dilengkapi dengan konversi teks menjadi big number dan sebaliknya.
+Konversi dilakukan untuk memudahkan proses enkripsi dan dekripsi.
 
-   Contoh : Varian - 13514041
-3. Lakukan commit secara berkala dan berikan pesan yang bermakna, hindari kasus sekali commit langsung selesai pada pengerjaan tugas.
-   Hal ini dimaksudkan agar anda terbiasa bekerja menggunakan git.
+## Cara Penggunaan dan Screenshot Aplikasi
 
-4. Untuk pengumpulan, lakukan pull request sebelum deadline. **Lengkapi juga dengan readme yang berisi penjelasan singkat, cara penggunaan dan screenshot program anda. (Edit Readme ini)**.
+1. Download repository ini.
+2. Buka direktori Catherine Almira - 13515111 di terminal.
+3. Masukan perintah `javac Main.java` kemudian `java Main`.
+4. Aplikasi seperti berikut akan muncul pada layar.
+![Main view]["Catherine Almira - 13515111"/Screenshot/MainView.png]
 
-# Spesifikasi Umum
-1. Program boleh dibuat dalam bahasa pemrograman apapun, boleh menggunakan GUI maupun console application biasa.
-2. Program dapat membaca input teks yang akan dienkripsi dari file eksternal.
-3. Program dapat melakukan generate public dan private key.
-4. Program dapat melakukan enkripsi pada teks yang dibaca dengan menggunakan key yang dihasilkan dan menampilkannya ke layar / menyimpannya ke file eksternal lain.
-5. Program dapat melakukan dekripsi kembali cipher text yang dihasilkan pada tahap (4) dan menampilkan ke layar / menyimpannya ke file eksternal lain.
-6. Program dapat menghitung dan menampilkan waktu eksekusi dari tahap 3 hingga 4.
-
-# Spesifikasi RSA
-1. Dua buah bilangan prima random yang dipilih di awal harus minimal **20 digit**
-2. Segala operasi pada bilangan big number **TIDAK BOLEH MENGGUNAKAN LIBRARY BAWAAN BAHASA PEMROGRAMAN / BUATAN ORANG**. Anda harus mengimplementasikan library / algoritma big number sendiri, namun belajar dari algoritma yang sudah ada tidak dilarang.
-
-# Deadline
-Deadline pengerjaan tugas ini adalah tanggal 30 Juni 2017 pukul 20.17 WIB, silahkan mulai dicicil mengerjakan dari sekarang karena waktu pengerjaan anda dipotong libur lebaran.
-
-Apabila ada perubahan spesifikasi maupun deadline, maka akan diberitahukan lebih lanjut.
-
-Tetap Semangat !! 
-
-# Referensi 
-https://en.wikipedia.org/wiki/RSA_(cryptosystem)
