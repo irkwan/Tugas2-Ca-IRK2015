@@ -39,6 +39,11 @@ public class Main extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         decryptedTextArea = new javax.swing.JTextArea();
         decryptButton = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        newMenuItem = new javax.swing.JMenuItem();
+        
+        this.setTitle("RSA Application by Catherine Almira - 13515111");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -62,7 +67,7 @@ public class Main extends javax.swing.JFrame {
         encryptionKeyTextField.setEditable(false);
 
         decryptionKeyTextField.setEditable(false);
-
+        
         encryptionKeyLabel.setText("Encryption Key:");
 
         decryptionKeyLabel.setText("Decryption Key:");
@@ -116,7 +121,6 @@ public class Main extends javax.swing.JFrame {
         plainTextPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Plain Text"));
         plainTextPanel.setPreferredSize(new java.awt.Dimension(210, 345));
 
-        //jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane1.setAutoscrolls(true);
 
         plainTextArea.setEditable(false);
@@ -141,7 +145,7 @@ public class Main extends javax.swing.JFrame {
         plainTextPanelLayout.setVerticalGroup(
             plainTextPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(plainTextPanelLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(browseButton)
                 .addContainerGap())
@@ -150,7 +154,6 @@ public class Main extends javax.swing.JFrame {
         encryptedTextPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Encrypted Text"));
         encryptedTextPanel.setPreferredSize(new java.awt.Dimension(210, 345));
 
-        //jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane3.setAutoscrolls(true);
 
         encryptedTextArea.setEditable(false);
@@ -184,7 +187,6 @@ public class Main extends javax.swing.JFrame {
         decryptedTextPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Decrypted Text"));
         decryptedTextPanel.setPreferredSize(new java.awt.Dimension(210, 345));
 
-        //jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setAutoscrolls(true);
 
         decryptedTextArea.setEditable(false);
@@ -215,6 +217,21 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jMenu1.setText("File");
+
+        newMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+        newMenuItem.setText("New");
+        newMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(newMenuItem);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -233,9 +250,9 @@ public class Main extends javax.swing.JFrame {
                 .addComponent(rsaKeysPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(plainTextPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
-                    .addComponent(encryptedTextPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
-                    .addComponent(decryptedTextPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE))
+                    .addComponent(plainTextPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                    .addComponent(encryptedTextPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                    .addComponent(decryptedTextPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -343,7 +360,22 @@ public class Main extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Generate keys and browse the text before encrypt.", "Message", JOptionPane.INFORMATION_MESSAGE);
         }
-    }                                                                                                
+    }
+
+    private void newMenuItemActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        Main reset = new Main();
+        primeNumber1TextField.setText("");
+        primeNumber2TextField.setText("");
+        encryptionKeyTextField.setText("");
+        decryptionKeyTextField.setText("");
+        plainTextArea.setText("");
+        decryptedTextArea.setText("");
+        encryptedTextArea.setText("");
+        isAlreadyEncrypted = false;
+        isAlreadyDecrypted = false;
+        isAlreadyBrowse = false;
+        isAlreadyGenerated = false;
+    }
 
     /**
      * @param args the command line arguments
@@ -399,14 +431,17 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel encryptionKeyLabel;
     private javax.swing.JTextField encryptionKeyTextField;
     private javax.swing.JButton generateKey;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JMenuItem newMenuItem;
     private javax.swing.JTextArea plainTextArea;
     private javax.swing.JPanel plainTextPanel;
     private javax.swing.JLabel primeNumber1Label;
     private javax.swing.JTextField primeNumber1TextField;
     private javax.swing.JLabel primeNumber2Label;
     private javax.swing.JTextField primeNumber2TextField;
-    private javax.swing.JPanel rsaKeysPanel;              
+    private javax.swing.JPanel rsaKeysPanel;            
 }

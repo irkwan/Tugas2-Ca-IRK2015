@@ -1,1 +1,7 @@
-HARI INI
+Tugas2-Ca-IRK2015 RSA and Big Number Implementation 
+
+Halo Ca-IRK 2015 !
+
+Pada kesempatan kali ini anda mendapat tugas untuk mengimplementasikan algoritma dalam bidang kriptografi yang cukup terkenal.
+Algoritma tersebut adalah algoritma RSA. RSA termasuk kedalam algoritma kriptografi non-simetris, RSA banyak dipakai karena tingkat 
+keamanannya yang cukup baik dengan memanfaatkan prinsip operasi pada big number.
