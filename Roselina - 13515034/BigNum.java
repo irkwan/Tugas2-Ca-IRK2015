@@ -452,20 +452,5 @@ public class BigNum {
 	public int[] toIntArray() {
 		return num;
 	}
-	
-	public static void main(String[] args) {
-		double startTime, stopTime, elapsedTime;
-		System.out.println("Finding Number...");
-		startTime = System.currentTimeMillis();
-		BigNum h = BigNum.probablePrime(64);
-		stopTime = System.currentTimeMillis();
-		elapsedTime = (stopTime - startTime) / 1000;
-		System.out.println(elapsedTime + " s");
-		System.out.print("Number is ");
-		h.printHex();
-		BigNum a = new BigNum(new int[]{0xFFFFFFAA, 0xFFFFFFFF});
-		BigNum b = new BigNum(new int[]{0x000000FF});
-		a.or(b).printHex();
-	}
 
 }
