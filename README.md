@@ -12,7 +12,12 @@ Library dari BigInteger beserta RSA di implementasi menggunakan bahasa C++. Dipi
 2. Angka 512 pada contoh di poin 1 diatas dapat diubah menjadi 1024 ataupun 2048 tergantung ukuran bit pada key yang diinginkan. Semakin besar ukuran key, akan semakin sulit untuk dipecahkan.
 
 ## Screenshot
-![fileinput] [https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(file%20input).png]
-![hasilfile1] [https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input1.txt).png]
-![hasilfile2] [https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input2.txt).png "Hasil eksekusi file input 2"]
-![hasilfile3] [https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input3.txt).png "Hasil eksekusi file input 3"]
+![fileinput] [1]
+![hasilfile1] [2]
+![hasilfile2] [3]
+![hasilfile3] [4]
+
+[1]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(file%20input).png
+[2]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input1.txt).png
+[3]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input2.txt).png
+[4]: https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/blob/master/Kezia%20Suhendra%20-%2013515063/screenshot/Screen%20Shot%20(input3.txt).png
