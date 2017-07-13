@@ -14,21 +14,34 @@ Operasi dasar (penjumlahan, pengurangan, perkalian, pembagian, dan mod), gcd (gr
 
 Implementasi algoritma RSA terdapat pada file [RSAGenerator.java](https://github.com/calmira/Tugas2-Ca-IRK2015/blob/master/Catherine%20Almira%20-%2013515111/RSAGenerator.java).
 
-Untuk menerapkan algoritma RSA, pertama-tama dipilih 2 buah bilangan prima secara acak, misal p dan q.
-Kemudian dihitung nilai dari n = p * q dan phi = (p - 1) * (q - 1).
-Pilih kunci publik, e, yang relatif prima dengan phi.
-Kunci privat, d, akan diperoleh dari invers e dalam modulus phi.
-Hasil enkripsi terhadap m diperoleh dengan c = m<sup>e</sup> mod n, sementara hasil dekripsi terhadap c diperoleh dengan m = c<sup>d</sup> mod n.
+Untuk menerapkan algoritma RSA, pertama-tama dipilih 2 buah bilangan prima secara acak, misal **p** dan **q**.
+Kemudian dihitung nilai dari **n = p * q** dan **phi = (p - 1) * (q - 1)**.
+Pilih kunci publik, **e**, yang **relatif prima dengan phi**.
+Kunci privat, **d**, akan diperoleh dari **invers e dalam modulus phi**.
+Hasil enkripsi terhadap m diperoleh dengan **c = m<sup>e</sup> mod n**, sementara hasil dekripsi terhadap c diperoleh dengan **m = c<sup>d</sup> mod n**.
 Pada RSAGenerator ini, enkripsi dilakukan per karakter agar tidak mengubah makna dari karakter tersebut.
 Untuk meningkatkan keamanan, enkripsi per karakter ini dilakukan dengan menjumlahkan suatu bilangan acak dikali dengan 256 terhadap nilai dari karakter tersebut agar dari karakter yang sama diperoleh hasil enkripsi yang berbeda. Hasil enkripsi yang akan didekripsi kembali dimod dengan 256 agar menghasilkan karakter sesuai dengan asalnya.
 Selain mengimplementasikan enkripsi dan dekripsi dengan algoritma RSA, file tersebut pun dilengkapi dengan konversi teks menjadi big number dan sebaliknya.
 Konversi dilakukan untuk memudahkan proses enkripsi dan dekripsi.
 
-## Cara Penggunaan dan Screenshot Aplikasi
+## Cara Penggunaan dan *Screenshot* Aplikasi
 
-1. Download repository ini.
+1. Download *repository* ini.
 2. Buka direktori Catherine Almira - 13515111 di terminal.
 3. Masukan perintah `javac Main.java` kemudian `java Main`.
 4. Aplikasi seperti berikut akan muncul pada layar.
 ![Main view](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/MainView.PNG)
-
+5. Tekan tombol **Generate Keys** untuk menghasilkan kunci-kunci enkripsi dan dekripsi.
+![Generate Keys](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/GenerationKey.PNG)
+6. Tekan tombol **Browse** untuk mencari dan **Open** untuk memilih file yang akan dienkripsi.
+![Browse](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/Browse.PNG)
+7. Tekan tombol **Encrypt** untuk mengenkripsi teks yang sudah dipilih.
+![Encrypt](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/EncryptedText.PNG)
+8. Tekan tombol **Decrypt** untuk mendekripsi teks agar kembali seperti semula.
+![Decrypt](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/DecryptedText.PNG)
+9. Tombol **Generate Keys** dan **Browse** kemudian **Open** harus ditekan terlebih dahulu sebelum enkripsi. Jika tidak, akan muncul pesan berikut.
+![Error message](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/EncryptionErrorMessage.PNG)
+10. Tombol **Encrypt** harus ditekan terlebih dahulu sebelum **Decrypt**. Jika tidak, akan muncul pesan berikut.
+![Error message](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/DecryptionErrorMessage.PNG)
+11. Tekan menu **File - New** atau **Ctrl+N** apabila ingin melakukan enkripsi dan dekripsi kembali.
+![New](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/NewRSA.PNG)
