@@ -67,3 +67,5 @@ Proses Dekripsi<br>
 062^7 mod 103 = 101<br>
 
 Teks hasil dekripsi -> 103 097 110 116 101 110 103
+
+Catatan Penulis : Seluruh test case dalam tugas ini diambil dari akun ig @johan.sentosa.
