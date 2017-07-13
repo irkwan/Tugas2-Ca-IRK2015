@@ -41,8 +41,6 @@ public class RSAGenerator {
       primeQ = BigInteger.generateRandomPrime(20);
     }
     modulus = primeP.multiply(primeQ);
-    System.out.println("Prime number 1 : " + primeP);
-    System.out.println("Prime number 2 : " + primeQ);
     BigInteger nMin = (primeP.subtract(one)).multiply(primeQ.subtract(one));
     BigInteger temp = new BigInteger("3");
     BigInteger two = new BigInteger("2");
@@ -58,9 +56,7 @@ public class RSAGenerator {
         enKey = enKey.add(two);
       }
     }
-    System.out.println("Public key : " + enKey);
     deKey = enKey.modInverse(nMin);
-    System.out.println("Private key : " + deKey);
   }
 
   /*
@@ -171,36 +167,4 @@ public class RSAGenerator {
   public String getDeKey() {
   	return deKey.toString();
   }
-
-  /*public static void main(String args[]) {
-  	try {
-  	  byte[] fileContent = readFile("sample.txt");
-  	  BigInteger[] content2 = convertASCIIToBigInt2(fileContent); //dalam bentuk array BigInteger
-      //start timer
-  	  long startTime = System.currentTimeMillis();
-  	  //generate public key dan private key
-      RSAGenerator rsa = new RSAGenerator();
-      //enkripsi
-      System.out.println("Encrypting...");
-      BigInteger[] encrypted = new BigInteger[content2.length];
-      for (int i = 0; i < content2.length; i++) {
-        encrypted[i] = rsa.encrypt(content2[i]);
-        System.out.println(encrypted[i]);
-      }
-      //stop timer (enkripsi selesai)
-      long endTime = System.currentTimeMillis();
-      System.out.println("Decrypting...");
-      //dekripsi
-      BigInteger[] decrypted = new BigInteger[encrypted.length];
-      for (int i = 0; i < encrypted.length; i++) {
-        decrypted[i] = rsa.decrypt(encrypted[i]);
-        System.out.println(decrypted[i]);
-      }
-      System.out.println("Finish");
-      System.out.println(convertASCIIToText(convertBigIntToASCII(decrypted)));
-      System.out.println("Execution time " + (endTime - startTime) + " ms");
-  	} catch (IOException e) {
-      System.out.println("File not found!");
-    }
-  }*/
 }
