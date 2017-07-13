@@ -35,7 +35,7 @@ public class RSA {
 	}
 
 	public static void main(String[] args) {
-		Message m = new Message("D:\\Roselina_2\\Java Program\\RSA\\src\\external_file\\message.txt");
+		Message m = new Message("message.txt");
 		RSA rsa = new RSA(m.getMessageLength());
 		BigNum message = m.getMessage();
 		BigNum encrypt = rsa.encrypt(message);
