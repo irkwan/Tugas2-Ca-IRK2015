@@ -1,42 +1,15 @@
-# Tugas2-Ca-IRK2015 RSA and Big Number Implementation 
+# RSA dan Big Number Implementation
+## Penjelasan Singkat
+Library dari BigInteger beserta RSA di implementasi menggunakan bahasa C++. Dipilih bahasa C++ karena lebih mudah dalam melakukan implementasi khususnya untuk operator overloading. Selain itu, diterapkan pula gcdextended dan gcd yang berdasarkan algoritma Euclidian. Terdapat pula method generateprime untuk menghasilkan angka prima secara random. Angka-angka prima yang sudah di generate secara random akan menjadi variabel p dan q yang akan digunakan pada RSA. Kunci publik adalah pasangan (n,e) sedangkan kunci privat adalah pasangan (n, d). n didapatkan dengan cara mengalikan p dengan q. Totient didapatkan dengan cara mengalikan (p-1) dengan (q-1). Kemudian pilih suatu bilangan e yang relatif prima terhadap totient. d dapat dihitung dengan rumus d kongruen e-1 mod (totient). Selanjutnya teks yang diinput pada file eksternal akan di enkripsi. Ukuran kunci untuk enkripsi dapat dibedakan menjadi 512, 1024, dan 2048 bit. Semakin besar ukuran bit maka semakin rumit kunci tersebut untuk diretas oleh orang lain.
 
-Halo Ca-IRK 2015 !
+## Cara Penggunaan
+**Cara Kompilasi Program:**
+1. Buka terminal kemudian masuk ke direktori source code yang dituju (Kezia Suhendra - 13515063).
+2. Ketik command `g++ -o main main.cpp BigInteger.cpp Key.cpp OAEP.cpp PrimeGenerator.cpp RSA.cpp StringTrans.cpp -std=c++11` untuk mengkompilasi program.
 
-Pada kesempatan kali ini anda mendapat tugas untuk mengimplementasikan algoritma dalam bidang kriptografi yang cukup terkenal.
-Algoritma tersebut adalah algoritma RSA. RSA termasuk kedalam algoritma kriptografi non-simetris, RSA banyak dipakai karena tingkat 
-keamanannya yang cukup baik dengan memanfaatkan prinsip operasi pada big number.
+**Cara Menjalankan Program:**
+1. Ketik command `./main ukuran namafiletxt`. Contohnya `./main 512 input1.txt`.
+2. Angka 512 pada contoh di poin 1 diatas dapat diubah menjadi 1024 ataupun 2048 tergantung ukuran bit pada key yang diinginkan. Semakin besar ukuran key, akan semakin sulit untuk dipecahkan.
 
-Sebagai tantangan tambahan, anda juga harus mengimplementasikan library big number hasil buatan anda sendiri dengan memanfaatkan
-algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
-
-# Aturan Pengerjaan
-1. Lakukan fork pada repository ini.
-2. Buat folder berisi hasil pekerjaan anda, beri nama folder dengan format : **Nama anda - NIM**. 
-
-   Contoh : Varian - 13514041
-3. Lakukan commit secara berkala dan berikan pesan yang bermakna, hindari kasus sekali commit langsung selesai pada pengerjaan tugas.
-   Hal ini dimaksudkan agar anda terbiasa bekerja menggunakan git.
-
-4. Untuk pengumpulan, lakukan pull request sebelum deadline. **Lengkapi juga dengan readme yang berisi penjelasan singkat, cara penggunaan dan screenshot program anda. (Edit Readme ini)**.
-
-# Spesifikasi Umum
-1. Program boleh dibuat dalam bahasa pemrograman apapun, boleh menggunakan GUI maupun console application biasa.
-2. Program dapat membaca input teks yang akan dienkripsi dari file eksternal.
-3. Program dapat melakukan generate public dan private key.
-4. Program dapat melakukan enkripsi pada teks yang dibaca dengan menggunakan key yang dihasilkan dan menampilkannya ke layar / menyimpannya ke file eksternal lain.
-5. Program dapat melakukan dekripsi kembali cipher text yang dihasilkan pada tahap (4) dan menampilkan ke layar / menyimpannya ke file eksternal lain.
-6. Program dapat menghitung dan menampilkan waktu eksekusi dari tahap 3 hingga 4.
-
-# Spesifikasi RSA
-1. Dua buah bilangan prima random yang dipilih di awal harus minimal **20 digit**
-2. Segala operasi pada bilangan big number **TIDAK BOLEH MENGGUNAKAN LIBRARY BAWAAN BAHASA PEMROGRAMAN / BUATAN ORANG**. Anda harus mengimplementasikan library / algoritma big number sendiri, namun belajar dari algoritma yang sudah ada tidak dilarang.
-
-# Deadline
-Deadline pengerjaan tugas ini adalah tanggal 30 Juni 2017 pukul 20.17 WIB, silahkan mulai dicicil mengerjakan dari sekarang karena waktu pengerjaan anda dipotong libur lebaran.
-
-Apabila ada perubahan spesifikasi maupun deadline, maka akan diberitahukan lebih lanjut.
-
-Tetap Semangat !! 
-
-# Referensi 
-https://en.wikipedia.org/wiki/RSA_(cryptosystem)
+## Screenshot
+https://github.com/keziasuhendra/Tugas2-Ca-IRK2015/tree/master/Kezia%20Suhendra%20-%2013515063/screenshot
