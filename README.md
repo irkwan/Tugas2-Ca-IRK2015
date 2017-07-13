@@ -30,5 +30,5 @@ Konversi dilakukan untuk memudahkan proses enkripsi dan dekripsi.
 2. Buka direktori Catherine Almira - 13515111 di terminal.
 3. Masukan perintah `javac Main.java` kemudian `java Main`.
 4. Aplikasi seperti berikut akan muncul pada layar.
-![Main view](Catherine Almira - 13515111/Screenshot/MainView.png)
+![Main view](https://raw.githubusercontent.com/calmira/Tugas2-Ca-IRK2015/master/Catherine%20Almira%20-%2013515111/Screenshot/MainView.PNG)
 
