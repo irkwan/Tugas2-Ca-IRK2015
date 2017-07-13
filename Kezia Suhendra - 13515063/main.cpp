@@ -35,9 +35,6 @@ int main(int argc, char **argv) {
       printf("Input the number either 512 or 768 or 1024 or 2048 after ./<exec>\n");
       exit(EXIT_FAILURE);
   }
-  /*cout << "\nInput your message here:\n";
-  string msg;
-  getline(cin, msg);*/
   ifstream input(argv[2]);
   string msg;
   char c;
@@ -59,8 +56,6 @@ int main(int argc, char **argv) {
   cout << st.toString() << endl;
   OAEP oaep(16, N.GetBitLength() - 17);
   oaep.encode(st);
-  //cout << "\nEncoded Message:\n";
-  //cout << st.toHexString() << endl;
   RSA::encrypt(st, N, E);
   cout << "\nEncrypted Message:\n";
   cout << st.toHexString() << endl;
