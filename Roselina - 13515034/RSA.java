@@ -1,5 +1,3 @@
-package main;
-
 public class RSA {
 
 	private BigNum p;
