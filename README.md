@@ -15,8 +15,8 @@ RSA adalah algoritma kriptografi asimetris yang mempunyai kunci yang berbeda pad
 
 # Screenshot
 
-![alt text](Roselina - 13515034/Screenshot/screenshot1.png?raw=true "Screenshot 1")
+![alt text](Roselina%20-%2013515034/Screenshot/screenshot1.png?raw=true "Screenshot 1")
 
-![alt text](Roselina - 13515034/Screenshot/screenshot2.png?raw=true "Screenshot 2")
+![alt text](Roselina%20-%2013515034/Screenshot/screenshot2.png?raw=true "Screenshot 2")
 
-![alt text](Roselina - 13515034/Screenshot/screenshot3.png?raw=true "Screenshot 3")
+![alt text](Roselina%20-%2013515034/Screenshot/screenshot3.png?raw=true "Screenshot 3")
