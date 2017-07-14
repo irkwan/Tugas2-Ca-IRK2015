@@ -221,6 +221,35 @@ class BigInt:
 		return result
 
 	"""
+		Fast power mod algorithm
+	"""
+	def pow_mod(self,y,m):
+		if (self<BigInt("1") or y<BigInt("0") or m<BigInt("1")):
+			return -1
+		y=y%m
+		# y = int(y.num)
+		# print self
+		# print y
+		# print m
+		result = BigInt("1")
+		while (y > BigInt("0")):
+			if (y%BigInt("2") == BigInt("1")):
+				result = (result * self) % m;
+			self = (self * self) % m;
+			y = y/BigInt("2");
+		return result % m;
+
+		# result=BigInt("1")
+		# x = self
+		# y = (int)(y.num) # assume never exceed 2^64-1
+		# while(y!=0):
+		# 	if(y&1==1):
+		# 		result=(result*x)%m
+		# 	y>>=1
+		# 	x=x*x%m
+		# return result		
+
+	"""
 		Karatsuba Multiplication with base10
 	"""
 	def __mul__(self,num2):
@@ -311,12 +340,12 @@ class BigInt:
 # x = BigInt("930756436598645946732525352353252353223532596759372658362763298647268352")
 # y = BigInt("33253253")
 # print x-y
-x = BigInt("14")
-y = BigInt("-3")
+# x = BigInt("14")
+# y = BigInt("-3")
 # x = BigInt("3000")
 # y = BigInt("3")
 # print x/y, x%y
-print x/y, x%y
+# print x/y, x%y
 # x = BigInt("100001")
 # y = BigInt("3")
 # print x/y, x%y

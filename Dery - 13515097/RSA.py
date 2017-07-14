@@ -1,9 +1,10 @@
 import random
 import timeit
+from BigPrime import *
 from BigInt import BigInt
 
 """
-Euclid's algorithm to determine GCD
+  Euclid's algorithm to determine GCD
 """
 def gcd(a, b):
   while b!=BigInt("0"):
@@ -12,18 +13,17 @@ def gcd(a, b):
 
 """
   Finding Multiplicative inverse
-  (Still not proper, need to fix soon)
 """
 def multiplicative_inverse(e, phi):
-  e = int(e.num)
-  phi = int(phi.num)
-  d = 0
-  a1 = 0
-  a2 = 1
-  b1 = 1
+  # e = int(e.num)
+  # phi = int(phi.num)
+  d = BigInt("0")
+  a1 = BigInt("0")
+  a2 = BigInt("1")
+  b1 = BigInt("1")
   temp_phi = phi
   
-  while e > 0:
+  while e > BigInt("0"):
     # print d, a1, a2, b1, temp_phi
     temp1 = temp_phi/e
     temp2 = temp_phi-temp1*e
@@ -38,7 +38,7 @@ def multiplicative_inverse(e, phi):
     d = b1
     b1 = b
   
-  if temp_phi == 1:
+  if temp_phi == BigInt("1"):
     return d + phi
 
 """
@@ -57,10 +57,10 @@ def is_prime(num):
   return True
 
 def generate_keypair(p, q):
-  if not is_prime(p) or not is_prime(q):
-    raise ValueError('Both must prime.')
-  elif p==q:
-    raise ValueError('p, q cannot equal')
+  # if not is_prime(p) or not is_prime(q):
+  #   raise ValueError('Both must prime.')
+  # elif p==q:
+  #   raise ValueError('p, q cannot equal')
 
   # n=p*q
   n=p*q
@@ -69,23 +69,19 @@ def generate_keypair(p, q):
   phi = (p-BigInt("1")) * (q-BigInt("1"))
 
   # Choose coprime integer
-  # (Still not proper, need to fix soon)
-  e = BigInt(str(random.randrange(1, int(phi.num))))
+  e = BigInt(str("2"))
 
   # Verify e and phi are coprime
   g = gcd(e, phi)
   while g != BigInt("1"):
-    # (Still not proper, need to fix soon)
-    e = BigInt(str(random.randrange(1, int(phi.num))))
+    e += BigInt("1")
     g = gcd(e, phi)
   
   # Generate private key
   d = multiplicative_inverse(e, phi)
     
   # Public key is (e, n) and private key is (d, n)
-  return ((e, n), (BigInt(str(d)), n))
-
-  # return (BigInt("155"), BigInt("247")), (BigInt("131"), BigInt("247"))
+  return ((e, n), (d, n))
 
 def encrypt(pub, plain):
   key, n = pub
@@ -93,7 +89,6 @@ def encrypt(pub, plain):
   # a^b mod m
   cipher = []
   for char in plain:
-    # print char, ord(char)
     cipher+=[((BigInt(str(ord(char))) ** key) % n).num]
     # print cipher
 
@@ -108,13 +103,21 @@ def decrypt(priv, cipher):
   # print n
   for char in cipher:
     # print char, (char ** int(key.num)) % int(n.num)
-    plain+=[chr(int(((BigInt(char) ** key) % n).num))]
+    # plain+=[chr(int(((BigInt(char) ** key) % n).num))]
+    # plain+=[chr(pow(int(char),int(key.num),int(n.num)))]
+    a = long((BigInt(char).pow_mod(key,n)).num)
+    # print a,
+    plain+=[chr(a%255)]
   return ''.join(plain)
     
 
 print "RSA"
-p = str(raw_input("Enter a prime number: "))
-q = str(raw_input("Enter another prime number: "))
+p = str(generateLargePrime(64)) # 2^64-1 is not Big Integer :)
+print "First prime number: ", p
+q = str(generateLargePrime(64)) # 2^64-1 is not Big Integer :)
+print "Second prime number: ", q
+# p = str(raw_input("1 :"))
+# q = str(raw_input("2 :"))
 p = BigInt(p)
 q = BigInt(q)
 print
@@ -123,7 +126,7 @@ print "Generating public and private keypairs..."
 start_time = timeit.default_timer()
 public, private = generate_keypair(p, q)
 elapsed_key = timeit.default_timer() - start_time
-print "Public key: ", public[0], public[1]
+print "Public key : ", public[0], public[1]
 print "Private key: ", private[0], private[1]
 print "Generate key time: ", elapsed_key
 print
