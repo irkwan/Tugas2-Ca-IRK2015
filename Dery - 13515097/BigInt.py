@@ -14,6 +14,9 @@ class BigInt:
 	def __init__(self, x):
 		self.num = ""
 		for i in range(len(x)):
+			if(x[i]=='-'):
+				self.num = '-'
+				continue
 			if(x[i]=='0'): continue
 			self.num = x[i:]
 			break
@@ -35,6 +38,9 @@ class BigInt:
 	def concate_front(self,num2):
 		s = num2.num
 		for i in range(len(s)):
+			if(s[i]=='-'):
+				self.num = '-'
+				continue
 			if(s[i]=='0'): continue
 			self.num = s[i:]+self.num
 			break
@@ -74,6 +80,12 @@ class BigInt:
 		x always >= y
 	"""
 	def __sub__(self,num2):
+		negative = False
+		if self<num2:
+			negative = True
+			temp = self
+			self = num2
+			num2 = temp
 		y = num2.num
 		x = self.num
 
@@ -97,6 +109,8 @@ class BigInt:
 			# print str(curr)+result
 			result = str(curr)+result
 		# print BigInt(result)
+		if negative:
+			return BigInt('-'+result)
 		return BigInt(result)
 
 	def divmod_each(self,y):
@@ -242,6 +256,8 @@ class BigInt:
 
 	def __eq__(self,num2):
 		return self.cmp(num2)==0
+	def __ne__(self,num2):
+		return self.cmp(num2)!=0
 	def __gt__(self,num2):
 		return self.cmp(num2)==1
 	def __ge__(self,num2):
