@@ -18,9 +18,9 @@ class BigInt:
 				self.num = '-'
 				continue
 			if(x[i]=='0'): continue
-			self.num = x[i:]
+			self.num += x[i:]
 			break
-		if(len(self.num)==0):
+		if(len(self.num)==0 or self.num=="-"):
 			self.num = "0"
 
 	def __str__(self):
@@ -58,6 +58,13 @@ class BigInt:
 		y = num2.num
 		x = self.num
 
+		if(x[0]=='-' and y[0]=='-'):
+			return BigInt('-'+(BigInt(x[1:])+BigInt(y[1:])).num)
+		if(x[0]=='-'):
+			return BigInt(y)-BigInt(x[1:])
+		if(y[0]=='-'):
+			return BigInt(x)-BigInt(y[1:])
+
 		if len(x)<len(y):
 			temp = x
 			x = y
@@ -80,14 +87,25 @@ class BigInt:
 		x always >= y
 	"""
 	def __sub__(self,num2):
+		y = num2.num
+		x = self.num
+
+		if(x[0]=='-' and y[0]=='-'):
+			# -x+y
+			return BigInt(x[1:])-BigInt(y[1:])
+		if(x[0]=='-'):
+			# -x-y
+			return BigInt('-'+(BigInt(x[1:])+BigInt(y)).num)
+		if(y[0]=='-'):
+			# x+y
+			return BigInt(x)+BigInt(y[1:])
+
 		negative = False
 		if self<num2:
 			negative = True
-			temp = self
-			self = num2
-			num2 = temp
-		y = num2.num
-		x = self.num
+			temp = x
+			x = y
+			y = temp
 
 		x = str(x)
 		y = str(y)
@@ -130,6 +148,16 @@ class BigInt:
 	def divmod(self,y):
 		x = self.num
 		y = y.num
+
+		if(x[0]=='-' and y[0]=='-'):
+			return BigInt(x[1:])/BigInt(y[1:]),BigInt('-'+(BigInt(x[1:])%BigInt(y[1:])).num)
+		if(x[0]=='-'):
+			s = ((BigInt(x[1:])/BigInt(y))+BigInt("1")).num
+			return BigInt('-'+s), BigInt(s)*BigInt(y)+BigInt(x)
+		if(y[0]=='-'):
+			s = ((BigInt(x)/BigInt(y[1:]))+BigInt("1")).num
+			return BigInt('-'+s), BigInt(s)*BigInt(y)+BigInt(x)
+
 		q = ""
 		j = len(x)
 		while BigInt(x)>=BigInt(y) or j>0:
@@ -198,6 +226,13 @@ class BigInt:
 	def __mul__(self,num2):
 		x = self.num
 		y = num2.num
+
+		if(x[0]=='-' and y[0]=='-'):
+			return BigInt(x[1:])*BigInt(y[1:])
+		if(x[0]=='-'):
+			return BigInt('-'+(BigInt(x[1:])*BigInt(y)).num)
+		if(y[0]=='-'):
+			return BigInt('-'+(BigInt(y[1:])*BigInt(x)).num)
 
 		if (len(x)==1 or len(y)==1):
 			# print type(BigInt(str(int(x)*int(y))))
@@ -276,11 +311,12 @@ class BigInt:
 # x = BigInt("930756436598645946732525352353252353223532596759372658362763298647268352")
 # y = BigInt("33253253")
 # print x-y
-# x = BigInt("3003")
-# y = BigInt("30")
+x = BigInt("14")
+y = BigInt("-3")
 # x = BigInt("3000")
 # y = BigInt("3")
 # print x/y, x%y
+print x/y, x%y
 # x = BigInt("100001")
 # y = BigInt("3")
 # print x/y, x%y
