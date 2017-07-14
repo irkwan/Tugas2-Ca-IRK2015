@@ -11,7 +11,7 @@ public class Message {
 	public Message(String filePath) {
 		this.filePath = filePath;
 		alphabetmessage = readMessage();
-		numericmessage = transformToNumber();
+		numericmessage = codeMessage(alphabetmessage);
 	}
 
 	private String readMessage() {
@@ -28,24 +28,20 @@ public class Message {
 		return s;
 	}
 	
-	private BigNum transformToNumber() {
+	public BigNum getMessage() {
+		return numericmessage;
+	}
+	
+	public static BigNum codeMessage(String s) {
 		BigNum result = new BigNum(), temp;
-		for (int i = alphabetmessage.length() - 1; i >= 0; i--) {
-			temp = new BigNum(new int[]{alphabetmessage.charAt(i)});
+		for (int i = s.length() - 1; i >= 0; i--) {
+			temp = new BigNum(new int[]{s.charAt(i)});
 			result = result.shiftLeft(8).or(temp);
 		}
 		return result;
 	}
 	
-	public BigNum getMessage() {
-		return numericmessage;
-	}
-	
-	public int getMessageLength() {
-		return alphabetmessage.length();
-	}
-	
-	public String decodeMessage(BigNum message) {
+	public static String decodeMessage(BigNum message) {
 		String s = "";
 		BigNum mask = new BigNum(new int[]{0xFF}), temp = message;
 		while (!temp.equals(BigNum.ZERO)) {

@@ -157,7 +157,7 @@ public class BigNum {
 		return finalres;
 	}
 	
-	public BigNum[] division(BigNum bn) {
+	private BigNum[] division(BigNum bn) {
 		BigNum q = new BigNum(this.num.length), r = new BigNum(), n = new BigNum(this.num.clone()), d = new BigNum(bn.num.clone());
 		for (int i = (this.num.length * 32) - 1; i >= 0; i--) {
 			r = r.shiftLeft(1);
@@ -440,17 +440,30 @@ public class BigNum {
 	public void printHex() {
 		for (int i = num.length - 1; i >= 0; i--) {
 			if (i == num.length - 1) {
-				System.out.print(String.format("0x%08X", num[i]));
+				System.out.print(String.format("0x%X", num[i]));
 			}
 			else {
-				System.out.print(String.format("%08X", num[i]));
+				System.out.print(String.format("%X", num[i]));
 			}
 		}
 		System.out.println();
 	}
 	
+	public String toString() {
+		String s = "";
+		for (int i = num.length - 1; i >= 0; i--) {
+			if (i == num.length - 1) {
+				s += String.format("0x%X", num[i]);
+			}
+			else {
+				s += String.format("%X", num[i]);
+			}
+		}
+		return s;
+	}
+	
 	public int[] toIntArray() {
-		return num;
+		return num.clone();
 	}
 
 }
