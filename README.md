@@ -1,3 +1,7 @@
+# Tugas2-Ca-IRK2015 RSA and Big Number Implementation
+
+Dibuat Oleh : Roselina - 13515034
+
 # Penjelasan
 
 RSA adalah algoritma kriptografi asimetris yang mempunyai kunci yang berbeda pada saat enkripsi dan dekripsi. Cara kerja RSA adalah sebagai berikut. Pertama, pengirim pesan akan melakukan enkripsi terhadap pesan yang ingin dikirim menggunakan kunci publik milik penerima pesan. Lalu, pesan yang sudah dienkripsi tadi akan dikirim ke penerima pesan. Setelah itu, penerima pesan akan menggunakan kunci privat nya untuk mendekripsi pesan tersebut agar dapat dibaca kembali.
