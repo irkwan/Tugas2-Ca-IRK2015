@@ -1,3 +1,4 @@
+#pragma once
 #include "biginteger.h"
 using namespace std;
 
