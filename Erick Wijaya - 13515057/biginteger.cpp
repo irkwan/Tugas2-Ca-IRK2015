@@ -10,7 +10,7 @@
 #include "biginteger.h"
 #include <iostream>
 #include <iomanip>
-#include <deque>
+#include <vector>
 #include <string>
 #include <cstdio>
 #include <cstdlib>
@@ -73,7 +73,7 @@ biginteger::biginteger(const biginteger& v) : pos(v.pos), digits(v.digits){
 
 /****************************************************************************/
 /* Getter */
-deque<int> biginteger::getDigits(){
+vector<int> biginteger::getDigits(){
 	return digits;
 }
 
@@ -463,7 +463,7 @@ biginteger biginteger::subDigit(int pos, int n) const{
 	
 	res.digits[0] += digits[index];
 	for(int i=index-1; i>index-n; i--){
-		res.digits.push_front(digits[i]);
+		res.digits.insert(res.digits.begin(), digits[i]);
 	}
 	return res;
 }
@@ -474,7 +474,7 @@ biginteger biginteger::subDigit(int pos) const{
 	
 	res.digits[0] += digits[index];
 	for(int i=index-1; i>=0; i--){
-		res.digits.push_front(digits[i]);
+		res.digits.insert(res.digits.begin(), digits[i]);
 	}
 	return res;
 }
@@ -522,7 +522,7 @@ biginteger biginteger::generateRandom(int digits){
 	biginteger res(rand()%9 + 1);
 
 	for(int i=0; i<digits-1; i++)
-		res.digits.push_front(rand()%10);
+		res.digits.insert(res.digits.begin(), rand()%10);
 	
 	return res;
 }
@@ -611,7 +611,7 @@ biginteger biginteger::multiply10(int n){
 
 void biginteger::multiplyThis10(int n){
 	for(int i=0; i<n; i++)
-		digits.push_front(0);
+		digits.insert(digits.begin(), 0);
 }
 
 biginteger biginteger::multiplySingleDigit(const biginteger& lhs, const biginteger& rhs){
@@ -643,7 +643,9 @@ biginteger biginteger::karatsubaMultiply(const biginteger& lhs, const biginteger
 		biginteger l2 = right.subDigit(m2);
 		
 		biginteger x0 = karatsubaMultiply(l1, l2);
-		biginteger x1 = karatsubaMultiply(l1+h1, l2+h2);
+		l1 += h1;
+		l2 += h2;
+		biginteger x1 = karatsubaMultiply(l1, l2);
 		biginteger x2 = karatsubaMultiply(h1, h2);
 
 		x0.normalize(); x1.normalize(); x2.normalize();
@@ -673,8 +675,8 @@ pair<biginteger, biginteger> biginteger::divmod(const biginteger& lhs, const big
 //		cout << remainder << " " << i << " " << res << endl; cin.get();
 		if (remainder < den){
 			if (i > 0){
-				res.digits.push_front(0);
-				remainder.digits.push_front(lhs.digits[i-1]);
+				res.digits.insert(res.digits.begin(), 0);
+				remainder.digits.insert(remainder.digits.begin(), lhs.digits[i-1]);
 				remainder.normalize(); // needed to avoid bug
 			}
 			i--;

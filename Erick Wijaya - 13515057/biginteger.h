@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <deque>
+#include <vector>
 #include <string>
 using namespace std;
 
@@ -57,10 +57,10 @@ public:
 	biginteger& operator=(int rhs);
 
 	/**
-	 * Get the digits as deque
+	 * Get the digits as vector
 	 * @return digits
 	 */
-	deque<int> getDigits();
+	vector<int> getDigits();
 
 	/**
 	 * Get the pos value
@@ -453,7 +453,7 @@ public:
 	bool isProbablePrime(int certainty = DEFAULT_CERTAINTY);
 
 private:
-	deque<int> digits; // reverse-ordered digits
+	vector<int> digits; // reverse-ordered digits
 	bool pos; // positive
 
 	static const int BASE = 10;
