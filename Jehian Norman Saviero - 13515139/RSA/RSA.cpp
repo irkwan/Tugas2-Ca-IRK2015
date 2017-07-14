@@ -148,18 +148,26 @@ void RSA::encrypt_to_code(const string& from, const string& to){
 		srand(time(NULL));
 		tmp = (select_random_prime()-1)*rand()*256;
 		for (ll i = 0; i < temp.size(); ++i){
-			do {
+/*			do {
 				if ((count*small[small.size()/4]) % small[small.size()/2] <= small[small.size()/8]){
 					tmp += select_random_prime()*256;
 				} else {
 					tmp -= small.back()*256;
 				}
 				++count;
-			} while (gcd(tmp + temp[i], n) != 1);
+			} while (gcd(tmp + temp[i], n) != 1); */
 			out << encrypt(tmp + (ll)((unsigned char) temp[i])) << " ";
 			count = 0;
 		}
-		out << encrypt((select_random_prime()-1)*rand()*256 + (ll) '\n');
+/*		do {
+			if ((count*small[small.size()/4]) % small[small.size()/2] <= small[small.size()/8]){
+				tmp += select_random_prime()*256;
+			} else {
+				tmp -= small.back()*256;
+			}
+			++count;
+		} while (gcd(tmp + temp[i], n) != 1);	*/
+		out << encrypt(tmp + (ll)((unsigned char) '\n')) << " ";
 	}
 }
 
