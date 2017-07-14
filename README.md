@@ -1,42 +1,50 @@
 # Tugas2-Ca-IRK2015 RSA and Big Number Implementation 
 
-Halo Ca-IRK 2015 !
+# Penjelasan Singkat
 
-Pada kesempatan kali ini anda mendapat tugas untuk mengimplementasikan algoritma dalam bidang kriptografi yang cukup terkenal.
-Algoritma tersebut adalah algoritma RSA. RSA termasuk kedalam algoritma kriptografi non-simetris, RSA banyak dipakai karena tingkat 
-keamanannya yang cukup baik dengan memanfaatkan prinsip operasi pada big number.
+Program kriptografi dengan algoritma RSA ini saya buat dengan menggunakan bahasa C++.
+Ketika program dijalankan, program akan langsung melakukan generate 2 bilangan prima dengan panjang 20 digit dan 25 digit.
+Lalu, program akan menghitung n serta menghitung Euler's Totient Function dari n, baru setelah itu melakukan generate bilangan random untuk mencari suatu bilangan yang relatif prima
+dengan Euler's Totient Function dari n beserta modular inverse nya yang kemudian menjadi e dan d.
+Setelah itu, program meminta masukan dari user apa yang ingin dilakukan. Program dapat melakukan 2 hal, yaitu mengenkripsi suatu file atau melakukan dekripsi terhadap suatu file
+yang sudah pernah dienkripsi sebelumnya.
 
-Sebagai tantangan tambahan, anda juga harus mengimplementasikan library big number hasil buatan anda sendiri dengan memanfaatkan
-algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
+# Cara Penggunaan
 
-# Aturan Pengerjaan
-1. Lakukan fork pada repository ini.
-2. Buat folder berisi hasil pekerjaan anda, beri nama folder dengan format : **Nama anda - NIM**. 
+Ketika program sudah siap, program akan menampilkan interface sebagai berikut :
+Menu :
+1. Encrypt Files
+2. Decrypt Files
+3. Exit
 
-   Contoh : Varian - 13514041
-3. Lakukan commit secara berkala dan berikan pesan yang bermakna, hindari kasus sekali commit langsung selesai pada pengerjaan tugas.
-   Hal ini dimaksudkan agar anda terbiasa bekerja menggunakan git.
+Input :
 
-4. Untuk pengumpulan, lakukan pull request sebelum deadline. **Lengkapi juga dengan readme yang berisi penjelasan singkat, cara penggunaan dan screenshot program anda. (Edit Readme ini)**.
+Masukkan angka 1-3 sesuai dengan yang diinginkan. 1 untuk enkripsi, 2 untuk dekripsi, dan 3 untuk keluar dari program.
+Setelah memasukkan angka 1 atau 2, program akan meminta masukan nama file yang ingin dienkripsi/didekripsi.
+Masukkan nama file, lalu tunggu beberapa saat sampai program menyelesaikan proses tersebut.
+Setelah selesai, program akan kembali menampilkan menu utama, program hanya akan keluar jika user memasukkan angka 3 pada menu utama.
 
-# Spesifikasi Umum
-1. Program boleh dibuat dalam bahasa pemrograman apapun, boleh menggunakan GUI maupun console application biasa.
-2. Program dapat membaca input teks yang akan dienkripsi dari file eksternal.
-3. Program dapat melakukan generate public dan private key.
-4. Program dapat melakukan enkripsi pada teks yang dibaca dengan menggunakan key yang dihasilkan dan menampilkannya ke layar / menyimpannya ke file eksternal lain.
-5. Program dapat melakukan dekripsi kembali cipher text yang dihasilkan pada tahap (4) dan menampilkan ke layar / menyimpannya ke file eksternal lain.
-6. Program dapat menghitung dan menampilkan waktu eksekusi dari tahap 3 hingga 4.
+# Contoh Hasil Eksekusi Program
 
-# Spesifikasi RSA
-1. Dua buah bilangan prima random yang dipilih di awal harus minimal **20 digit**
-2. Segala operasi pada bilangan big number **TIDAK BOLEH MENGGUNAKAN LIBRARY BAWAAN BAHASA PEMROGRAMAN / BUATAN ORANG**. Anda harus mengimplementasikan library / algoritma big number sendiri, namun belajar dari algoritma yang sudah ada tidak dilarang.
+- Contoh 1
+Input : 1
 
-# Deadline
-Deadline pengerjaan tugas ini adalah tanggal 30 Juni 2017 pukul 20.17 WIB, silahkan mulai dicicil mengerjakan dari sekarang karena waktu pengerjaan anda dipotong libur lebaran.
+Enter file's name : test.txt
+Please wait until the process is done.
 
-Apabila ada perubahan spesifikasi maupun deadline, maka akan diberitahukan lebih lanjut.
+Ciphertext :
+☺S♀e↓♥aA§)A⌂BoVWL|v
 
-Tetap Semangat !! 
+Encryption time : 0.703
 
-# Referensi 
-https://en.wikipedia.org/wiki/RSA_(cryptosystem)
+- Contoh 2
+Input : 2
+
+Enter file's name : test.txt
+Please wait until the process is done.
+
+Plaintext :
+IRK
+
+
+Decryption time : 2.283
