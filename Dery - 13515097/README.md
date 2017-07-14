@@ -28,4 +28,6 @@ $ python RSA.py
 
 ## Screenshot
 
-![GitHub Logo](https://github.com/deryrahman/Tugas2-Ca-IRK2015/blob/master/Dery%20-%2013515097/screenshot.png)
+![Screenshot Message](https://github.com/deryrahman/Tugas2-Ca-IRK2015/blob/master/Dery%20-%2013515097/msg.png)
+![Screenshot Cipher](https://github.com/deryrahman/Tugas2-Ca-IRK2015/blob/master/Dery%20-%2013515097/cipher.png)
+![Screenshot Terminal](https://github.com/deryrahman/Tugas2-Ca-IRK2015/blob/master/Dery%20-%2013515097/screenshot.png)
