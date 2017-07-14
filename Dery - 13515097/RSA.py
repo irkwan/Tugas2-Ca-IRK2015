@@ -3,6 +3,17 @@ import timeit
 from BigPrime import *
 from BigInt import BigInt
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 """
   Euclid's algorithm to determine GCD
 """
@@ -107,7 +118,7 @@ def decrypt(priv, cipher):
     # plain+=[chr(pow(int(char),int(key.num),int(n.num)))]
     a = long((BigInt(char).pow_mod(key,n)).num)
     # print a,
-    plain+=[chr(a%255)]
+    plain+=[chr(a%256)]
   return ''.join(plain)
     
 
@@ -126,34 +137,50 @@ print "Generating public and private keypairs..."
 start_time = timeit.default_timer()
 public, private = generate_keypair(p, q)
 elapsed_key = timeit.default_timer() - start_time
-print "Public key : ", public[0], public[1]
-print "Private key: ", private[0], private[1]
+print bcolors.OKGREEN, bcolors.BOLD, "Public key : ", bcolors.ENDC
+print "   e =", bcolors.OKGREEN, public[0], bcolors.ENDC
+print "   n =", bcolors.OKGREEN, public[1], bcolors.ENDC
+print bcolors.OKBLUE, bcolors.BOLD, "Private key: ", bcolors.ENDC
+print "   d =", bcolors.OKBLUE, private[0], bcolors.ENDC
+print "   n =", bcolors.OKBLUE, private[1], bcolors.ENDC
 print "Generate key time: ", elapsed_key
 print
 
-print "Enter a message to encrypt: "
-print "-----"
+print bcolors.BOLD, "Enter a message to encrypt: ", bcolors.ENDC
+print
 message = raw_input("")
-print "-----"
+for i in range(len(message)/2+1):
+  print "-",
+print
+print
 print
 
-print "Encrypting message with public key ",public[0], public[1],"..."
+print bcolors.BOLD, "Encrypted messege:", bcolors.ENDC
+print "Encrypting message with public key ", bcolors.OKGREEN ,public[0], public[1],"...",bcolors.ENDC
 start_time = timeit.default_timer()
 encrypted_msg = encrypt(public, message)
 elapsed_enc = timeit.default_timer() - start_time
-print "Encrypted messege:"
-print "-----"
-print ''.join(encrypted_msg)
-print "-----"
-print "Encrypting time: ", elapsed_enc
 print
+en_msg = ''.join(encrypted_msg)
+print en_msg
+for i in range(len(en_msg)/2+1):
+  print "-",
+print
+print "Encrypting time: ", elapsed_enc
+
 print "Total time generate + encrypt: ", elapsed_enc+elapsed_key
 print
-print "Decrypting message with private key ", private[0], private[1] ,"..."
-print "Decrypted message:"
+print
+print
+
+print bcolors.BOLD, "Decrypted message:", bcolors.ENDC
+print "Decrypting message with private key ", bcolors.OKBLUE ,private[0], private[1] ,"...", bcolors.ENDC
 start_time = timeit.default_timer()
-print "-----"
-print decrypt(private, encrypted_msg)
-print "-----"
+print
+de_msg = decrypt(private, encrypted_msg)
+print de_msg
+for i in range(len(de_msg)/2+1):
+  print "-",
+print
 elapsed_dec = timeit.default_timer() - start_time
 print "Decrypting time: ", elapsed_dec

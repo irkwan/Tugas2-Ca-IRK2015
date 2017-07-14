@@ -210,15 +210,23 @@ class BigInt:
 		Power Algorithm
 	"""
 	def __pow__(self,y):
-		result=BigInt("1")
-		x = self
-		y = (int)(y.num) # assume never exceed 2^64-1
-		while(y!=0):
-			if(y&1==1):
-				result=result*x
-			y>>=1
-			x=x*x
-		return result
+
+		result = BigInt("1")
+		while (y > BigInt("0")):
+			if (y%BigInt("2") == BigInt("1")):
+				result = (result * self)
+			self = (self * self)
+			y = y/BigInt("2");
+		return result;
+		# result=BigInt("1")
+		# x = self
+		# y = (int)(y.num) # assume never exceed 2^64-1
+		# while(y!=0):
+		# 	if(y&1==1):
+		# 		result=result*x
+		# 	y>>=1
+		# 	x=x*x
+		# return result
 
 	"""
 		Fast power mod algorithm
@@ -234,10 +242,10 @@ class BigInt:
 		result = BigInt("1")
 		while (y > BigInt("0")):
 			if (y%BigInt("2") == BigInt("1")):
-				result = (result * self) % m;
-			self = (self * self) % m;
-			y = y/BigInt("2");
-		return result % m;
+				result = (result * self) % m
+			self = (self * self) % m
+			y = y/BigInt("2")
+		return result % m
 
 		# result=BigInt("1")
 		# x = self
