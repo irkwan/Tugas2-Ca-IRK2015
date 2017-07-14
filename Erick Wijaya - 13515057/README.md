@@ -7,7 +7,7 @@ This project consists of two applications, the *Command Line Interface (CLI) app
 
 ## RSA With GUI
 ### Run
-To run the application, download and unzip [MainGUI.zip](https://github.com/wijayaerick/Tugas2-Ca-IRK2015/blob/master/Erick%20Wijaya%20-%2013515057/MainGUI.zip) then open RSA-GUI.exe. Note that currenly the GUI application only works in Windows. If you have different OS, you can read the CLI documentation below the tutorial.
+To run the application, download and unzip [MainGUI.zip](https://github.com/wijayaerick/Tugas2-Ca-IRK2015/blob/master/Erick%20Wijaya%20-%2013515057/MainGUI.zip) then open RSA-GUI.exe. Please note that currently the GUI application only works in Windows. If you have different OS, you can read the CLI documentation below the tutorial.
 
 ### Tutorial
 These are steps to use the RSA with GUI app.
