@@ -22,4 +22,4 @@ Pastikan versi python2.7
 
 ### Screenshot
 
-![GitHub Logo](/Dery - 13515097/screenshot.png)
+![GitHub Logo](https://github.com/deryrahman/Tugas2-Ca-IRK2015/blob/master/Dery%20-%2013515097/screenshot.png)
