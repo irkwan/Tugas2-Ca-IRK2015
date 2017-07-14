@@ -63,20 +63,59 @@ Tahap 1 hingga 7 dapat diganti dengan menggunakan tombol **Load public/private k
 
 # Screenshot Program
 
-1. Generate
-2. Generate time
-3. Input
-4. Encrypt time
-5. Encrypt output
-6. Decrypt time
-7. Decrypt output
+1. Tampilan awal program
+
+| <img src="/Edwin%20Rachman%20-%2013515042/screenshots/0.png" height=252 /> |
+| :-: |
+| Program rsa.jar |
+
+2. Tampilan awal generasi key pair
+
+
+<img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-0.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-0.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-0.png" height=252 />
+:-: | :-: | :-:
+512-bit | 1024-bit | 2048-bit
+
+3. Waktu eksekusi generasi key pair
+
+<img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-1.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-1.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-1.png" height=252 />
+:-: | :-: | :-:
+512-bit | 1024-bit | 2048-bit
+
+4. Tampilan awal message
+
+<img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-2.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-2.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-2.png" height=260 />
+:-: | :-: | :-:
+512-bit | 1024-bit | 2048-bit
+
+5. Waktu eksekusi enkripsi message
+
+<img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-3.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-3.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-3.png" height=260 />
+:-: | :-: | :-:
+512-bit | 1024-bit | 2048-bit
+
+6. Message hasil enkripsi
+
+<img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-4.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-4.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-4.png" height=260 />
+:-: | :-: | :-:
+512-bit | 1024-bit | 2048-bit
+
+7. Waktu eksekusi dekripsi message
+
+<img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-5.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-5.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-5.png" height=260 />
+:-: | :-: | :-:
+512-bit | 1024-bit | 2048-bit
+
+8. Message hasil dekripsi
+
+<img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-6.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-6.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-6.png" height=260 />
+:-: | :-: | :-:
+512-bit | 1024-bit | 2048-bit
 
 # Referensi 
 
-Artikel Wikipedia
+- [Artikel Wikipedia](https://en.wikipedia.org/wiki/RSA_(cryptosystem))
 
-https://en.wikipedia.org/wiki/RSA_(cryptosystem)
+- [Dokumen standar PKCS#1 v2.2](https://www.emc.com/collateral/white-papers/h11300-pkcs-1v2-2-rsa-cryptography-standard-wp.pdf)
 
-Dokumen standar PKCS#1 v2.2
-
-https://www.emc.com/collateral/white-papers/h11300-pkcs-1v2-2-rsa-cryptography-standard-wp.pdf
+- [Spesifikasi tugas](Spesifikasi-Tugas.md/)
