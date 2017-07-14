@@ -11,8 +11,8 @@ Aplikasi ini terdiri atas sebuah implementasi tipe data bilangan integer besar (
 
 Aplikasi ini memiliki tiga fungsi utama, yaitu: 
 1. **Generasi key pair n-bit** (pasangan public key dan private key)
-2. **Enkripsi dari plaintext menjadi ciphertext**
-3. **Dekripsi dari ciphertext menjadi plaintext**
+2. **Enkripsi dari plaintext menjadi ciphertext** (RSAES-OAEP encrypt)
+3. **Dekripsi dari ciphertext menjadi plaintext** (RSAES-OAEP decrypt)
 
 Tahap-tahap generasi key-pair n-bit yang digunakan oleh apliaksi ini adalah sebagai berikut:
 1. Sebuah **bilangan random ganjil sebesar (n/2)-bit** dihasilkan menggunakan sebuah random number generator yang aman (SecureRandom dari java.security)
@@ -47,7 +47,7 @@ Detil mengenai operasi **OS2IP**, **I2OSP**, **RSAEP**, **RSADP**, **EME-OAEP en
 
 # Cara Penggunaan
 
-1. Buka file aplikasi [rsa.jar](bin/rsa.jar)
+1. Buka file aplikasi [rsa.jar](/Edwin%20Rachman%20-%2013515042/bin/rsa.jar)
 2. Pilih tombol **Generate new key pair**
 3. Pada dialog box yang terbuka, pilih nilai **Key length**, yaitu jumlah bit key yang diinginkan (minimum ``384``, step ``64``).
 4. Hal di atas dapat disesuaikan dengan nilai **Message limit**, yaitu jumlah byte maksimum message yanga dapat dienkripsi.
@@ -74,43 +74,43 @@ Prakiraan waktu kunci 512-bit adalah 3-5 detik, 1024-bit adalah 20-40 detik, 201
 
 <img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-0.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-0.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-0.png" height=252 />
 :-: | :-: | :-:
-512-bit | 1024-bit | 2048-bit
+Key 512-bit | Key 1024-bit | Key 2048-bit
 
 3. Waktu eksekusi generasi key pair
 
 <img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-1.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-1.png" height=252 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-1.png" height=252 />
 :-: | :-: | :-:
-512-bit | 1024-bit | 2048-bit
+Key 512-bit | Key 1024-bit | Key 2048-bit
 
 4. Tampilan awal message
 
 <img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-2.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-2.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-2.png" height=260 />
 :-: | :-: | :-:
-512-bit | 1024-bit | 2048-bit
+Key 512-bit | Key 1024-bit | Key 2048-bit
 
 5. Waktu eksekusi enkripsi message
 
 <img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-3.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-3.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-3.png" height=260 />
 :-: | :-: | :-:
-512-bit | 1024-bit | 2048-bit
+Key 512-bit | Key 1024-bit | Key 2048-bit
 
 6. Message hasil enkripsi
 
 <img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-4.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-4.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-4.png" height=260 />
 :-: | :-: | :-:
-512-bit | 1024-bit | 2048-bit
+Key 512-bit | Key 1024-bit | Key 2048-bit
 
 7. Waktu eksekusi dekripsi message
 
 <img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-5.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-5.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-5.png" height=260 />
 :-: | :-: | :-:
-512-bit | 1024-bit | 2048-bit
+Key 512-bit | Key 1024-bit | Key 2048-bit
 
 8. Message hasil dekripsi
 
 <img src="/Edwin%20Rachman%20-%2013515042/screenshots/512-6.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/1024-6.png" height=260 /> | <img src="/Edwin%20Rachman%20-%2013515042/screenshots/2048-6.png" height=260 />
 :-: | :-: | :-:
-512-bit | 1024-bit | 2048-bit
+Key 512-bit | Key 1024-bit | Key 2048-bit
 
 # Referensi 
 
