@@ -123,8 +123,25 @@ def decrypt(priv, cipher):
     
 
 print "RSA"
+print
+print bcolors.BOLD, "Message from file external:", bcolors.ENDC
+
+# Read file external
+f = file('msg.in', 'r')
+message=""
+for line in f:
+  message += line
+f.close()
+print
+print message
+for i in range((len(message)/2+1)%20):
+  print "-",
+  if i>20: break
+print
+print
+
 p = str(generate_large_prime(64)) # 2^64-1 is not Big Integer :)
-print "First prime number: ", p
+print "First prime number : ", p
 q = str(generate_large_prime(64)) # 2^64-1 is not Big Integer :)
 print "Second prime number: ", q
 # p = str(raw_input("1 :"))
@@ -136,40 +153,33 @@ print
 print "Generating public and private keypairs..."
 start_time = timeit.default_timer()
 public, private = generate_keypair(p, q)
-elapsed_key = timeit.default_timer() - start_time
 print bcolors.OKGREEN, bcolors.BOLD, "Public key : ", bcolors.ENDC
 print "   e =", bcolors.OKGREEN, public[0], bcolors.ENDC
 print "   n =", bcolors.OKGREEN, public[1], bcolors.ENDC
 print bcolors.OKBLUE, bcolors.BOLD, "Private key: ", bcolors.ENDC
 print "   d =", bcolors.OKBLUE, private[0], bcolors.ENDC
 print "   n =", bcolors.OKBLUE, private[1], bcolors.ENDC
-print "Generate key time: ", elapsed_key
-print
-
-print bcolors.BOLD, "Enter a message to encrypt: ", bcolors.ENDC
-print
-message = raw_input("")
-for i in range(len(message)/2+1):
-  print "-",
-print
-print
 print
 
 print bcolors.BOLD, "Encrypted messege:", bcolors.ENDC
 print "Encrypting message with public key ", bcolors.OKGREEN ,public[0], public[1],"...",bcolors.ENDC
-start_time = timeit.default_timer()
 encrypted_msg = encrypt(public, message)
-elapsed_enc = timeit.default_timer() - start_time
+elapsed = timeit.default_timer() - start_time
 print
-en_msg = ''.join(encrypted_msg)
+en_msg = ' '.join(encrypted_msg)
 print en_msg
-for i in range(len(en_msg)/2+1):
-  print "-",
-print
-print "Encrypting time: ", elapsed_enc
 
-print "Total time generate + encrypt: ", elapsed_enc+elapsed_key
+# Output to external file
+f = open("cipher_msg.ci","w")
+for i in encrypted_msg:
+  print >> f, i,
+f.close()
+
+for i in range((len(en_msg)/2+1)):
+  print "-",
+  if i>20: break
 print
+print "Generate key + encrypting time: ", elapsed
 print
 print
 
@@ -177,6 +187,14 @@ print bcolors.BOLD, "Decrypted message:", bcolors.ENDC
 print "Decrypting message with private key ", bcolors.OKBLUE ,private[0], private[1] ,"...", bcolors.ENDC
 start_time = timeit.default_timer()
 print
+
+# Read file external
+f = file('cipher_msg.ci', 'r')
+for line in f:
+  encrypted_msg = line.split(" ")
+f.close()
+
+# Decripting
 de_msg = decrypt(private, encrypted_msg)
 print de_msg
 for i in range(len(de_msg)/2+1):
