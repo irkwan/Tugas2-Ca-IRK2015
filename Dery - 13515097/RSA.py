@@ -112,9 +112,9 @@ def decrypt(priv, cipher):
     
 
 print "RSA"
-p = str(generateLargePrime(64)) # 2^64-1 is not Big Integer :)
+p = str(generate_large_prime(64)) # 2^64-1 is not Big Integer :)
 print "First prime number: ", p
-q = str(generateLargePrime(64)) # 2^64-1 is not Big Integer :)
+q = str(generate_large_prime(64)) # 2^64-1 is not Big Integer :)
 print "Second prime number: ", q
 # p = str(raw_input("1 :"))
 # q = str(raw_input("2 :"))
