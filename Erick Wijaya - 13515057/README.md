@@ -60,3 +60,6 @@ To encrypt a plaintext, the plaintext is converted into its ASCII values. Each v
 Please note that this program is created for educational purpose and not supposed to be used in practical usage.
 
 
+## Documentation
+See the [cppdoc documentation](https://github.com/wijayaerick/Tugas2-Ca-IRK2015/tree/master/Erick%20Wijaya%20-%2013515057/cppdoc) for more information about the classes and their methods.
+
