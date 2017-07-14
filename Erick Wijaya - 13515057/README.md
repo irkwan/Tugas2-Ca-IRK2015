@@ -4,70 +4,32 @@
 A simple RSA that can encrypt plaintext into ciphertext and decrypt it back to retrieve the text. Written in C++ languange, this project consists of Big Integer Library and RSA. The Big Integer Library can be used to create and operate very large integers. 
 
 ## Run
-To run the application, you will need an input file (text file) that contains message needed to be encrypted. Run the cmd or shell and type
-```
-rsa <your-file.txt>
-```
-or
-```
-./rsa <your-file.txt>
-```
-depends on platform you use.
+To run the application, you will need an input file (text file) that contains message needed to be encrypted. Run the cmd or shell and type the command below.
 
-## Result
-Coming soon
+```
+./main <your-file.txt>
+```
+If you are using windows, you may need to use "main" instead of "./main".
+
+
+## Explanation
+The Big Integer class uses std::vector to store the digits of integer. The Big Integer class has methods that overload c++ operators like operator +, -, /, %, ++, +=, and so on. Karatsuba Multiplication Algorithm is used to implement multiplication operator. Random probable prime numbers are generated with Miller-Rabin Primality Test Algorithm.
+
+The RSA class has two primary methods and a constructor. The constructor handles generating the public and private key. First, the constructor generates two random probable prime numbers (p and q). The prime numbers are used to calculate n = p * q. After that, the euler phi function is calculated with formula eulerphi = (p - 1) * (q - 1). After that, pick a number e that is coprime with the eulerphi. The number e is the public key. To generate the private key d, calculate with e^-1 mod eulerphi (this can be done with Extended Euclidean Algorithm implemented in gcdExtended method). In this state the program have generated two keys, the public key e and the private key d. 
+
+To encrypt a plaintext, the plaintext is converted into its ASCII values. Each values (ci) will be encrypted to create values for ciphertext (di). For each ci, calculate di = ci^e mod n. All the di values combined is the ciphertext. To decrypt the ciphertext back to plaintext, calculate ci = di^d mod n. All the ci values are converted back from ASCII to characters. To make the encryption and decryption safer, ci must be multiplied by random multiple of 256 before calculating di. After the decryption, the results must be divided by 256 to get the remainders. The remaindes are the ASCII values that are converted back to plaintext.
 
 ## Compile
-To compile the program, type
+To compile the code, use this command below.
 ```
-g++ biginteger.cpp rsa.cpp -o rsa
+g++ src/biginteger.cpp src/rsa.cpp main.cpp -o main
 ```
 
 ## Screenshot
-Coming soon
+![Input 2](screenshot/input2.PNG)
+
+![Input 3](screenshot/input3.PNG)
 
 
 
 
-
-
-Halo Ca-IRK 2015 !
-
-Pada kesempatan kali ini anda mendapat tugas untuk mengimplementasikan algoritma dalam bidang kriptografi yang cukup terkenal.
-Algoritma tersebut adalah algoritma RSA. RSA termasuk kedalam algoritma kriptografi non-simetris, RSA banyak dipakai karena tingkat 
-keamanannya yang cukup baik dengan memanfaatkan prinsip operasi pada big number.
-
-Sebagai tantangan tambahan, anda juga harus mengimplementasikan library big number hasil buatan anda sendiri dengan memanfaatkan
-algoritma yang sudah ada, misal: karatsuba atau algoritma lainnya.
-
-# Aturan Pengerjaan
-1. Lakukan fork pada repository ini.
-2. Buat folder berisi hasil pekerjaan anda, beri nama folder dengan format : **Nama anda - NIM**. 
-
-   Contoh : Varian - 13514041
-3. Lakukan commit secara berkala dan berikan pesan yang bermakna, hindari kasus sekali commit langsung selesai pada pengerjaan tugas.
-   Hal ini dimaksudkan agar anda terbiasa bekerja menggunakan git.
-
-4. Untuk pengumpulan, lakukan pull request sebelum deadline. **Lengkapi juga dengan readme yang berisi penjelasan singkat, cara penggunaan dan screenshot program anda. (Edit Readme ini)**.
-
-# Spesifikasi Umum
-1. Program boleh dibuat dalam bahasa pemrograman apapun, boleh menggunakan GUI maupun console application biasa.
-2. Program dapat membaca input teks yang akan dienkripsi dari file eksternal.
-3. Program dapat melakukan generate public dan private key.
-4. Program dapat melakukan enkripsi pada teks yang dibaca dengan menggunakan key yang dihasilkan dan menampilkannya ke layar / menyimpannya ke file eksternal lain.
-5. Program dapat melakukan dekripsi kembali cipher text yang dihasilkan pada tahap (4) dan menampilkan ke layar / menyimpannya ke file eksternal lain.
-6. Program dapat menghitung dan menampilkan waktu eksekusi dari tahap 3 hingga 4.
-
-# Spesifikasi RSA
-1. Dua buah bilangan prima random yang dipilih di awal harus minimal **20 digit**
-2. Segala operasi pada bilangan big number **TIDAK BOLEH MENGGUNAKAN LIBRARY BAWAAN BAHASA PEMROGRAMAN / BUATAN ORANG**. Anda harus mengimplementasikan library / algoritma big number sendiri, namun belajar dari algoritma yang sudah ada tidak dilarang.
-
-# Deadline
-Deadline pengerjaan tugas ini adalah tanggal 30 Juni 2017 pukul 20.17 WIB, silahkan mulai dicicil mengerjakan dari sekarang karena waktu pengerjaan anda dipotong libur lebaran.
-
-Apabila ada perubahan spesifikasi maupun deadline, maka akan diberitahukan lebih lanjut.
-
-Tetap Semangat !! 
-
-# Referensi 
-https://en.wikipedia.org/wiki/RSA_(cryptosystem)
