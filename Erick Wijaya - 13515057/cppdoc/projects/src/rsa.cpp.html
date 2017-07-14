@@ -1,0 +1,110 @@
+<HTML>
+<HEAD>
+<TITLE>
+rsa.cpp
+</TITLE>
+</HEAD>
+<BODY>
+<PRE>
+<font color="green">/**
+ * Implementation of RSA Class.
+ * For more details, see rsa.h.
+ *
+ * @author Erick Wijaya 
+ * @version 1.0
+ * @since 2017-13-07
+ */</font>
+
+<font color="blue">#include</font> <font color="maroon">&#60;iostream&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;vector&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;string&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;sstream&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;ctime&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;cmath&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;cstdlib&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;ctime&#62;</font>
+<font color="blue">#include</font> <font color="maroon">"rsa.h"</font>
+
+<font color="blue">const</font> biginteger RSA<font color="black">:</font><font color="black">:</font>MULTIPLIER_SUB <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">255</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger RSA<font color="black">:</font><font color="black">:</font>MULTIPLIER_MOD <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">256</font><font color="black">)</font>;
+
+RSA<font color="black">:</font><font color="black">:</font>RSA<font color="black">(</font><font color="blue">int</font> digits<font color="black">)</font><font color="black">{</font>
+    <font color="green">// Initialize Prime Numbers</font>
+    p <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>generateRandomProbablePrime<font color="black">(</font>digits<font color="black">)</font>;
+    q <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>generateRandomProbablePrime<font color="black">(</font>digits<font color="black">)</font>;
+    <font color="blue">while</font> <font color="black">(</font>p <font color="black">=</font><font color="black">=</font> q<font color="black">)</font><font color="black">{</font>
+        q <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>generateRandomProbablePrime<font color="black">(</font>digits<font color="black">)</font>;
+    <font color="black">}</font>
+
+    <font color="green">// Calculate Security Parameter</font>
+    n <font color="black">=</font> p <font color="black">*</font> q;
+
+    <font color="green">// Calculate EulerPhi</font>
+    biginteger eulerPhi <font color="black">=</font> <font color="black">(</font>p <font color="maroon">-1</font><font color="black">)</font> <font color="black">*</font> <font color="black">(</font>q <font color="maroon">-1</font><font color="black">)</font>;
+
+    <font color="green">// Calculate Public Key</font>
+    e <font color="black">=</font> <font color="maroon">3</font>;
+    <font color="blue">while</font> <font color="black">(</font>biginteger<font color="black">:</font><font color="black">:</font>gcd<font color="black">(</font>e, eulerPhi<font color="black">)</font> <font color="black">!</font><font color="black">=</font> <font color="maroon">1</font><font color="black">)</font><font color="black">{</font>
+        e <font color="black">+</font><font color="black">=</font> <font color="maroon">2</font>;
+    <font color="black">}</font>
+
+    <font color="green">// Calculate Private Key</font>
+    biginteger a;
+    biginteger gcd <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>gcdExtended<font color="black">(</font>e, eulerPhi, d, a<font color="black">)</font>;
+    <font color="blue">if</font> <font color="black">(</font>d <font color="black">&#60;</font> <font color="maroon">0</font><font color="black">)</font>
+        d <font color="black">+</font><font color="black">=</font> eulerPhi;
+
+    <font color="green">// Initialize for RSA-CRT Decryption</font>
+    dp <font color="black">=</font> d % <font color="black">(</font>p <font color="maroon">-1</font><font color="black">)</font>;
+    dq <font color="black">=</font> d % <font color="black">(</font>q <font color="maroon">-1</font><font color="black">)</font>;
+    gcd <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>gcdExtended<font color="black">(</font>q, p, qInv, a<font color="black">)</font>;
+    <font color="blue">if</font> <font color="black">(</font>qInv <font color="black">&#60;</font> <font color="maroon">0</font><font color="black">)</font>
+        qInv <font color="black">+</font><font color="black">=</font> p;
+<font color="black">}</font>
+
+string RSA<font color="black">:</font><font color="black">:</font>encrypt<font color="black">(</font>string plainText<font color="black">)</font><font color="black">{</font>
+    stringstream sscipher;
+
+    <font color="green">// C = P^e % n</font>
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>; i<font color="black">&#60;</font>plainText.length<font color="black">(</font><font color="black">)</font>; i<font color="black">+</font><font color="black">+</font><font color="black">)</font><font color="black">{</font>
+        biginteger p<font color="black">(</font>plainText<font color="black">[</font>i<font color="black">]</font><font color="black">)</font>;
+        biginteger mul <font color="black">=</font> <font color="black">(</font>n <font color="black">-</font>MULTIPLIER_SUB<font color="black">)</font> <font color="black">/</font> MULTIPLIER_MOD;
+        <font color="blue">int</font> len <font color="black">=</font> mul.toString<font color="black">(</font><font color="black">)</font>.length<font color="black">(</font><font color="black">)</font>;
+        <font color="blue">if</font> <font color="black">(</font>len <font color="black">&#62;</font> <font color="maroon">0</font><font color="black">)</font>
+            len<font color="black">-</font><font color="black">-</font>;
+
+        p <font color="black">+</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>generateRandom<font color="black">(</font>len<font color="black">)</font> <font color="black">*</font> MULTIPLIER_MOD;
+        sscipher <font color="black">&#60;</font><font color="black">&#60;</font> biginteger<font color="black">:</font><font color="black">:</font>modpow<font color="black">(</font>p, e, n<font color="black">)</font>.toString<font color="black">(</font><font color="black">)</font>;
+        <font color="blue">if</font> <font color="black">(</font>i <font color="black">&#60;</font> plainText.length<font color="black">(</font><font color="black">)</font><font color="maroon">-1</font><font color="black">)</font>
+            sscipher <font color="black">&#60;</font><font color="black">&#60;</font> <font color="maroon">" "</font>;
+    <font color="black">}</font>
+
+    <font color="blue">return</font> sscipher.str<font color="black">(</font><font color="black">)</font>;
+<font color="black">}</font>
+
+string RSA<font color="black">:</font><font color="black">:</font>decrypt<font color="black">(</font>string cipherText<font color="black">)</font><font color="black">{</font>
+    stringstream ssplain;
+    stringstream sscipher<font color="black">(</font>cipherText<font color="black">)</font>;
+
+    <font color="green">// P = C^d % n</font>
+    biginteger in;
+    <font color="blue">while</font> <font color="black">(</font>sscipher <font color="black">&#62;</font><font color="black">&#62;</font> in<font color="black">)</font><font color="black">{</font>
+        biginteger result <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>modpow<font color="black">(</font>in, d, n<font color="black">)</font>;
+        result %<font color="black">=</font> MULTIPLIER_MOD;
+        ssplain <font color="black">&#60;</font><font color="black">&#60;</font> <font color="black">(</font><font color="blue">char</font><font color="black">)</font>result.toInt<font color="black">(</font><font color="black">)</font>;
+    <font color="black">}</font>
+
+    <font color="blue">return</font> ssplain.str<font color="black">(</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger RSA<font color="black">:</font><font color="black">:</font>getPublicKey<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> e;
+<font color="black">}</font>
+
+biginteger RSA<font color="black">:</font><font color="black">:</font>getPrivateKey<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> d;
+<font color="black">}</font>
+
+</PRE>
+</BODY>
+</HTML>

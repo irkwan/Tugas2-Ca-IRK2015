@@ -1,0 +1,736 @@
+<HTML>
+<HEAD>
+<TITLE>
+biginteger.cpp
+</TITLE>
+</HEAD>
+<BODY>
+<PRE>
+<font color="green">/**
+ * Implementation of Big Integer Class.
+ * For more details, see biginteger.h.
+ *
+ * @author Erick Wijaya 
+ * @version 1.0
+ * @since 2017-13-07
+ */</font>
+
+<font color="blue">#include</font> <font color="maroon">"biginteger.h"</font>
+<font color="blue">#include</font> <font color="maroon">&#60;iostream&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;iomanip&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;vector&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;string&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;cstdio&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;cstdlib&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;ctime&#62;</font>
+<font color="blue">using</font> <font color="blue">namespace</font> std;
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Commonly Used Constants */</font>
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>ZERO <font color="black">=</font> biginteger<font color="black">(</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>ONE <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">1</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>TWO <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">2</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>THREE <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">3</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>FOUR <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">4</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>FIVE <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">5</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>SIX <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">6</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>SEVEN <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">7</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>EIGHT <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">8</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>NINE <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">9</font><font color="black">)</font>;
+<font color="blue">const</font> biginteger biginteger<font color="black">:</font><font color="black">:</font>TEN <font color="black">=</font> biginteger<font color="black">(</font><font color="maroon">10</font><font color="black">)</font>;
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Constructors */</font>
+biginteger<font color="black">:</font><font color="black">:</font>biginteger<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    pos <font color="black">=</font> <font color="blue">true</font>;
+    digits.push_back<font color="black">(</font><font color="maroon">0</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">:</font><font color="black">:</font>biginteger<font color="black">(</font><font color="blue">int</font> v<font color="black">)</font><font color="black">{</font>
+    pos <font color="black">=</font> v <font color="black">&#62;</font><font color="black">=</font> <font color="maroon">0</font>;
+    <font color="blue">if</font> <font color="black">(</font><font color="black">!</font>pos<font color="black">)</font>
+        v <font color="black">=</font> <font color="black">-</font>v;
+    <font color="blue">while</font> <font color="black">(</font>v <font color="black">!</font><font color="black">=</font> <font color="maroon">0</font><font color="black">)</font><font color="black">{</font>
+        <font color="blue">int</font> dig <font color="black">=</font> v % BASE;
+        digits.push_back<font color="black">(</font>dig<font color="black">)</font>;
+        v <font color="black">/</font><font color="black">=</font> BASE;
+    <font color="black">}</font>
+    <font color="blue">if</font> <font color="black">(</font>digits.size<font color="black">(</font><font color="black">)</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">0</font><font color="black">)</font>
+        digits.push_back<font color="black">(</font><font color="maroon">0</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">:</font><font color="black">:</font>biginteger<font color="black">(</font><font color="blue">const</font> string<font color="black">&</font> v<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>v.length<font color="black">(</font><font color="black">)</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">0</font><font color="black">)</font><font color="black">{</font>
+        pos <font color="black">=</font> <font color="blue">true</font>;
+        digits.push_back<font color="black">(</font><font color="maroon">0</font><font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">else</font><font color="black">{</font>
+        pos <font color="black">=</font> v<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">!</font><font color="black">=</font> <font color="maroon">'-'</font>;
+        <font color="blue">int</font> end <font color="black">=</font> pos ? <font color="maroon">0</font> <font color="black">:</font> <font color="maroon">1</font>;
+        <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>v.length<font color="black">(</font><font color="black">)</font><font color="maroon">-1</font>; i<font color="black">&#62;</font><font color="black">=</font>end; i<font color="black">-</font><font color="black">-</font><font color="black">)</font><font color="black">{</font>
+            <font color="blue">int</font> dig <font color="black">=</font> v<font color="black">[</font>i<font color="black">]</font> <font color="black">-</font><font color="maroon">'0'</font>;
+            digits.push_back<font color="black">(</font>dig<font color="black">)</font>;
+        <font color="black">}</font>
+    <font color="black">}</font>
+<font color="black">}</font>
+
+biginteger<font color="black">:</font><font color="black">:</font>biginteger<font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> v<font color="black">)</font> <font color="black">:</font> pos<font color="black">(</font>v.pos<font color="black">)</font>, digits<font color="black">(</font>v.digits<font color="black">)</font><font color="black">{</font>
+<font color="black">}</font>
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Getter */</font>
+vector<font color="black">&#60;</font><font color="blue">int</font><font color="black">&#62;</font> biginteger<font color="black">:</font><font color="black">:</font>getDigits<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> digits;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font>getPos<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> pos;
+<font color="black">}</font>
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Operator= */</font>
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    pos <font color="black">=</font> rhs.pos;
+    digits <font color="black">=</font> rhs.digits;
+    <font color="blue">return</font> <font color="black">*</font><font color="blue">this</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Arithmetic Operators */</font>
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">+</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res <font color="black">+</font><font color="black">=</font> rhs;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">+</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">+</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">-</font><font color="black">(</font><font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res.negate<font color="black">(</font><font color="black">)</font>;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">-</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res <font color="black">-</font><font color="black">=</font> rhs;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">-</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">-</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">*</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res <font color="black">*</font><font color="black">=</font> rhs;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">*</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">*</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">/</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res <font color="black">/</font><font color="black">=</font> rhs;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">/</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">/</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font>%<font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res %<font color="black">=</font> rhs;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font>%<font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font>%<font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">+</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>pos <font color="black">=</font><font color="black">=</font> rhs.pos<font color="black">)</font><font color="black">{</font>
+        <font color="blue">int</font> end <font color="black">=</font> max<font color="black">(</font>rhs.digits.size<font color="black">(</font><font color="black">)</font>, digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font>;
+        <font color="blue">int</font> carry <font color="black">=</font> <font color="maroon">0</font>;
+
+        <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>; i<font color="black">&#60;</font>end; i<font color="black">+</font><font color="black">+</font><font color="black">)</font><font color="black">{</font>
+            <font color="blue">if</font> <font color="black">(</font>i <font color="black">=</font><font color="black">=</font> digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font>
+                digits.push_back<font color="black">(</font><font color="maroon">0</font><font color="black">)</font>;
+
+            digits<font color="black">[</font>i<font color="black">]</font> <font color="black">+</font><font color="black">=</font> carry <font color="black">+</font> <font color="black">(</font>i <font color="black">&#60;</font> rhs.digits.size<font color="black">(</font><font color="black">)</font> ? rhs.digits<font color="black">[</font>i<font color="black">]</font> <font color="black">:</font> <font color="maroon">0</font><font color="black">)</font>;
+            carry <font color="black">=</font> digits<font color="black">[</font>i<font color="black">]</font> <font color="black">/</font> BASE;
+            <font color="blue">if</font> <font color="black">(</font>carry<font color="black">)</font>
+                digits<font color="black">[</font>i<font color="black">]</font> <font color="black">-</font><font color="black">=</font> BASE;
+        <font color="black">}</font>
+        <font color="blue">if</font> <font color="black">(</font>carry<font color="black">)</font>
+            digits.push_back<font color="black">(</font>carry<font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">else</font><font color="black">{</font>
+        <font color="blue">if</font> <font color="black">(</font>rhs <font color="black">!</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font>
+            <font color="blue">return</font> <font color="blue">operator</font><font color="black">-</font><font color="black">=</font><font color="black">(</font><font color="black">-</font>rhs<font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">return</font> <font color="black">*</font><font color="blue">this</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">+</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">+</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">void</font> biginteger<font color="black">:</font><font color="black">:</font>negate<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">!</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font>
+        pos <font color="black">=</font> <font color="black">!</font>pos;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">-</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>pos <font color="black">=</font><font color="black">=</font> rhs.pos<font color="black">)</font><font color="black">{</font>
+        <font color="blue">if</font> <font color="black">(</font>abs<font color="black">(</font><font color="black">)</font> <font color="black">&#62;</font><font color="black">=</font> rhs.abs<font color="black">(</font><font color="black">)</font><font color="black">)</font><font color="black">{</font> <font color="green">// this &#62;= rhs</font>
+            <font color="blue">int</font> carry <font color="black">=</font> <font color="maroon">0</font>;
+
+            <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>; i<font color="black">&#60;</font>rhs.digits.size<font color="black">(</font><font color="black">)</font> <font color="black">|</font><font color="black">|</font> carry; i<font color="black">+</font><font color="black">+</font><font color="black">)</font><font color="black">{</font>
+                digits<font color="black">[</font>i<font color="black">]</font> <font color="black">-</font><font color="black">=</font> carry;
+                <font color="blue">if</font> <font color="black">(</font>i <font color="black">&#60;</font> rhs.digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font>
+                    digits<font color="black">[</font>i<font color="black">]</font> <font color="black">-</font><font color="black">=</font> rhs.digits<font color="black">[</font>i<font color="black">]</font>;
+                carry <font color="black">=</font> <font color="black">(</font>digits<font color="black">[</font>i<font color="black">]</font> <font color="black">&#60;</font> <font color="maroon">0</font><font color="black">)</font>? <font color="maroon">1</font> <font color="black">:</font> <font color="maroon">0</font>;
+                <font color="blue">if</font> <font color="black">(</font>carry<font color="black">)</font>
+                    digits<font color="black">[</font>i<font color="black">]</font> <font color="black">+</font><font color="black">=</font> BASE;
+            <font color="black">}</font>
+
+            normalize<font color="black">(</font><font color="black">)</font>;
+        <font color="black">}</font>
+        <font color="blue">else</font><font color="black">{</font> <font color="green">// this &#60; rhs</font>
+            <font color="green">// this - rhs = -(rhs - this)</font>
+            <font color="green">// return -(rhs - *this);</font>
+            biginteger right <font color="black">=</font> rhs;
+            right <font color="black">-</font><font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+            right.negate<font color="black">(</font><font color="black">)</font>;
+            <font color="blue">return</font> <font color="blue">operator</font><font color="black">=</font><font color="black">(</font>right<font color="black">)</font>;
+        <font color="black">}</font>
+    <font color="black">}</font>
+    <font color="blue">else</font><font color="black">{</font>
+        <font color="blue">if</font> <font color="black">(</font>rhs <font color="black">!</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font>
+            <font color="blue">return</font> <font color="blue">operator</font><font color="black">+</font><font color="black">=</font><font color="black">(</font><font color="black">-</font>rhs<font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">return</font> <font color="black">*</font><font color="blue">this</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">-</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">-</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">*</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">bool</font> positive <font color="black">=</font> pos;
+    <font color="black">*</font><font color="blue">this</font> <font color="black">=</font> karatsubaMultiply<font color="black">(</font><font color="black">*</font><font color="blue">this</font>, rhs<font color="black">)</font>;
+    pos <font color="black">=</font> positive <font color="black">=</font><font color="black">=</font> rhs.pos;
+    normalize<font color="black">(</font><font color="black">)</font>;
+    <font color="blue">return</font> <font color="black">*</font><font color="blue">this</font>;
+<font color="black">}</font>
+<font color="green">/*
+biginteger schonhageStrassenMultiplication(const biginteger& x, const biginteger& y){
+    int n = x.digits.size();
+    int m = y.digits.size();
+    int linearConvo[n+m-1];
+
+    biginteger p = x;
+    for(int i=0; i&#60;m; i++){
+        x = p;
+        for(int j=0; j&#60;n; j++){
+            linearConvo[i+j] += y.digits[0] * x.digits[0];
+            x /= 10;
+        }
+        y /= 10;
+    }
+
+    biginteger product, base(1);
+    int nextCarry = 0,
+
+    for(int i=0; i&#60;n+m-1; i++){
+        linearConvo[i] += nextCarry;
+        product += base * (linearConvo[i] % 10);
+        nextCarry = linearConvo[i] / 10;
+        base.multiplyThis10(1);
+    }
+}*/</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">*</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">*</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">/</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">=</font><font color="black">(</font>divmod<font color="black">(</font><font color="black">*</font><font color="blue">this</font>, rhs<font color="black">)</font>.first<font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">/</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">/</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font>%<font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">=</font><font color="black">(</font>divmod<font color="black">(</font><font color="black">*</font><font color="blue">this</font>, rhs<font color="black">)</font>.second<font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font>%<font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font>%<font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">+</font><font color="black">+</font><font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="black">*</font><font color="blue">this</font> <font color="black">+</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+    <font color="blue">return</font> <font color="black">*</font><font color="blue">this</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">+</font><font color="black">+</font><font color="black">(</font><font color="blue">int</font> d<font color="black">)</font><font color="black">{</font>
+    biginteger before <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    <font color="black">*</font><font color="blue">this</font> <font color="black">+</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+    <font color="blue">return</font> before;
+<font color="black">}</font>
+
+biginteger<font color="black">&</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">-</font><font color="black">-</font><font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="black">*</font><font color="blue">this</font> <font color="black">-</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+    <font color="blue">return</font> <font color="black">*</font><font color="blue">this</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">-</font><font color="black">-</font><font color="black">(</font><font color="blue">int</font> d<font color="black">)</font><font color="black">{</font>
+    biginteger before <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    <font color="black">*</font><font color="blue">this</font> <font color="black">-</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+    <font color="blue">return</font> before;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>abs<font color="black">(</font><font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res.pos <font color="black">=</font> <font color="blue">true</font>;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>pow<font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> a, <font color="blue">const</font> biginteger<font color="black">&</font> n<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>n <font color="black">=</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font>
+        <font color="blue">return</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+    <font color="blue">else</font> <font color="blue">if</font> <font color="black">(</font>n <font color="black">=</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE<font color="black">)</font>
+        <font color="blue">return</font> a;
+    <font color="blue">else</font><font color="black">{</font>
+        biginteger a2 <font color="black">=</font> pow<font color="black">(</font>a, n <font color="black">/</font> biginteger<font color="black">:</font><font color="black">:</font>TWO<font color="black">)</font>;
+        <font color="blue">if</font> <font color="black">(</font>n.isOdd<font color="black">(</font><font color="black">)</font><font color="black">)</font>
+            <font color="blue">return</font> a2 <font color="black">*</font> a2 <font color="black">*</font> a;
+        <font color="blue">else</font>
+            <font color="blue">return</font> a2 <font color="black">*</font> a2;
+    <font color="black">}</font>
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>modpow<font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> a, <font color="blue">const</font> biginteger<font color="black">&</font> n, <font color="blue">const</font> biginteger<font color="black">&</font> m<font color="black">)</font><font color="black">{</font>
+    biginteger base <font color="black">=</font> a;
+    biginteger exp <font color="black">=</font> n;
+    biginteger res <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+    <font color="blue">while</font> <font color="black">(</font>exp <font color="black">&#62;</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font>
+    <font color="black">{</font>
+        <font color="blue">if</font> <font color="black">(</font>exp.isOdd<font color="black">(</font><font color="black">)</font><font color="black">)</font><font color="black">{</font>
+            res <font color="black">*</font><font color="black">=</font> base;
+            res %<font color="black">=</font> m;
+            <font color="green">//res = (res * base) % m;</font>
+        <font color="black">}</font>
+        exp <font color="black">/</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>TWO;
+        <font color="green">//base = (base * base) % m;</font>
+        base <font color="black">*</font><font color="black">=</font> base;
+        base %<font color="black">=</font> m;
+    <font color="black">}</font>
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Relational Operators */</font>
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">=</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">bool</font> same <font color="black">=</font> <font color="black">(</font>digits.size<font color="black">(</font><font color="black">)</font> <font color="black">=</font><font color="black">=</font> rhs.digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font> <font color="black">&</font><font color="black">&</font> <font color="black">(</font>pos <font color="black">=</font><font color="black">=</font> rhs.pos<font color="black">)</font>;
+    <font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>;
+    <font color="blue">while</font> <font color="black">(</font>same <font color="black">&</font><font color="black">&</font> <font color="black">(</font>i <font color="black">&#60;</font> digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font><font color="black">)</font><font color="black">{</font>
+        same <font color="black">=</font> <font color="black">(</font>digits<font color="black">[</font>i<font color="black">]</font> <font color="black">=</font><font color="black">=</font> rhs.digits<font color="black">[</font>i<font color="black">]</font><font color="black">)</font>;
+        i<font color="black">+</font><font color="black">+</font>;
+    <font color="black">}</font>
+    <font color="blue">return</font> same;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">=</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">=</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">!</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="black">!</font><font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">=</font><font color="black">=</font> rhs<font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">!</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">!</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#62;</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>pos <font color="black">!</font><font color="black">=</font> rhs.pos<font color="black">)</font>
+        <font color="blue">return</font> pos <font color="black">=</font><font color="black">=</font> <font color="blue">true</font>;
+    <font color="blue">else</font> <font color="blue">if</font> <font color="black">(</font>digits.size<font color="black">(</font><font color="black">)</font> <font color="black">!</font><font color="black">=</font> rhs.digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font>
+        <font color="blue">return</font> pos ? digits.size<font color="black">(</font><font color="black">)</font> <font color="black">&#62;</font> rhs.digits.size<font color="black">(</font><font color="black">)</font> <font color="black">:</font> digits.size<font color="black">(</font><font color="black">)</font> <font color="black">&#60;</font> rhs.digits.size<font color="black">(</font><font color="black">)</font>;
+    <font color="blue">else</font><font color="black">{</font>
+        <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>digits.size<font color="black">(</font><font color="black">)</font><font color="maroon">-1</font>; i<font color="black">&#62;</font><font color="black">=</font><font color="maroon">0</font>; i<font color="black">-</font><font color="black">-</font><font color="black">)</font><font color="black">{</font>
+            <font color="blue">if</font> <font color="black">(</font>digits<font color="black">[</font>i<font color="black">]</font> <font color="black">!</font><font color="black">=</font> rhs.digits<font color="black">[</font>i<font color="black">]</font><font color="black">)</font>
+                <font color="blue">return</font> pos ? digits<font color="black">[</font>i<font color="black">]</font> <font color="black">&#62;</font> rhs.digits<font color="black">[</font>i<font color="black">]</font> <font color="black">:</font> digits<font color="black">[</font>i<font color="black">]</font> <font color="black">&#60;</font> rhs.digits<font color="black">[</font>i<font color="black">]</font>;
+        <font color="black">}</font>
+        <font color="blue">return</font> <font color="blue">false</font>;
+    <font color="black">}</font>
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#62;</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">&#62;</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#62;</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="black">!</font><font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">&#60;</font> rhs<font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#62;</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">&#62;</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#60;</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">!</font><font color="black">=</font> rhs<font color="black">)</font> <font color="black">&</font><font color="black">&</font> <font color="black">!</font><font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">&#62;</font> rhs<font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#60;</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">&#60;</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#60;</font><font color="black">=</font><font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="black">!</font><font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">&#62;</font> rhs<font color="black">)</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font><font color="blue">operator</font><font color="black">&#60;</font><font color="black">=</font><font color="black">(</font><font color="blue">int</font> rhs<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="blue">operator</font><font color="black">&#60;</font><font color="black">=</font><font color="black">(</font>biginteger<font color="black">(</font>rhs<font color="black">)</font><font color="black">)</font>;
+<font color="black">}</font>
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* I/O */</font>
+istream<font color="black">&</font> <font color="blue">operator</font><font color="black">&#62;</font><font color="black">&#62;</font><font color="black">(</font>istream <font color="black">&</font>is, biginteger<font color="black">&</font> v<font color="black">)</font><font color="black">{</font>
+    string <font color="blue">input</font>;
+    is <font color="black">&#62;</font><font color="black">&#62;</font> <font color="blue">input</font>;
+
+    v <font color="black">=</font> biginteger<font color="black">(</font><font color="blue">input</font><font color="black">)</font>;
+
+    <font color="blue">return</font> is;
+<font color="black">}</font>
+
+ostream<font color="black">&</font> <font color="blue">operator</font><font color="black">&#60;</font><font color="black">&#60;</font><font color="black">(</font>ostream <font color="black">&</font>os, <font color="blue">const</font> biginteger<font color="black">&</font> v<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font><font color="black">!</font>v.pos<font color="black">)</font>
+        os <font color="black">&#60;</font><font color="black">&#60;</font> <font color="maroon">"-"</font>;
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>v.digits.size<font color="black">(</font><font color="black">)</font><font color="maroon">-1</font>; i<font color="black">&#62;</font><font color="black">=</font><font color="maroon">0</font>; i<font color="black">-</font><font color="black">-</font><font color="black">)</font>
+        os <font color="black">&#60;</font><font color="black">&#60;</font> v.digits<font color="black">[</font>i<font color="black">]</font>;
+    <font color="blue">return</font> os;
+<font color="black">}</font>
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Type Conversion */</font>
+string biginteger<font color="black">:</font><font color="black">:</font>toString<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    string res;
+    <font color="blue">if</font> <font color="black">(</font><font color="black">!</font>pos<font color="black">)</font>
+        res <font color="black">+</font><font color="black">=</font> <font color="maroon">'-'</font>;
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>digits.size<font color="black">(</font><font color="black">)</font><font color="maroon">-1</font>; i<font color="black">&#62;</font><font color="black">=</font><font color="maroon">0</font>; i<font color="black">-</font><font color="black">-</font><font color="black">)</font><font color="black">{</font>
+        res <font color="black">+</font><font color="black">=</font> digits<font color="black">[</font>i<font color="black">]</font> <font color="black">+</font> <font color="maroon">'0'</font>;
+    <font color="black">}</font>
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+<font color="blue">int</font> biginteger<font color="black">:</font><font color="black">:</font>toInt<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="blue">int</font> res <font color="black">=</font> <font color="maroon">0</font>;
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>digits.size<font color="black">(</font><font color="black">)</font><font color="maroon">-1</font>; i<font color="black">&#62;</font><font color="black">=</font><font color="maroon">0</font>; i<font color="black">-</font><font color="black">-</font><font color="black">)</font><font color="black">{</font>
+        res <font color="black">=</font> res <font color="black">*</font> <font color="maroon">10</font> <font color="black">+</font> digits<font color="black">[</font>i<font color="black">]</font>;
+    <font color="black">}</font>
+    <font color="blue">if</font> <font color="black">(</font><font color="black">!</font>pos<font color="black">)</font>
+        res <font color="black">=</font> <font color="black">-</font>res;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Other Public Methods */</font>
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font>isOdd<font color="black">(</font><font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> % <font color="maroon">2</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">1</font>;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font>isEven<font color="black">(</font><font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="black">!</font>isOdd<font color="black">(</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>subDigit<font color="black">(</font><font color="blue">int</font> pos, <font color="blue">int</font> n<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res;
+    <font color="blue">int</font> index <font color="black">=</font> digits.size<font color="black">(</font><font color="black">)</font> <font color="black">-</font>pos <font color="maroon">-1</font>;
+    
+    res.digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">+</font><font color="black">=</font> digits<font color="black">[</font>index<font color="black">]</font>;
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>index<font color="maroon">-1</font>; i<font color="black">&#62;</font>index<font color="black">-</font>n; i<font color="black">-</font><font color="black">-</font><font color="black">)</font><font color="black">{</font>
+        res.digits.insert<font color="black">(</font>res.digits.begin<font color="black">(</font><font color="black">)</font>, digits<font color="black">[</font>i<font color="black">]</font><font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>subDigit<font color="black">(</font><font color="blue">int</font> pos<font color="black">)</font> <font color="blue">const</font><font color="black">{</font>
+    biginteger res;
+    <font color="blue">int</font> index <font color="black">=</font> digits.size<font color="black">(</font><font color="black">)</font> <font color="black">-</font>pos <font color="maroon">-1</font>;
+    
+    res.digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">+</font><font color="black">=</font> digits<font color="black">[</font>index<font color="black">]</font>;
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>index<font color="maroon">-1</font>; i<font color="black">&#62;</font><font color="black">=</font><font color="maroon">0</font>; i<font color="black">-</font><font color="black">-</font><font color="black">)</font><font color="black">{</font>
+        res.digits.insert<font color="black">(</font>res.digits.begin<font color="black">(</font><font color="black">)</font>, digits<font color="black">[</font>i<font color="black">]</font><font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>gcd<font color="black">(</font>biginteger a, biginteger b<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>a <font color="black">=</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font>
+        <font color="blue">return</font> b;
+    <font color="blue">else</font>
+        <font color="blue">return</font> biginteger<font color="black">:</font><font color="black">:</font>gcd<font color="black">(</font>b%a, a<font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>gcdExtended<font color="black">(</font>biginteger a, biginteger b, biginteger<font color="black">&</font> x, biginteger<font color="black">&</font> y<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>a <font color="black">=</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font><font color="black">{</font>
+        x <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO;
+        y <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+        <font color="blue">return</font> b;
+    <font color="black">}</font>
+    
+    biginteger x1, y1; 
+    biginteger gcd <font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>gcdExtended<font color="black">(</font>b%a, a, x1, y1<font color="black">)</font>;
+
+    x <font color="black">=</font> y1 <font color="black">-</font><font color="black">(</font>b<font color="black">/</font>a<font color="black">)</font> <font color="black">*</font> x1;
+    y <font color="black">=</font> x1;
+
+    <font color="blue">return</font> gcd;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>generateRandomProbablePrime<font color="black">(</font><font color="blue">int</font> digits<font color="black">)</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> generateRandomNearlyPrime<font color="black">(</font>digits<font color="black">)</font>;
+
+    <font color="blue">while</font> <font color="black">(</font><font color="black">!</font>res.isProbablePrime<font color="black">(</font><font color="black">)</font><font color="black">)</font><font color="black">{</font>
+        res <font color="black">+</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>TWO;
+        <font color="blue">if</font> <font color="black">(</font>res.digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">5</font><font color="black">)</font>
+            res <font color="black">+</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>TWO;
+    <font color="black">}</font>
+
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>generateRandom<font color="black">(</font><font color="blue">int</font> digits<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font>digits <font color="black">=</font><font color="black">=</font> <font color="maroon">1</font><font color="black">)</font><font color="black">{</font>
+        <font color="blue">return</font> biginteger<font color="black">(</font>rand<font color="black">(</font><font color="black">)</font>%<font color="maroon">10</font><font color="black">)</font>;
+    <font color="black">}</font>
+    
+    biginteger res<font color="black">(</font>rand<font color="black">(</font><font color="black">)</font>%<font color="maroon">9</font> <font color="black">+</font> <font color="maroon">1</font><font color="black">)</font>;
+
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>; i<font color="black">&#60;</font>digits<font color="maroon">-1</font>; i<font color="black">+</font><font color="black">+</font><font color="black">)</font>
+        res.digits.insert<font color="black">(</font>res.digits.begin<font color="black">(</font><font color="black">)</font>, rand<font color="black">(</font><font color="black">)</font>%<font color="maroon">10</font><font color="black">)</font>;
+    
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+<font color="blue">bool</font> biginteger<font color="black">:</font><font color="black">:</font>isProbablePrime<font color="black">(</font><font color="blue">int</font> certainty<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">&#60;</font> biginteger<font color="black">:</font><font color="black">:</font>TWO<font color="black">)</font>
+        <font color="blue">return</font> <font color="blue">false</font>;
+    <font color="blue">if</font> <font color="black">(</font><font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">!</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>TWO<font color="black">)</font> <font color="black">&</font><font color="black">&</font> <font color="black">(</font><font color="black">*</font><font color="blue">this</font> % biginteger<font color="black">:</font><font color="black">:</font>TWO <font color="black">=</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font><font color="black">)</font>
+        <font color="blue">return</font> <font color="blue">false</font>;
+
+    biginteger val <font color="black">=</font> <font color="black">*</font><font color="blue">this</font> <font color="black">-</font>biginteger<font color="black">:</font><font color="black">:</font>ONE;
+    <font color="blue">while</font> <font color="black">(</font>val % biginteger<font color="black">:</font><font color="black">:</font>TWO <font color="black">=</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font>
+        val <font color="black">/</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>TWO;
+
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>; i<font color="black">&#60;</font>certainty; i<font color="black">+</font><font color="black">+</font><font color="black">)</font><font color="black">{</font>
+        biginteger a <font color="black">=</font> biginteger<font color="black">(</font>rand<font color="black">(</font><font color="black">)</font><font color="black">)</font>;
+        a %<font color="black">=</font> biginteger<font color="black">(</font><font color="black">*</font><font color="blue">this</font> <font color="black">-</font>biginteger<font color="black">:</font><font color="black">:</font>ONE<font color="black">)</font>;
+        a <font color="black">+</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE;
+
+        biginteger temp <font color="black">=</font> val;
+        biginteger mod <font color="black">=</font> modpow<font color="black">(</font>a, temp, <font color="black">*</font><font color="blue">this</font><font color="black">)</font>;
+
+        <font color="blue">while</font> <font color="black">(</font>temp <font color="black">!</font><font color="black">=</font> <font color="black">*</font><font color="blue">this</font> <font color="black">-</font>biginteger<font color="black">:</font><font color="black">:</font>ONE <font color="black">&</font><font color="black">&</font> mod <font color="black">!</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ONE <font color="black">&</font><font color="black">&</font> mod <font color="black">!</font><font color="black">=</font> <font color="black">*</font><font color="blue">this</font> <font color="black">-</font>biginteger<font color="black">:</font><font color="black">:</font>ONE<font color="black">)</font><font color="black">{</font>
+            <font color="green">//mod = (mod * mod) % (*this);</font>
+            mod <font color="black">*</font><font color="black">=</font> mod;
+            mod %<font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+            temp <font color="black">*</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>TWO;
+        <font color="black">}</font>
+
+        <font color="blue">if</font> <font color="black">(</font>mod <font color="black">!</font><font color="black">=</font> <font color="black">*</font><font color="blue">this</font> <font color="black">-</font>biginteger<font color="black">:</font><font color="black">:</font>ONE <font color="black">&</font><font color="black">&</font> temp % biginteger<font color="black">:</font><font color="black">:</font>TWO <font color="black">=</font><font color="black">=</font> biginteger<font color="black">:</font><font color="black">:</font>ZERO<font color="black">)</font><font color="black">{</font>
+            <font color="blue">return</font> <font color="blue">false</font>;
+        <font color="black">}</font>
+    <font color="black">}</font>
+
+    <font color="blue">return</font> <font color="blue">true</font>;
+<font color="black">}</font>
+
+<font color="green">/*
+    if (*this &#60; biginteger::TWO)
+        return false;
+    if ((*this != biginteger::TWO) && (*this % biginteger::TWO == biginteger::ZERO))
+        return false;
+    if (*this == biginteger::THREE)
+        return true;
+
+    biginteger val = *this - biginteger::ONE;
+    while (val % biginteger::TWO == biginteger::ZERO)
+        val /= biginteger::TWO;
+
+    biginteger mod = modpow(biginteger::TWO, val, *this);
+    if (mod == biginteger::ONE || mod == *this - biginteger::ONE)
+        return true;
+
+    for(int i=0; i&#60;certainty; i++){
+        mod = modpow(mod, biginteger::TWO, *this);
+        if (mod == biginteger::ONE)
+            return false;
+        else if (mod == *this - biginteger::ONE)
+            return true;
+    }
+
+    return false;
+*/</font>
+
+
+<font color="green">/****************************************************************************/</font>
+<font color="green">/* Private Methods */</font>
+<font color="blue">int</font> biginteger<font color="black">:</font><font color="black">:</font>max<font color="black">(</font><font color="blue">int</font> a, <font color="blue">int</font> b<font color="black">)</font><font color="black">{</font>
+    <font color="blue">return</font> <font color="black">(</font>a <font color="black">&#62;</font> b<font color="black">)</font> ? a <font color="black">:</font> b;
+<font color="black">}</font>
+
+<font color="blue">void</font> biginteger<font color="black">:</font><font color="black">:</font>normalize<font color="black">(</font><font color="black">)</font><font color="black">{</font>
+    <font color="blue">while</font> <font color="black">(</font><font color="black">(</font>digits<font color="black">[</font>digits.size<font color="black">(</font><font color="black">)</font><font color="maroon">-1</font><font color="black">]</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">0</font><font color="black">)</font> <font color="black">&</font><font color="black">&</font> <font color="black">(</font>digits.size<font color="black">(</font><font color="black">)</font> <font color="black">&#62;</font> <font color="maroon">1</font><font color="black">)</font><font color="black">)</font><font color="black">{</font>
+        digits.pop_back<font color="black">(</font><font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">if</font> <font color="black">(</font><font color="black">(</font>digits.size<font color="black">(</font><font color="black">)</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">1</font><font color="black">)</font> <font color="black">&</font><font color="black">&</font> <font color="black">(</font>digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">0</font><font color="black">)</font><font color="black">)</font><font color="black">{</font>
+        pos <font color="black">=</font> <font color="blue">true</font>; <font color="green">// handle negative zero</font>
+    <font color="black">}</font>
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>multiply10<font color="black">(</font><font color="blue">int</font> n<font color="black">)</font><font color="black">{</font>
+    biginteger res <font color="black">=</font> <font color="black">*</font><font color="blue">this</font>;
+    res.multiplyThis10<font color="black">(</font>n<font color="black">)</font>;
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+<font color="blue">void</font> biginteger<font color="black">:</font><font color="black">:</font>multiplyThis10<font color="black">(</font><font color="blue">int</font> n<font color="black">)</font><font color="black">{</font>
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>; i<font color="black">&#60;</font>n; i<font color="black">+</font><font color="black">+</font><font color="black">)</font>
+        digits.insert<font color="black">(</font>digits.begin<font color="black">(</font><font color="black">)</font>, <font color="maroon">0</font><font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>multiplySingleDigit<font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> lhs, <font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">int</font> num <font color="black">=</font> lhs.digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">*</font> rhs.digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font>;
+    <font color="blue">return</font> biginteger<font color="black">(</font>num<font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>karatsubaMultiply<font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> lhs, <font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font>
+    <font color="blue">if</font> <font color="black">(</font><font color="black">(</font>lhs.digits.size<font color="black">(</font><font color="black">)</font> <font color="black">&#60;</font> <font color="maroon">2</font><font color="black">)</font> <font color="black">&</font><font color="black">&</font> <font color="black">(</font>rhs.digits.size<font color="black">(</font><font color="black">)</font> <font color="black">&#60;</font> <font color="maroon">2</font><font color="black">)</font><font color="black">)</font><font color="black">{</font>
+        <font color="blue">return</font> multiplySingleDigit<font color="black">(</font>lhs, rhs<font color="black">)</font>;
+    <font color="black">}</font>
+    <font color="blue">else</font><font color="black">{</font>
+        <font color="blue">int</font> m1 <font color="black">=</font> max<font color="black">(</font>lhs.digits.size<font color="black">(</font><font color="black">)</font>, rhs.digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font>;
+        <font color="blue">if</font> <font color="black">(</font>m1 % <font color="maroon">2</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">1</font><font color="black">)</font>
+            m1<font color="black">+</font><font color="black">+</font>;
+        <font color="blue">int</font> m2 <font color="black">=</font> m1 <font color="black">/</font> <font color="maroon">2</font>;
+
+        biginteger left <font color="black">=</font> lhs;
+        biginteger right <font color="black">=</font> rhs;
+
+        <font color="blue">while</font> <font color="black">(</font>left.digits.size<font color="black">(</font><font color="black">)</font> <font color="black">&#60;</font> m1<font color="black">)</font>
+            left.digits.push_back<font color="black">(</font><font color="maroon">0</font><font color="black">)</font>;
+        <font color="blue">while</font> <font color="black">(</font>right.digits.size<font color="black">(</font><font color="black">)</font> <font color="black">&#60;</font> m1<font color="black">)</font>
+            right.digits.push_back<font color="black">(</font><font color="maroon">0</font><font color="black">)</font>;
+
+        biginteger h1 <font color="black">=</font> left.subDigit<font color="black">(</font><font color="maroon">0</font>,m2<font color="black">)</font>;
+        biginteger l1 <font color="black">=</font> left.subDigit<font color="black">(</font>m2<font color="black">)</font>;
+        biginteger h2 <font color="black">=</font> right.subDigit<font color="black">(</font><font color="maroon">0</font>,m2<font color="black">)</font>;
+        biginteger l2 <font color="black">=</font> right.subDigit<font color="black">(</font>m2<font color="black">)</font>;
+        
+        biginteger x0 <font color="black">=</font> karatsubaMultiply<font color="black">(</font>l1, l2<font color="black">)</font>;
+        l1 <font color="black">+</font><font color="black">=</font> h1;
+        l2 <font color="black">+</font><font color="black">=</font> h2;
+        biginteger x1 <font color="black">=</font> karatsubaMultiply<font color="black">(</font>l1, l2<font color="black">)</font>;
+        biginteger x2 <font color="black">=</font> karatsubaMultiply<font color="black">(</font>h1, h2<font color="black">)</font>;
+
+        x0.normalize<font color="black">(</font><font color="black">)</font>; x1.normalize<font color="black">(</font><font color="black">)</font>; x2.normalize<font color="black">(</font><font color="black">)</font>;
+        x1 <font color="black">-</font><font color="black">=</font> x2;
+        x1 <font color="black">-</font><font color="black">=</font> x0;
+        x2.multiplyThis10<font color="black">(</font><font color="maroon">2</font><font color="black">*</font>m2<font color="black">)</font>;
+        x1.multiplyThis10<font color="black">(</font>m2<font color="black">)</font>;
+        <font color="blue">return</font> x2 <font color="black">+</font> x1 <font color="black">+</font> x0;
+    <font color="black">}</font>
+<font color="black">}</font>
+
+pair<font color="black">&#60;</font>biginteger, biginteger<font color="black">&#62;</font> biginteger<font color="black">:</font><font color="black">:</font>divmod<font color="black">(</font><font color="blue">const</font> biginteger<font color="black">&</font> lhs, <font color="blue">const</font> biginteger<font color="black">&</font> rhs<font color="black">)</font><font color="black">{</font> <font color="green">// TODO: benerin kasus mod negatif (klo sempet aja krn ga ngaruh rsa)</font>
+    biginteger den<font color="black">(</font>rhs<font color="black">)</font>; <font color="green">// denominator</font>
+    biginteger res;
+    biginteger remainder;
+    <font color="blue">bool</font> negativeDen <font color="black">=</font> den <font color="black">&#60;</font> <font color="maroon">0</font>;
+
+    <font color="blue">if</font> <font color="black">(</font>lhs <font color="black">&#60;</font> den<font color="black">)</font><font color="black">{</font>
+        <font color="blue">return</font> make_pair<font color="black">(</font>biginteger<font color="black">:</font><font color="black">:</font>ZERO, lhs<font color="black">)</font>;
+    <font color="black">}</font>
+
+    <font color="blue">if</font> <font color="black">(</font>den <font color="black">&#60;</font> <font color="maroon">0</font><font color="black">)</font>
+        den <font color="black">=</font> <font color="black">-</font>den;
+
+    remainder <font color="black">=</font> lhs.subDigit<font color="black">(</font><font color="maroon">0</font>, den.digits.size<font color="black">(</font><font color="black">)</font><font color="black">)</font>;
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font>lhs.digits.size<font color="black">(</font><font color="black">)</font> <font color="black">-</font>den.digits.size<font color="black">(</font><font color="black">)</font>; i<font color="black">&#62;</font><font color="black">=</font><font color="maroon">0</font>; <font color="green">/* No Decrement */</font><font color="black">)</font><font color="black">{</font>
+<font color="green">//      cout &#60;&#60; remainder &#60;&#60; " " &#60;&#60; i &#60;&#60; " " &#60;&#60; res &#60;&#60; endl; cin.get();</font>
+        <font color="blue">if</font> <font color="black">(</font>remainder <font color="black">&#60;</font> den<font color="black">)</font><font color="black">{</font>
+            <font color="blue">if</font> <font color="black">(</font>i <font color="black">&#62;</font> <font color="maroon">0</font><font color="black">)</font><font color="black">{</font>
+                res.digits.insert<font color="black">(</font>res.digits.begin<font color="black">(</font><font color="black">)</font>, <font color="maroon">0</font><font color="black">)</font>;
+                remainder.digits.insert<font color="black">(</font>remainder.digits.begin<font color="black">(</font><font color="black">)</font>, lhs.digits<font color="black">[</font>i<font color="maroon">-1</font><font color="black">]</font><font color="black">)</font>;
+                remainder.normalize<font color="black">(</font><font color="black">)</font>; <font color="green">// needed to avoid bug</font>
+            <font color="black">}</font>
+            i<font color="black">-</font><font color="black">-</font>;
+        <font color="black">}</font>
+        <font color="blue">else</font><font color="black">{</font>
+            <font color="blue">int</font> count <font color="black">=</font> <font color="maroon">0</font>;
+            <font color="blue">while</font> <font color="black">(</font>remainder <font color="black">&#62;</font><font color="black">=</font> den<font color="black">)</font><font color="black">{</font>
+                remainder <font color="black">-</font><font color="black">=</font> den;
+                count<font color="black">+</font><font color="black">+</font>;
+            <font color="black">}</font>
+            res.digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">=</font> count;
+        <font color="black">}</font>
+    <font color="black">}</font>
+
+    res.normalize<font color="black">(</font><font color="black">)</font>;
+    remainder.normalize<font color="black">(</font><font color="black">)</font>;
+
+    res.pos <font color="black">=</font> lhs.pos <font color="black">=</font><font color="black">=</font> rhs.pos;
+
+    <font color="blue">return</font> make_pair<font color="black">(</font>res, remainder<font color="black">)</font>;
+<font color="black">}</font>
+
+biginteger biginteger<font color="black">:</font><font color="black">:</font>generateRandomNearlyPrime<font color="black">(</font><font color="blue">int</font> digits<font color="black">)</font><font color="black">{</font>
+    srand<font color="black">(</font>time<font color="black">(</font>NULL<font color="black">)</font><font color="black">)</font>;
+
+    <font color="blue">if</font> <font color="black">(</font>digits <font color="black">=</font><font color="black">=</font> <font color="maroon">1</font><font color="black">)</font><font color="black">{</font>
+        <font color="blue">int</font> n <font color="black">=</font> rand<font color="black">(</font><font color="black">)</font>%<font color="maroon">9</font> <font color="black">+</font> <font color="maroon">1</font>;
+        <font color="blue">if</font> <font color="black">(</font><font color="black">(</font>n <font color="black">!</font><font color="black">=</font> <font color="maroon">2</font><font color="black">)</font> <font color="black">&</font><font color="black">&</font> <font color="black">(</font>n % <font color="maroon">2</font> <font color="black">=</font><font color="black">=</font> <font color="maroon">0</font><font color="black">)</font><font color="black">)</font>
+            n<font color="black">-</font><font color="black">-</font>;
+        <font color="blue">return</font> biginteger<font color="black">(</font>n<font color="black">)</font>;
+    <font color="black">}</font>
+    
+    biginteger res;
+    <font color="blue">int</font> odds<font color="black">[</font><font color="maroon">4</font><font color="black">]</font> <font color="black">=</font> <font color="black">{</font><font color="maroon">1</font>, <font color="maroon">3</font>, <font color="maroon">7</font>, <font color="maroon">9</font><font color="black">}</font>;
+    <font color="blue">int</font> least <font color="black">=</font> odds<font color="black">[</font>rand<font color="black">(</font><font color="black">)</font>%<font color="maroon">4</font><font color="black">]</font>;
+    res.digits<font color="black">[</font><font color="maroon">0</font><font color="black">]</font> <font color="black">=</font> least; <font color="green">// smallest digit must be odd and not 5</font>
+
+    <font color="blue">for</font><font color="black">(</font><font color="blue">int</font> i<font color="black">=</font><font color="maroon">0</font>; i<font color="black">&#60;</font>digits<font color="maroon">-2</font>; i<font color="black">+</font><font color="black">+</font><font color="black">)</font>
+        res.digits.push_back<font color="black">(</font>rand<font color="black">(</font><font color="black">)</font>%<font color="maroon">10</font><font color="black">)</font>;
+
+    <font color="blue">int</font> most <font color="black">=</font> rand<font color="black">(</font><font color="black">)</font>%<font color="maroon">9</font> <font color="black">+</font> <font color="maroon">1</font>; <font color="green">// biggest digit must not be zero</font>
+    res.digits.push_back<font color="black">(</font>most<font color="black">)</font>;
+    
+    <font color="blue">return</font> res;
+<font color="black">}</font>
+
+</PRE>
+</BODY>
+</HTML>
