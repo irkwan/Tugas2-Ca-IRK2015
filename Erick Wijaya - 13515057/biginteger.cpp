@@ -9,6 +9,7 @@
 
 #include "biginteger.h"
 #include <iostream>
+#include <iomanip>
 #include <deque>
 #include <string>
 #include <cstdio>
@@ -71,12 +72,20 @@ biginteger::biginteger(const biginteger& v) : pos(v.pos), digits(v.digits){
 
 
 /****************************************************************************/
+/* Getter */
+deque<int> biginteger::getDigits(){
+	return digits;
+}
+
+bool biginteger::getPos(){
+	return pos;
+}
+
+/****************************************************************************/
 /* Operator= */
 biginteger& biginteger::operator=(const biginteger& rhs){
-	if (this != &rhs){
-		pos = rhs.pos;
-		digits = rhs.digits;
-	}
+	pos = rhs.pos;
+	digits = rhs.digits;
 	return *this;
 }
 
@@ -88,30 +97,9 @@ biginteger& biginteger::operator=(int rhs){
 /****************************************************************************/
 /* Arithmetic Operators */
 biginteger biginteger::operator+(const biginteger& rhs) const{
-	if (pos == rhs.pos){
-		int end = max(rhs.digits.size(), digits.size());
-		int carry = 0;
-		biginteger res = rhs;
-
-		for(int i=0; i<end; i++){
-			if (i == res.digits.size())
-				res.digits.push_back(0);
-
-			res.digits[i] += carry + (i < digits.size() ? digits[i] : 0);
-			carry = res.digits[i] / BASE;
-			if (carry)
-				res.digits[i] -= BASE;
-		}
-		if (carry)
-			res.digits.push_back(carry);
-
-		return res;
-	}
-	else{
-		if (rhs == biginteger::ZERO)
-			return *this;
-		return *this - (-rhs);
-	}
+	biginteger res = *this;
+	res += rhs;
+	return res;
 }
 
 biginteger biginteger::operator+(int rhs) const{
@@ -120,40 +108,14 @@ biginteger biginteger::operator+(int rhs) const{
 
 biginteger biginteger::operator-() const{
 	biginteger res = *this;
-	if (res != biginteger::ZERO)
-		res.pos = !res.pos;
+	res.negate();
 	return res;
 }
 
 biginteger biginteger::operator-(const biginteger& rhs) const{
-	if (pos == rhs.pos){
-		if (abs() >= rhs.abs()){ // this >= rhs
-			biginteger res = *this;
-			int carry = 0;
-
-			for(int i=0; i<rhs.digits.size() || carry; i++){
-				res.digits[i] -= carry;
-				if (i < rhs.digits.size())
-					res.digits[i] -= rhs.digits[i];
-				carry = (res.digits[i] < 0)? 1 : 0;
-				if (carry)
-					res.digits[i] += BASE;
-			}
-
-			res.normalize();
-
-			return res;
-		}
-		else{ // this < rhs
-			// this - rhs = -(rhs - this)
-			return -(rhs - *this);
-		}
-	}
-	else{
-		if (rhs == biginteger::ZERO)
-			return *this;
-		return *this + (-rhs);
-	}
+	biginteger res = *this;
+	res -= rhs;
+	return res;
 }
 
 biginteger biginteger::operator-(int rhs) const{
@@ -161,9 +123,8 @@ biginteger biginteger::operator-(int rhs) const{
 }
 
 biginteger biginteger::operator*(const biginteger& rhs) const{
-	biginteger res = karatsubaMultiply(*this, rhs);
-	res.pos = pos == rhs.pos;
-	res.normalize();
+	biginteger res = *this;
+	res *= rhs;
 	return res;
 }
 
@@ -172,7 +133,8 @@ biginteger biginteger::operator*(int rhs) const{
 }
 
 biginteger biginteger::operator/(const biginteger& rhs) const{
-	biginteger res = divmod(*this, rhs).first;
+	biginteger res = *this;
+	res /= rhs;
 	return res;
 }
 
@@ -181,7 +143,8 @@ biginteger biginteger::operator/(int rhs) const{
 }
 
 biginteger biginteger::operator%(const biginteger& rhs) const{
-	biginteger res = divmod(*this, rhs).second;
+	biginteger res = *this;
+	res %= rhs;
 	return res;
 }
 
@@ -190,7 +153,26 @@ biginteger biginteger::operator%(int rhs) const{
 }
 
 biginteger& biginteger::operator+=(const biginteger& rhs){
-	*this = *this + rhs;
+	if (pos == rhs.pos){
+		int end = max(rhs.digits.size(), digits.size());
+		int carry = 0;
+
+		for(int i=0; i<end; i++){
+			if (i == digits.size())
+				digits.push_back(0);
+
+			digits[i] += carry + (i < rhs.digits.size() ? rhs.digits[i] : 0);
+			carry = digits[i] / BASE;
+			if (carry)
+				digits[i] -= BASE;
+		}
+		if (carry)
+			digits.push_back(carry);
+	}
+	else{
+		if (rhs != biginteger::ZERO)
+			return operator-=(-rhs);
+	}
 	return *this;
 }
 
@@ -198,8 +180,40 @@ biginteger& biginteger::operator+=(int rhs){
 	return operator+=(biginteger(rhs));
 }
 
+void biginteger::negate(){
+	if (*this != biginteger::ZERO)
+		pos = !pos;
+}
+
 biginteger& biginteger::operator-=(const biginteger& rhs){
-	*this = *this - rhs;
+	if (pos == rhs.pos){
+		if (abs() >= rhs.abs()){ // this >= rhs
+			int carry = 0;
+
+			for(int i=0; i<rhs.digits.size() || carry; i++){
+				digits[i] -= carry;
+				if (i < rhs.digits.size())
+					digits[i] -= rhs.digits[i];
+				carry = (digits[i] < 0)? 1 : 0;
+				if (carry)
+					digits[i] += BASE;
+			}
+
+			normalize();
+		}
+		else{ // this < rhs
+			// this - rhs = -(rhs - this)
+			// return -(rhs - *this);
+			biginteger right = rhs;
+			right -= *this;
+			right.negate();
+			return operator=(right);
+		}
+	}
+	else{
+		if (rhs != biginteger::ZERO)
+			return operator+=(-rhs);
+	}
 	return *this;
 }
 
@@ -208,17 +222,45 @@ biginteger& biginteger::operator-=(int rhs){
 }
 
 biginteger& biginteger::operator*=(const biginteger& rhs){
-	*this = *this * rhs;
+	bool positive = pos;
+	*this = karatsubaMultiply(*this, rhs);
+	pos = positive == rhs.pos;
+	normalize();
 	return *this;
 }
+/*
+biginteger schonhageStrassenMultiplication(const biginteger& x, const biginteger& y){
+	int n = x.digits.size();
+	int m = y.digits.size();
+	int linearConvo[n+m-1];
+
+	biginteger p = x;
+	for(int i=0; i<m; i++){
+		x = p;
+		for(int j=0; j<n; j++){
+			linearConvo[i+j] += y.digits[0] * x.digits[0];
+			x /= 10;
+		}
+		y /= 10;
+	}
+
+	biginteger product, base(1);
+	int nextCarry = 0,
+
+	for(int i=0; i<n+m-1; i++){
+		linearConvo[i] += nextCarry;
+		product += base * (linearConvo[i] % 10);
+		nextCarry = linearConvo[i] / 10;
+		base.multiplyThis10(1);
+	}
+}*/
 
 biginteger& biginteger::operator*=(int rhs){
 	return operator*=(biginteger(rhs));
 }
 
 biginteger& biginteger::operator/=(const biginteger& rhs){
-	*this = *this / rhs;
-	return *this;
+	return operator=(divmod(*this, rhs).first);
 }
 
 biginteger& biginteger::operator/=(int rhs){
@@ -226,8 +268,7 @@ biginteger& biginteger::operator/=(int rhs){
 }
 
 biginteger& biginteger::operator%=(const biginteger& rhs){
-	*this = *this % rhs;
-	return *this;
+	return operator=(divmod(*this, rhs).second);
 }
 
 biginteger& biginteger::operator%=(int rhs){
@@ -235,24 +276,24 @@ biginteger& biginteger::operator%=(int rhs){
 }
 
 biginteger& biginteger::operator++(){
-	*this += 1;
+	*this += biginteger::ONE;
 	return *this;
 }
 
 biginteger biginteger::operator++(int d){
 	biginteger before = *this;
-	*this += 1;
+	*this += biginteger::ONE;
 	return before;
 }
 
 biginteger& biginteger::operator--(){
-	*this -= 1;
+	*this -= biginteger::ONE;
 	return *this;
 }
 
 biginteger biginteger::operator--(int d){
 	biginteger before = *this;
-	*this -= 1;
+	*this -= biginteger::ONE;
 	return before;
 }
 
@@ -282,10 +323,15 @@ biginteger biginteger::modpow(const biginteger& a, const biginteger& n, const bi
     biginteger res = biginteger::ONE;
     while (exp > biginteger::ZERO)
     {
-        if (exp.isOdd())
-            res = (res * base) % m;
+        if (exp.isOdd()){
+        	res *= base;
+        	res %= m;
+            //res = (res * base) % m;
+        }
         exp /= biginteger::TWO;
-        base = (base * base) % m;
+        //base = (base * base) % m;
+        base *= base;
+        base %= m;
     }
     return res;
 }
@@ -468,6 +514,19 @@ biginteger biginteger::generateRandomProbablePrime(int digits){
 	return res;
 }
 
+biginteger biginteger::generateRandom(int digits){
+	if (digits == 1){
+		return biginteger(rand()%10);
+	}
+	
+	biginteger res(rand()%9 + 1);
+
+	for(int i=0; i<digits-1; i++)
+		res.digits.push_front(rand()%10);
+	
+	return res;
+}
+
 bool biginteger::isProbablePrime(int certainty){
 	if (*this < biginteger::TWO)
 		return false;
@@ -479,12 +538,17 @@ bool biginteger::isProbablePrime(int certainty){
 		val /= biginteger::TWO;
 
 	for(int i=0; i<certainty; i++){
-		biginteger a = biginteger(rand()) % biginteger(*this - biginteger::ONE) + biginteger::ONE;
+		biginteger a = biginteger(rand());
+		a %= biginteger(*this - biginteger::ONE);
+		a += biginteger::ONE;
+
 		biginteger temp = val;
 		biginteger mod = modpow(a, temp, *this);
 
 		while (temp != *this - biginteger::ONE && mod != biginteger::ONE && mod != *this - biginteger::ONE){
-			mod = (mod * mod) % (*this);
+			//mod = (mod * mod) % (*this);
+			mod *= mod;
+			mod %= *this;
 			temp *= biginteger::TWO;
 		}
 
@@ -541,9 +605,13 @@ void biginteger::normalize(){
 
 biginteger biginteger::multiply10(int n){
 	biginteger res = *this;
-	for(int i=0; i<n; i++)
-		res.digits.push_front(0);
+	res.multiplyThis10(n);
 	return res;
+}
+
+void biginteger::multiplyThis10(int n){
+	for(int i=0; i<n; i++)
+		digits.push_front(0);
 }
 
 biginteger biginteger::multiplySingleDigit(const biginteger& lhs, const biginteger& rhs){
@@ -573,17 +641,17 @@ biginteger biginteger::karatsubaMultiply(const biginteger& lhs, const biginteger
 		biginteger l1 = left.subDigit(m2);
 		biginteger h2 = right.subDigit(0,m2);
 		biginteger l2 = right.subDigit(m2);
-
-//		cout << l1 << "," << h1 << "  " << l2 << "," << h2 << endl;
 		
 		biginteger x0 = karatsubaMultiply(l1, l2);
 		biginteger x1 = karatsubaMultiply(l1+h1, l2+h2);
-//		cout << "tes1" << endl;
 		biginteger x2 = karatsubaMultiply(h1, h2);
-//		cout << "tes2" << endl;
 
 		x0.normalize(); x1.normalize(); x2.normalize();
-		return x2.multiply10(2*m2) + (x1-x2-x0).multiply10(m2) + x0;
+		x1 -= x2;
+		x1 -= x0;
+		x2.multiplyThis10(2*m2);
+		x1.multiplyThis10(m2);
+		return x2 + x1 + x0;
 	}
 }
 

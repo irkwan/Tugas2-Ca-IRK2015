@@ -1,5 +1,11 @@
-// NIM/Nama : 13515057 / Erick Wijaya
-// File     : rsa.cpp
+/**
+ * Implementation of RSA Class.
+ * For more details, see rsa.h.
+ *
+ * @author Erick Wijaya 
+ * @version 1.0
+ * @since 2017-13-07
+ */
 
 #include <iostream>
 #include <iomanip>
@@ -11,26 +17,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include "biginteger.h"
-using namespace std;
+#include "rsa.h"
 
-class RSA {
-public:
-	RSA(int digits = DEFAULT_DIGITS);
-	string encrypt(string plainText);
-	string decrypt(string cipherText);
-
-private:
-	biginteger n; // security parameter
-	biginteger e; // public key
-	biginteger d; // private key
-
-	biginteger p, q;
-	biginteger dp, dq;
-	biginteger qInv;
-
-	static const int DEFAULT_DIGITS = 20;
-};
+const biginteger RSA::MULTIPLIER_SUB = biginteger(255);
+const biginteger RSA::MULTIPLIER_MOD = biginteger(256);
 
 RSA::RSA(int digits){
 	// Initialize Prime Numbers
@@ -72,6 +62,12 @@ string RSA::encrypt(string plainText){
 	// C = P^e % n
 	for(int i=0; i<plainText.length(); i++){
 		biginteger p(plainText[i]);
+		biginteger mul = (n - MULTIPLIER_SUB) / MULTIPLIER_MOD;
+		int len = mul.toString().length();
+		if (len > 0)
+			len--;
+
+		p += biginteger::generateRandom(len) * MULTIPLIER_MOD;
 		sscipher << biginteger::modpow(p, e, n).toString();
 		if (i < plainText.length()-1)
 			sscipher << " ";
@@ -87,15 +83,26 @@ string RSA::decrypt(string cipherText){
 	// P = C^d % n
 	biginteger in;
 	while (sscipher >> in){
-		biginteger m1 = biginteger::modpow(in, dp, p);
+		/*biginteger m1 = biginteger::modpow(in, dp, p);
 		biginteger m2 = biginteger::modpow(in, dq, q);
-		biginteger h = (qInv * (m1 - m2)) % p;
+		//biginteger h = (qInv * (m1 - m2)) % p;
+		biginteger h = qInv;
+		h *= (m1 - m2);
+		h %= p;
+
 		if (h < 0)
 			h += p;
+		
 		biginteger result = m2 + h * q;
-		ssplain << (char)result.toInt();
+		result %= MULTIPLIER_MOD;
+		ssplain << (char)result.toInt();*/
+
 		/*biginteger result = biginteger::modpow(in, d, n);
 		plainText += (char)result.toInt();*/
+
+		biginteger result = biginteger::modpow(in, d, n);
+		result %= MULTIPLIER_MOD;
+		ssplain << (char)result.toInt();
 	}
 
 	return ssplain.str();
@@ -171,7 +178,9 @@ string readFile(char* filename){
 	string plainText;
 
 	while(inputFile.good()){
-		plainText += inputFile.get();
+		char c = inputFile.get();
+		if (c >= 0)
+			plainText += c;
 	}
 	inputFile.close();
 

@@ -5,7 +5,7 @@
 using namespace std;
 
 /**
- * A Class that represents integer with unrestrained size.
+ * A class that represents integer with unrestrained size.
  *
  * @author Erick Wijaya 
  * @version 1.0
@@ -55,6 +55,18 @@ public:
 	 * @return this object with initialized value.
 	 */
 	biginteger& operator=(int rhs);
+
+	/**
+	 * Get the digits as deque
+	 * @return digits
+	 */
+	deque<int> getDigits();
+
+	/**
+	 * Get the pos value
+	 * @return pos
+	 */
+	bool getPos();
 
 	/** 
 	 * Add this object with parameter.
@@ -149,6 +161,11 @@ public:
 	 * @return this object with updated value.
 	 */
 	biginteger& operator+=(int rhs);
+
+	/**
+	 * Negate this object's sign.
+	 */
+	void negate();
 
 	/**
 	 * Substract this object with rhs.
@@ -421,6 +438,13 @@ public:
 	 */
 	static biginteger generateRandomProbablePrime(int digits = DEFAULT_DIGITS);
 
+	/**
+	 * Generate random big integer.
+	 * @param The amount of digits.
+	 * @return new random Big Integer.
+	 */
+	static biginteger generateRandom(int digits = DEFAULT_DIGITS);
+
 	/** 
 	 * Check whether this object is probably prime or certainly composite.
 	 * @param certainty The certainty factor that determines the accuracy.
@@ -449,6 +473,12 @@ private:
 	 * return this * 10^n.
 	 */
 	biginteger multiply10(int n);
+
+	/**
+	 * Update this value to this * 10^n with n > 0.
+	 * @param n The exponent..
+	 */
+	void multiplyThis10(int n);
 
 	/**
 	 * Multiply single-lengthed Big Integers.

@@ -3,17 +3,23 @@
 
 #include "biginteger.h"
 #include <iostream>
-#include <vector>
+#include <iomanip>
+#include <deque>
 #include <string>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 int main() {
-	biginteger b1, b2(2), b3(2);
-	//cin >> b1 >> b2 >> b3;
+	biginteger b1, b2, b3;
+	cin >> b1 >> b2 >> b3;
 
 	cout << "b1 + b2 = " << b1 + b2 << endl;
 	cout << "b1 - b2 = " << b1 - b2 << endl;
+	clock_t t = clock();
 	cout << "b1 * b2 = " << b1 * b2 << endl;
+	printf("%.6f\n", (double)(clock() - t)/CLOCKS_PER_SEC);
 	cout << "b1 / b2 = " << b1 / b2 << endl;
 	cout << "b1 % b2 = " << b1 % b2 << endl;
 	cout << endl;
@@ -34,8 +40,8 @@ int main() {
 	cout << "b1*x + b2*y = (expected)   " << b1*x + b2*y << endl; 
 	cout << endl;
 	//cout << "pow(b1,b2) = " << biginteger::pow(b1, b2) << endl;
-	cout << "modpow(b1,b2,b3) = " << biginteger::modpow(b1, b2, b3) << endl;
-	cout << "random prime = " << biginteger::generateRandomProbablePrime() << endl;
+	//cout << "modpow(b1,b2,b3) = " << biginteger::modpow(b1, b2, b3) << endl;
+	//cout << "random prime = " << biginteger::generateRandomProbablePrime() << endl;
 	biginteger myint(126);
 	cout << myint.toInt() << " " << myint.toString() << endl;
 
