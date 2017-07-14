@@ -1,8 +1,15 @@
-# class TenPow:
-# 	@classmethod
-# 	def ten_pow(i):
-# 		return ten_pow[i]
+"""
+	Name : Dery Rahman Ahaddienata
+	Nim  : 13515097
 
+	BigInt lib. All operate with string manipulation
+"""
+
+
+"""
+	Generate ten power of n (n is integer above 0).
+	This can optimize karatsuba multiplication
+"""
 ten_pow = {}
 for i in range(10000):
 	if i==0:
@@ -10,7 +17,14 @@ for i in range(10000):
 	else:
 		ten_pow[i]=ten_pow[i-1]*10
 
+"""
+	BigInt Class
+"""
 class BigInt:
+
+	"""
+		Constructor
+	"""
 	def __init__(self, x):
 		self.num = ""
 		for i in range(len(x)):
@@ -23,41 +37,20 @@ class BigInt:
 		if(len(self.num)==0 or self.num=="-"):
 			self.num = "0"
 
+	"""
+		Print BigInt
+	"""
 	def __str__(self):
 		return self.num
 
-	def ten(self,i):
-		return self.ten_pow[i]
-
-	def length(self):
-		return len(self.num)
-
-	def split_on(self,m):
-		return self.num[:m], self.num[m:]
-
-	def concate_front(self,num2):
-		s = num2.num
-		for i in range(len(s)):
-			if(s[i]=='-'):
-				self.num = '-'
-				continue
-			if(s[i]=='0'): continue
-			self.num = s[i:]+self.num
-			break
-		# print self.num
-
-	def concate_back(self,num2):
-		self.num = self.num + num2.num
-
-	def is_zero(self):
-		return len(self.num)==0 or self.num=="0"
 	"""
 		Addition Operator
 	"""
 	def __add__(self,num2):
-		y = num2.num
-		x = self.num
+		y = str(num2.num)
+		x = str(self.num)
 
+		# Case when negative
 		if(x[0]=='-' and y[0]=='-'):
 			return BigInt('-'+(BigInt(x[1:])+BigInt(y[1:])).num)
 		if(x[0]=='-'):
@@ -65,15 +58,22 @@ class BigInt:
 		if(y[0]=='-'):
 			return BigInt(x)-BigInt(y[1:])
 
+		# Length of string x must greather than y
 		if len(x)<len(y):
 			temp = x
 			x = y
 			y = temp
 		max = len(x)
+
+		# Zero leading string for string y
 		for i in range(max-len(y)):
 			y = "0"+y
+
+		# Initial
 		reminder = 0
 		result = ""
+
+		# Addition operation :)
 		for i in range(max):
 			curr = int(x[len(x)-1-i])+int(y[len(y)-1-i])+reminder
 			reminder = curr/10
@@ -84,12 +84,13 @@ class BigInt:
 
 	"""
 		Substraction Operator
-		x always >= y
 	"""
 	def __sub__(self,num2):
-		y = num2.num
-		x = self.num
+		y = str(num2.num)
+		x = str(self.num)
+		negative = False
 
+		# Case when negative
 		if(x[0]=='-' and y[0]=='-'):
 			# -x+y
 			return BigInt(x[1:])-BigInt(y[1:])
@@ -100,55 +101,64 @@ class BigInt:
 			# x+y
 			return BigInt(x)+BigInt(y[1:])
 
-		negative = False
+		# If self<num2 revert and put sign '-' on front of the result
 		if self<num2:
 			negative = True
 			temp = x
 			x = y
 			y = temp
-
-		x = str(x)
-		y = str(y)
 		max = len(x)
+
+		# Zero leading string for string y
 		for i in range(max-len(y)):
 			y = "0"+y
-		# print x
-		# print y
+
+		# Initial
 		reminder = 0
 		result = ""
+
+		# Substraction operation :)
 		for i in range(max):
-			# print x[len(x)-1-i], y[len(x)-1-i]
 			curr = int(x[len(x)-1-i])-int(y[len(y)-1-i])-reminder
 			if curr<0:
 				reminder = 1
 				curr = 10+curr
 			else:
 				reminder = 0
-			# print str(curr)+result
 			result = str(curr)+result
-		# print BigInt(result)
+
+		# Add negative sign when self>num2
 		if negative:
 			return BigInt('-'+result)
+
 		return BigInt(result)
 
+	"""
+		Div and mod for small portion of string number
+		This can optimize div mod operator
+	"""
 	def divmod_each(self,y):
 		x = self
-		q=BigInt("0")
+		q = BigInt("0")
+
+		# Calculate with substraction
 		while x>=y:
 			q+=BigInt("1")
 			x-=y
 		x = x.num
 		q = q.num
-		# if q=="0":
-		# 	q=""
 		if x=="0":
 			x = ""
 		return q,x
 
+	"""
+		Calculate div and mod, even for large number using long division, porogapit in Indonesia :)
+	"""
 	def divmod(self,y):
-		x = self.num
-		y = y.num
+		x = str(self.num)
+		y = str(y.num)
 
+		# Case when negative
 		if(x[0]=='-' and y[0]=='-'):
 			return BigInt(x[1:])/BigInt(y[1:]),BigInt('-'+(BigInt(x[1:])%BigInt(y[1:])).num)
 		if(x[0]=='-'):
@@ -158,8 +168,11 @@ class BigInt:
 			s = ((BigInt(x)/BigInt(y[1:]))+BigInt("1")).num
 			return BigInt('-'+s), BigInt(s)*BigInt(y)+BigInt(x)
 
+		# Initial
 		q = ""
 		j = len(x)
+
+		# Division operation :)
 		while BigInt(x)>=BigInt(y) or j>0:
 			j-=1
 			while True:
@@ -167,103 +180,53 @@ class BigInt:
 					x_head, x_tail = x, ""
 				else:
 					x_head, x_tail = x[:-j], x[-j:]
-				# print j
-				# print x_head, x_tail
 				if(BigInt(x_head)>=BigInt(y)) or j<=0:
 					break
 				j-=1
 				q = q+"0"
-			# print x_head, y
 			q_temp,x_add = BigInt(x_head).divmod_each(BigInt(y))
 			x = x_add + x_tail
 			q = q + q_temp
-			# print "Q", q
 		return BigInt(q),BigInt(x)
 
 	"""
 		Division and Modulo with base10
 	"""
 	def divmod10(self,exp):
-		x = self.num
-		y = exp
+		x = str(self.num)
+		y = str(exp)
 
-		x = str(x)
-		y = str(y)
+		# Div mod when the divisor is base10
 		if(len(y)>len(x)):
-			# print "BUM"
 			return BigInt("0"),BigInt(x)
-		# print BigInt(x[:len(x)-len(y)+1]), BigInt(x[-len(y)+1:])
 		return BigInt(x[:len(x)-len(y)+1]),BigInt(x[-len(y)+1:])
 
 	"""
+		Division and Modulo operator
+	"""
+	def __div__(self,y):
+		res, dummy = self.divmod(y)
+		return res
+	def __mod__(self,y):
+		dummy, res = self.divmod(y)
+		return res
+
+	"""
 		Multiplication with base10
-		x = Number
-		y = Number with base10 ex. 10000
 	"""
 	def mul10(self,x,y):
-		x = x.num
-		x = str(x)
+		x = str(x.num)
 		x += str(y)[1:]
 		return BigInt(x)
-
-	"""
-		Power Algorithm
-	"""
-	def __pow__(self,y):
-
-		result = BigInt("1")
-		while (y > BigInt("0")):
-			if (y%BigInt("2") == BigInt("1")):
-				result = (result * self)
-			self = (self * self)
-			y = y/BigInt("2");
-		return result;
-		# result=BigInt("1")
-		# x = self
-		# y = (int)(y.num) # assume never exceed 2^64-1
-		# while(y!=0):
-		# 	if(y&1==1):
-		# 		result=result*x
-		# 	y>>=1
-		# 	x=x*x
-		# return result
-
-	"""
-		Fast power mod algorithm
-	"""
-	def pow_mod(self,y,m):
-		if (self<BigInt("1") or y<BigInt("0") or m<BigInt("1")):
-			return -1
-		y=y%m
-		# y = int(y.num)
-		# print self
-		# print y
-		# print m
-		result = BigInt("1")
-		while (y > BigInt("0")):
-			if (y%BigInt("2") == BigInt("1")):
-				result = (result * self) % m
-			self = (self * self) % m
-			y = y/BigInt("2")
-		return result % m
-
-		# result=BigInt("1")
-		# x = self
-		# y = (int)(y.num) # assume never exceed 2^64-1
-		# while(y!=0):
-		# 	if(y&1==1):
-		# 		result=(result*x)%m
-		# 	y>>=1
-		# 	x=x*x%m
-		# return result		
 
 	"""
 		Karatsuba Multiplication with base10
 	"""
 	def __mul__(self,num2):
-		x = self.num
-		y = num2.num
+		x = str(self.num)
+		y = str(num2.num)
 
+		# Case when negative
 		if(x[0]=='-' and y[0]=='-'):
 			return BigInt(x[1:])*BigInt(y[1:])
 		if(x[0]=='-'):
@@ -271,17 +234,15 @@ class BigInt:
 		if(y[0]=='-'):
 			return BigInt('-'+(BigInt(y[1:])*BigInt(x)).num)
 
+		# Base case
 		if (len(x)==1 or len(y)==1):
-			# print type(BigInt(str(int(x)*int(y))))
-			# print x, y
-			# print BigInt(str(int(x)*int(y)))
 			return BigInt(str(int(x)*int(y)))
 		else:
 			n = max(len(x),len(y))
 			m = n/2
-			# B = 10
+
 			"""
-				Split number into form
+				Split number into form, where B=10
 					x = x1.B^m + x0
 					y = y1.B^m + y0
 			"""
@@ -302,17 +263,42 @@ class BigInt:
 			return result
 
 	"""
+		Power Algorithm
+	"""
+	def __pow__(self,y):
+
+		result = BigInt("1")
+		while (y > BigInt("0")):
+			if (y%BigInt("2") == BigInt("1")):
+				result = (result * self)
+			self = (self * self)
+			y = y/BigInt("2")
+		return result
+
+	"""
+		Fast power mod algorithm
+	"""
+	def pow_mod(self,y,m):
+		if (self<BigInt("1") or y<BigInt("0") or m<BigInt("1")):
+			return -1
+		y=y%m
+		result = BigInt("1")
+		while (y > BigInt("0")):
+			if (y%BigInt("2") == BigInt("1")):
+				result = (result * self) % m
+			self = (self * self) % m
+			y = y/BigInt("2")
+		return result % m
+
+	"""
 		Comparation
-		equal 0
-		greater than 1
-		less than 2
+		equal = 0
+		greater than = 1
+		less than = 2
 	"""
 	def cmp(self,y):
-		x = self.num
-		y = y.num
-
-		x = str(x)
-		y = str(y)
+		x = str(self.num)
+		y = str(y.num)
 
 		if(len(x)>len(y)):
 			return 1
@@ -326,6 +312,9 @@ class BigInt:
 				return 2
 		return 0
 
+	"""
+		Comparation operator
+	"""
 	def __eq__(self,num2):
 		return self.cmp(num2)==0
 	def __ne__(self,num2):
@@ -338,27 +327,3 @@ class BigInt:
 		return self.cmp(num2)==2
 	def __le__(self,num2):
 		return self.cmp(num2)==2 or self.cmp(num2)==0
-
-	def __div__(self,y):
-		res, dummy = self.divmod(y)
-		return res
-	def __mod__(self,y):
-		dummy, res = self.divmod(y)
-		return res
-# x = BigInt("930756436598645946732525352353252353223532596759372658362763298647268352")
-# y = BigInt("33253253")
-# print x-y
-# x = BigInt("14")
-# y = BigInt("-3")
-# x = BigInt("3000")
-# y = BigInt("3")
-# print x/y, x%y
-# print x/y, x%y
-# x = BigInt("100001")
-# y = BigInt("3")
-# print x/y, x%y
-# print x.split_on(3)[1]
-
-# z = "12345"
-# print x.length()
-# print x**y
