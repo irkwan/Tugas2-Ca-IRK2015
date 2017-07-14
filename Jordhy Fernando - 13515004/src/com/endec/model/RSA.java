@@ -125,4 +125,16 @@ public class RSA {
     result.append("d: ").append(d);
     return result.toString();
   }
+
+  public BigInteger getN() {
+    return n;
+  }
+
+  public BigInteger getE() {
+    return e;
+  }
+
+  public BigInteger getD() {
+    return d;
+  }
 }
