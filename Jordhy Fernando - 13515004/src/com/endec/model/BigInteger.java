@@ -78,7 +78,7 @@ public class BigInteger implements Comparable<BigInteger> {
    */
   public BigInteger(String val) {
     digits = new ArrayList<>();
-    if (val.length() == 1 && val.charAt(0) == '0') {
+    if ((val.length() == 1 && val.charAt(0) == '0') || val.length() == 0) {
       sign = 0;
     } else {
       int limit = 0;
@@ -858,7 +858,7 @@ public class BigInteger implements Comparable<BigInteger> {
   public static BigInteger random(BigInteger a, BigInteger b) throws IllegalArgumentException {
     return add(a, random(subtract(b, a)));
   }
-  
+
   /**
    * Returns true if b is probably prime, false if it's definitely composite.
    * If uncertainty <= 0, returns true.
@@ -965,6 +965,17 @@ public class BigInteger implements Comparable<BigInteger> {
       probablePrime = random(lowerBound, upperBound);
     }
     return probablePrime;
+  }
+
+  /**
+   * Returns the number of digits of this BigInteger in decimal representation.
+   * @return the number of digits of this BigInteger.
+   */
+  public int getNumOfDigits() {
+    if (sign == 0) {
+      return 1;
+    }
+    return digits.size();
   }
 
   /**
