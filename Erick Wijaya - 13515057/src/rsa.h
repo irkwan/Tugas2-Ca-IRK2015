@@ -31,6 +31,18 @@ public:
 	 */
 	string decrypt(string cipherText);
 
+	/**
+	 * Return the public key.
+	 * @return Public key.
+	 */
+	biginteger getPublicKey();
+
+	/**
+	 * Return the private key.
+	 * @return Private key.
+	 */
+	biginteger getPrivateKey();
+
 private:
 	biginteger n; // security parameter
 	biginteger e; // public key

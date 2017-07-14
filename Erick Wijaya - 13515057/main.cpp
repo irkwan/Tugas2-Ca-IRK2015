@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <ctime>
-#include "rsa.h"
+#include "src/rsa.h"
 using namespace std;
 
 string readFile(char* filename);
@@ -19,33 +19,44 @@ int main(int argc, char* argv[]){
 	double keyTime, encryptTime, decryptTime;
 
 	// Generate Public and Private Key
+	cout << "Generating Keys... ";
 	t = clock();
 	RSA security;
 	t = clock() - t;
 	keyTime = (double)t/CLOCKS_PER_SEC;
+	cout << "Done" << endl;
 
 	// Read From File
 	string input = readFile(argv[1]);
 	
 	// Encrypt Message
+	cout << "Encrypting text... ";
 	t = clock();
 	string cipher = security.encrypt(input);
 	t = clock() - t;
 	encryptTime = (double)t/CLOCKS_PER_SEC;
+	cout << "Done" << endl;
 	
 	// Decrypt Message
+	cout << "Decrypting text... ";
 	t = clock();
 	string plain = security.decrypt(cipher);
 	t = clock() - t;
 	decryptTime = (double)t/CLOCKS_PER_SEC;
+	cout << "Done" << endl << endl;
 
 	// Show Output
-	cout << setprecision(4) << fixed;
+	cout << setprecision(3) << fixed;
+	cout << "-- RESULT --" << endl;
 	cout << "Generate Key Time: " << keyTime << "s"<< endl;
 	cout << "Encrypt Time     : " << encryptTime << "s"<< endl;
 	cout << "Decrypt Time     : " << decryptTime << "s"<< endl;
-	cout << "CipherText: " << cipher << endl;
-	cout << "Decrypt Result: " << plain << endl;
+	cout << "Total Time       : " << keyTime + encryptTime + decryptTime << "s"<< endl << endl;
+	cout << "Public Key       : " << security.getPublicKey() << endl;
+	cout << "Private Key      : " << security.getPrivateKey() << endl << endl;
+	cout << "Plain Text       : " << endl << input << endl << endl;
+	cout << "Cipher Text      : " << endl << cipher << endl << endl;
+	cout << "Decrypt Result   : " << endl << plain << endl;
 	
 	return 0;
 }
