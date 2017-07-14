@@ -13,8 +13,8 @@ Cara Penggunaan:
 
 Screenshot:
 
-![Alt text](/Screenshot/screenshot1.png?raw=true "Screenshot 1")
+![alt text](/Screenshot/screenshot1.png?raw=true "Screenshot 1")
 
-![Alt text](/Screenshot/screenshot2.png?raw=true "Screenshot 2")
+![alt text](/Screenshot/screenshot2.png?raw=true "Screenshot 2")
 
-![Alt text](/Screenshot/screenshot3.png?raw=true "Screenshot 3")
+![alt text](/Screenshot/screenshot3.png?raw=true "Screenshot 3")
