@@ -153,6 +153,9 @@
               <model>
                 <item value="UTF-8"/>
                 <item value="Hex"/>
+                <item value="ASCII"/>
+                <item value="UTF-16"/>
+                <item value="UTF-32"/>
               </model>
             </properties>
           </component>

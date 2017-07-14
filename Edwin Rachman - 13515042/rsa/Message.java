@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.security.MessageDigest;
@@ -89,12 +88,12 @@ public class Message {
     byte[] seed = new byte[hashLength];
     random.nextBytes(seed);
 
-    byte[] dataBlockMask = maskGenerationFunction(seed, dataBlock.length, "SHA-1");
+    byte[] dataBlockMask = maskGenerationFunction(seed, dataBlock.length, hashAlgorithm);
     for (int i = 0; i < dataBlock.length; ++i) {
       dataBlock[i] ^= dataBlockMask[i];
     }
 
-    byte[] seedMask = maskGenerationFunction(dataBlock, seed.length, "SHA-1");
+    byte[] seedMask = maskGenerationFunction(dataBlock, seed.length, hashAlgorithm);
     for (int i = 0; i < seed.length; ++i) {
       seed[i] ^= seedMask[i];
     }
@@ -121,12 +120,12 @@ public class Message {
     byte[] seed = Arrays.copyOfRange(content, 1, hashLength + 1);
     byte[] dataBlock = Arrays.copyOfRange(content, hashLength + 1, modulusByteCount);
 
-    byte[] seedMask = maskGenerationFunction(dataBlock, seed.length, "SHA-1");
+    byte[] seedMask = maskGenerationFunction(dataBlock, seed.length, hashAlgorithm);
     for (int i = 0; i < seed.length; ++i) {
       seed[i] ^= seedMask[i];
     }
 
-    byte[] dataBlockMask = maskGenerationFunction(seed, dataBlock.length, "SHA-1");
+    byte[] dataBlockMask = maskGenerationFunction(seed, dataBlock.length, hashAlgorithm);
     for (int i = 0; i < dataBlock.length; ++i) {
       dataBlock[i] ^= dataBlockMask[i];
     }
