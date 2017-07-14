@@ -3,7 +3,7 @@
 ### Penjelasan singkat
 
 1. RSA menggunakan 2 bilangan prima (dalam program ini menggunakan bilangan prima sebesar 64bit yang otomatis tergenerate)
-2. Hitung nilai n = p*q dan phi = (p-1)*(q-1)
+2. Hitung nilai n = p\*q dan phi = (p-1)\*(q-1)
 3. Public key e, merupakan angka yang relatif prima dengan phi
 4. Private key d, merupakan angka yang diperoleh menggunakan multiplicative inverse e dan phi
 5. Text dienkripsi dengan public key, dan akan didekripsi dengan private key
@@ -21,3 +21,5 @@ $ python RSA.py
 Pastikan versi python2.7
 
 ### Screenshot
+
+![GitHub Logo](/Dery - 13515097/screenshot.png)
