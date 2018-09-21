@@ -7,7 +7,7 @@ This project consists of two applications, the *Command Line Interface (CLI) app
 
 ## RSA With GUI
 ### Run
-To run the application, download and unzip [MainGUI.zip](https://github.com/wijayaerick/Tugas2-Ca-IRK2015/blob/master/Erick%20Wijaya%20-%2013515057/MainGUI.zip) then open RSA-GUI.exe. Please note that currently the GUI application only works in Windows. If you have different OS, you can read the CLI documentation below the tutorial.
+To run the application, download and unzip from [Release](https://github.com/wijayaerick/Tugas2-Ca-IRK2015/releases) then open RSA-GUI.exe. Please note that currently the GUI application only works in Windows. If you have different OS, you can read the CLI documentation below the tutorial.
 
 ### Tutorial
 These are steps to use the RSA with GUI app.
@@ -57,9 +57,7 @@ The RSA class has two primary methods and a constructor. The constructor handles
 
 To encrypt a plaintext, the plaintext is converted into its ASCII values. Each values (ci) will be encrypted to create values for ciphertext (di). For each ci, calculate di = ci^e mod n. All the di values combined is the ciphertext. To decrypt the ciphertext back to plaintext, calculate ci = di^d mod n. All the ci values are converted back from ASCII to characters. To make the encryption and decryption safer, ci must be multiplied by random multiple of 256 before calculating di. After the decryption, the results must be divided by 256 to get the remainders. The remaindes are the ASCII values that are converted back to plaintext.
 
-Please note that this program is created for educational purpose and not supposed to be used in practical usage.
+*Please note that this program is created for educational purpose and not supposed to be used in practical usage.*
 
 
-## Documentation
-See the [cppdoc documentation](https://github.com/wijayaerick/Tugas2-Ca-IRK2015/tree/master/Erick%20Wijaya%20-%2013515057/cppdoc) for more information about the classes and their methods.
 
